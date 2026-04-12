@@ -8,7 +8,8 @@
  */
 
 import { useRef, useState, useEffect, useCallback } from 'react'
-import { BehaviorTreeRunner, CanvasAdapter, getBehavior } from '../engine'
+import { BehaviorTreeRunner, CanvasAdapter } from '../engine'
+import { getBehavior, getCharacter } from '../agents'
 import type { RunnerSnapshot, RunnerState } from '../engine'
 
 export interface UseBehaviorTreeResult {
@@ -131,16 +132,6 @@ export function useBehaviorTree(characterId: string): UseBehaviorTreeResult {
   return { canvasRef, snapshot, state, start, stop, pause, resume }
 }
 
-// Quick emoji lookup
-const emojiMap: Record<string, string> = {
-  'loyal-dog': '🐕',
-  'curious-cat': '🐈',
-  'guard-dino': '🦖',
-  'dance-bot': '🤖',
-  'zen-turtle': '🐢',
-  'scout-eagle': '🦅',
-}
-
 function getEmoji(id: string): string {
-  return emojiMap[id] ?? '🤖'
+  return getCharacter(id)?.emoji ?? '🤖'
 }

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { characters, getCharacter, getCharactersByCategory } from './characters';
+import { characters, getCharacter, getCharactersByCategory } from '../agents';
 
 describe('characters data', () => {
   it('has at least 1 character', () => {

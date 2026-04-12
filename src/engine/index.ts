@@ -34,5 +34,5 @@ export type { RunnerState, RunnerSnapshot } from './runner'
 // Canvas adapter
 export { CanvasAdapter } from './canvas-adapter'
 
-// Character behaviors
-export { getBehavior, getAllBehaviors } from './behaviors'
+// Character behaviors (re-exported from agents module)
+export { getBehavior, getAllBehaviors } from '../agents'

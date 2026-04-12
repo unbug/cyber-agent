@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Search, ArrowRight } from 'lucide-react'
-import { characters, type Character } from '@/data/characters'
+import { characters, type Character } from '@/agents'
 import styles from './Gallery.module.css'
 
 const CATEGORIES = [

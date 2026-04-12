@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { getBehavior, getAllBehaviors } from './behaviors'
+import { getBehavior, getAllBehaviors } from '../agents'
 import { hydrate, tick } from './executor'
 import { createBlackboard } from './types'
 import type { RobotAdapter } from './types'

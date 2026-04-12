@@ -2,7 +2,7 @@ import { useParams, Link } from 'react-router-dom'
 import { useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowLeft, Play, Square, Pause, Zap, Activity } from 'lucide-react'
-import { getCharacter } from '@/data/characters'
+import { getCharacter } from '@/agents'
 import { useBehaviorTree } from '@/hooks/useBehaviorTree'
 import styles from './Agent.module.css'
 
