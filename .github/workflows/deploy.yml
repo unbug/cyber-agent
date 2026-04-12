@@ -1,18 +1,16 @@
-name: Deploy to GitHub Pages
+name: Build & Deploy
 
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - 'docs/**'
 
 permissions:
   contents: write
 
-concurrency:
-  group: "pages"
-  cancel-in-progress: true
-
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -34,13 +32,14 @@ jobs:
         run: npm run build
 
       - name: Copy 404.html for SPA routing
-        run: cp dist/index.html dist/404.html
+        run: cp docs/index.html docs/404.html
 
       - name: Add .nojekyll
-        run: touch dist/.nojekyll
+        run: touch docs/.nojekyll
 
-      - name: Deploy to gh-pages branch
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
+      - name: Commit docs
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/ -f
+          git diff --cached --quiet && echo "No changes" || (git commit -m "chore: update build output [skip ci]" && git push)
