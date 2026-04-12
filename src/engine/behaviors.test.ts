@@ -17,14 +17,22 @@ const mockAdapter: RobotAdapter = {
 
 describe('Character behaviors', () => {
   it('has a behavior for every character', () => {
-    const ids = ['loyal-dog', 'curious-cat', 'guard-dino', 'dance-bot', 'zen-turtle', 'scout-eagle']
+    const ids = [
+      'loyal-dog',
+      'curious-cat',
+      'guard-dino',
+      'dance-bot',
+      'zen-turtle',
+      'scout-eagle',
+      'ws-demo',
+    ]
     for (const id of ids) {
       expect(getBehavior(id)).toBeDefined()
     }
   })
 
-  it('getAllBehaviors returns all 6', () => {
-    expect(getAllBehaviors()).toHaveLength(6)
+  it('getAllBehaviors returns all 7', () => {
+    expect(getAllBehaviors()).toHaveLength(7)
   })
 
   it('each behavior tree can hydrate and tick without crashing', () => {

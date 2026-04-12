@@ -34,5 +34,8 @@ export type { RunnerState, RunnerSnapshot } from './runner'
 // Canvas adapter
 export { CanvasAdapter } from './canvas-adapter'
 
+// WebSocket adapter
+export { WebSocketAdapter, createWebSocketAdapter } from './websocket-adapter'
+
 // Character behaviors (re-exported from agents module)
 export { getBehavior, getAllBehaviors } from '../agents'

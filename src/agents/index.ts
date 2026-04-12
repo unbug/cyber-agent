@@ -16,10 +16,11 @@ import * as guardDino from './guard-dino'
 import * as danceBot from './dance-bot'
 import * as zenTurtle from './zen-turtle'
 import * as scoutEagle from './scout-eagle'
+import * as wsDemo from './ws-demo'
 
 // ─── Registry ─────────────────────────────────────────────────
 
-const agents = [loyalDog, curiousCat, guardDino, danceBot, zenTurtle, scoutEagle]
+const agents = [loyalDog, curiousCat, guardDino, danceBot, zenTurtle, scoutEagle, wsDemo]
 
 const characterMap = new Map<string, Character>(
   agents.map((a) => [a.character.id, a.character]),
