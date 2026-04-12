@@ -8,19 +8,18 @@ const sections = [
     icon: <Zap size={18} />,
     title: 'Quick Start',
     content: `
-1. **Choose a Character** — Browse the Gallery and pick a personality that fits your robot.
-2. **Connect your Robot** — Use the WebSocket API to pair your hardware with CyberAgent.
-3. **Start the Behavior Tree** — The character's behavior tree will bring your robot to life.
+1. **Clone the repo** and start the dev server:
 
 \`\`\`bash
-# Install the SDK
-npm install @cyber-agent/sdk
-
-# Initialize connection
-import { CyberAgent } from '@cyber-agent/sdk';
-const agent = new CyberAgent({ character: 'loyal-dog' });
-await agent.connect('ws://your-robot:8080');
+git clone https://github.com/unbug/cyber-agent.git
+cd cyber-agent
+npm install
+npm run dev
 \`\`\`
+
+2. **Browse the Gallery** — pick any character.
+3. **Open the Agent page** — the behavior tree starts automatically.
+4. **Move your mouse** over the canvas — watch the character react in real-time.
     `.trim(),
   },
   {
@@ -28,63 +27,90 @@ await agent.connect('ws://your-robot:8080');
     icon: <Blocks size={18} />,
     title: 'Architecture',
     content: `
-CyberAgent uses a **Behavior Tree** architecture to give robots character-driven autonomy.
+CyberAgent uses a **Behavior Tree** engine to give characters autonomous decision-making.
 
-- **Character Layer** — Defines personality traits, emotional responses, and interaction patterns.
-- **Behavior Tree Engine** — Executes decision logic in real-time based on sensor input and character state.
-- **Robot Adapter** — Bridges the behavior tree to specific hardware (servo, LED, audio, motor).
-- **Telemetry** — Streams performance metrics and emotional state back to the dashboard.
+- **Behavior Tree Engine** — A composable tree of nodes (Sequence, Selector, Parallel, decorators, and leaf nodes) that evaluates every tick.
+- **Blackboard** — Shared key-value state: pointer position, energy, emotion, position. The tree reads and writes to the blackboard.
+- **Robot Adapter** — Pluggable output layer. The built-in \`CanvasAdapter\` renders on a 2D canvas. Future adapters (WebSocket, BLE, Serial) will drive real hardware.
+- **Character Behaviors** — Each character is a \`CharacterBehavior\` config: a tree definition + blackboard defaults + tick rate.
 
-Each character is a composable JSON config — easy to fork, remix, and extend.
+The engine runs at a fixed tick rate for logic (10 FPS default) and uses \`requestAnimationFrame\` for smooth rendering — decoupled for consistency.
     `.trim(),
   },
   {
     id: 'characters',
     icon: <Settings size={18} />,
-    title: 'Character System',
+    title: 'Behavior Tree Nodes',
     content: `
-Characters are defined with the following properties:
+**Composite Nodes** — control flow:
 
-| Field | Type | Description |
-|-------|------|-------------|
-| \`id\` | string | Unique identifier (kebab-case) |
-| \`name\` | string | Display name |
-| \`category\` | enum | companion / guard / performer / explorer |
-| \`personality\` | string[] | Trait descriptors |
-| \`difficulty\` | enum | beginner / intermediate / advanced |
-| \`behaviorTree\` | object | Root node of the behavior tree |
+| Node | Behavior |
+|------|----------|
+| \`sequence\` | Runs children left-to-right. Fails on first failure. |
+| \`selector\` | Runs children left-to-right. Succeeds on first success. |
+| \`parallel\` | Ticks ALL children. Succeeds when threshold met. |
 
-Characters support **inheritance** — create a base character and extend it with overrides.
+**Decorator Nodes** — modify child behavior:
+
+| Node | Behavior |
+|------|----------|
+| \`inverter\` | Flips success ↔ failure. |
+| \`repeater\` | Repeats child N times (-1 = forever). |
+| \`cooldown\` | Blocks re-execution for N milliseconds. |
+
+**Leaf Nodes** — actual work:
+
+| Node | Behavior |
+|------|----------|
+| \`condition\` | Checks a predicate on the blackboard. |
+| \`action\` | Executes a registered action function. |
+| \`wait\` | Pauses for N milliseconds. |
+
+Built-in actions include: \`moveToPointer\`, \`wander\`, \`patrol\`, \`bounceFromEdge\`, \`setEmotion\`, \`drainEnergy\`, \`restoreEnergy\`, and more.
     `.trim(),
   },
   {
     id: 'api',
     icon: <Terminal size={18} />,
-    title: 'API Reference',
+    title: 'Extending the Engine',
     content: `
-### WebSocket API
+### Custom Actions
 
+Register new actions that your characters can use:
+
+\`\`\`typescript
+import { registerAction } from './engine';
+
+registerAction('spin', (bb, adapter, args) => {
+  bb.rotation += (args?.speed as number) ?? 5;
+  return 'success';
+});
 \`\`\`
-ws://host:port/api/v1/agent/:characterId
+
+### Custom Conditions
+
+\`\`\`typescript
+import { registerCondition } from './engine';
+
+registerCondition('isNight', (bb) => {
+  return new Date().getHours() >= 20;
+});
 \`\`\`
 
-**Messages (Client → Server):**
-- \`{ "type": "command", "action": "start" | "stop" | "pause" }\`
-- \`{ "type": "input", "sensor": "...", "value": ... }\`
+### Custom Robot Adapter
 
-**Messages (Server → Client):**
-- \`{ "type": "telemetry", "data": { ... } }\`
-- \`{ "type": "state", "emotion": "...", "action": "..." }\`
-- \`{ "type": "error", "message": "..." }\`
+Implement the \`RobotAdapter\` interface to drive real hardware:
 
-### REST API
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | \`/api/v1/characters\` | List all characters |
-| GET | \`/api/v1/characters/:id\` | Get character detail |
-| POST | \`/api/v1/agents\` | Create agent session |
-| DELETE | \`/api/v1/agents/:id\` | Terminate session |
+\`\`\`typescript
+class MyRobotAdapter implements RobotAdapter {
+  readonly type = 'my-robot';
+  readonly name = 'My Custom Robot';
+  init(bb) { /* open connection */ }
+  update(bb) { /* send position/emotion to motors */ }
+  destroy() { /* close connection */ }
+  sendCommand(cmd) { /* forward to hardware */ }
+}
+\`\`\`
     `.trim(),
   },
   {
@@ -108,9 +134,9 @@ npm run dev
 - Submit a PR with a clear description
 
 **Creating a new Character:**
-1. Add the character definition to \`src/data/characters.ts\`
-2. Add a test in \`src/data/characters.test.ts\`
-3. Verify it renders correctly on the Gallery and Agent pages
+1. Define a \`CharacterBehavior\` in \`src/engine/behaviors.ts\`
+2. Add the character data in \`src/data/characters.ts\`
+3. The behavior tree engine will auto-register and run it
     `.trim(),
   },
 ];

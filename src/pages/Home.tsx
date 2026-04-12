@@ -7,22 +7,22 @@ const FEATURES = [
   {
     icon: Bot,
     title: 'Character Gallery',
-    desc: 'Hundreds of unique AI personalities — dogs, cats, dinosaurs, companions, guards, dancers — each with its own behavior tree.',
+    desc: 'Unique AI personalities — dogs, cats, dinosaurs, and more. Each with its own behavior tree that defines how it acts and reacts.',
   },
   {
     icon: Cpu,
-    title: 'Robot Integration',
-    desc: 'Plug-and-play adapters for DJI RoboMaster, Arduino, Raspberry Pi, and more. One click to pair.',
+    title: 'Live Behavior Trees',
+    desc: 'Real decision-making in your browser. Watch characters wander, follow your cursor, rest, and react — all driven by a behavior tree engine.',
   },
   {
     icon: Wifi,
-    title: 'Real-Time Control',
-    desc: 'WebSocket bi-directional streaming. Agent decisions flow to motors; sensor data flows back. Millisecond latency.',
+    title: 'Extensible Adapters',
+    desc: 'Open adapter architecture. Built-in Canvas renderer, with a plugin interface ready for WebSocket, BLE, and serial robot connections.',
   },
   {
     icon: Sparkles,
-    title: 'Self-Evolving AI',
-    desc: 'Agents learn from sensor data over time. Behavior trees grow and adapt — your robot gets smarter every day.',
+    title: 'Open Source',
+    desc: 'MIT licensed. Fork characters, create your own behavior trees, build custom robot adapters. The platform grows with the community.',
   },
 ]
 
@@ -56,7 +56,7 @@ export function HomePage() {
           </div>
 
           <h1 className={styles.heroTitle}>
-            Give your robot<br />
+            Give your robot {' '}
             <span className={styles.heroAccent}>a soul</span>
           </h1>
 

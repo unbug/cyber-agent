@@ -16,7 +16,7 @@ describe('Home page', () => {
   it('renders feature cards', () => {
     renderWithRouter(<Home />);
     expect(screen.getByText('Character Gallery')).toBeInTheDocument();
-    expect(screen.getByText('Robot Integration')).toBeInTheDocument();
+    expect(screen.getByText('Extensible Adapters')).toBeInTheDocument();
   });
 
   it('renders CTA link to gallery', () => {

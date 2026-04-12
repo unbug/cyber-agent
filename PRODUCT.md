@@ -24,10 +24,15 @@ Make character-driven AI accessible to every robot builder in the world. CyberAg
 ### Y1 Milestones
 - [ ] Gallery v1: 20+ curated characters across 4 categories
 - [ ] WebSocket Robot Adapter: ESP32, Raspberry Pi, Arduino
-- [ ] Behavior Tree v1: visual editor (drag-and-drop nodes)
+- [x] Behavior Tree Engine v1: runtime executor with 9 node types (Sequence, Selector, Parallel, Inverter, Repeater, Cooldown, Condition, Action, Wait)
+- [x] RobotAdapter Interface: hardware abstraction layer (`src/engine/types.ts`)
+- [x] CanvasAdapter: built-in browser renderer with trail, glow, bounce effects
+- [x] 6 Character Behaviors: loyal-dog, curious-cat, guard-dino, dance-bot, zen-turtle, scout-eagle
+- [x] Live Preview: interactive canvas on Agent page with real BT telemetry
+- [ ] Behavior Tree visual editor (drag-and-drop nodes)
 - [ ] SDK v1: `npm install @cyber-agent/sdk`
 - [ ] Community: GitHub Discussions, contributor guide
-- [ ] Deploy: GitHub Pages SPA, zero-cost hosting
+- [x] Deploy: GitHub Pages SPA, zero-cost hosting
 
 ### Y2 Milestones
 - [ ] Character Creator: web-based UI to design custom characters

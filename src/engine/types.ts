@@ -1,0 +1,219 @@
+/**
+ * CyberAgent Behavior Tree Engine — Core Types
+ *
+ * Architecture:
+ *   BehaviorTree ← defines character logic as a tree of nodes
+ *   Blackboard   ← shared key-value state (sensors, emotions, flags)
+ *   RobotAdapter ← hardware abstraction (browser canvas, WebSocket, BLE, serial...)
+ *
+ * Node types:
+ *   Composite: Sequence, Selector, Parallel
+ *   Decorator: Inverter, Repeater, Cooldown, Condition
+ *   Leaf:      Action, Wait
+ */
+
+// ─── Node Status ──────────────────────────────────────────────
+
+export type NodeStatus = 'success' | 'failure' | 'running'
+
+// ─── Blackboard (shared world state) ──────────────────────────
+
+export interface Blackboard {
+  // Perception
+  pointerX: number
+  pointerY: number
+  pointerActive: boolean
+  canvasWidth: number
+  canvasHeight: number
+
+  // Agent state
+  x: number
+  y: number
+  rotation: number    // degrees
+  speed: number       // pixels per tick
+  emotion: Emotion
+  energy: number      // 0-1
+  excitement: number  // 0-1
+
+  // Timing
+  tick: number
+  deltaMs: number
+  totalMs: number
+
+  // Custom flags (extensible by character behaviors)
+  [key: string]: unknown
+}
+
+export type Emotion = 'idle' | 'happy' | 'curious' | 'alert' | 'sleepy' | 'playful' | 'angry'
+
+export function createBlackboard(canvasWidth = 400, canvasHeight = 300): Blackboard {
+  return {
+    pointerX: 0,
+    pointerY: 0,
+    pointerActive: false,
+    canvasWidth,
+    canvasHeight,
+    x: canvasWidth / 2,
+    y: canvasHeight / 2,
+    rotation: 0,
+    speed: 2,
+    emotion: 'idle',
+    energy: 1,
+    excitement: 0,
+    tick: 0,
+    deltaMs: 0,
+    totalMs: 0,
+  }
+}
+
+// ─── Node Definitions (serializable JSON) ─────────────────────
+
+export type BehaviorNodeDef =
+  | SequenceDef
+  | SelectorDef
+  | ParallelDef
+  | InverterDef
+  | RepeaterDef
+  | CooldownDef
+  | ConditionDef
+  | ActionDef
+  | WaitDef
+
+interface BaseNodeDef {
+  /** Optional label for debugging/visualization */
+  name?: string
+}
+
+export interface SequenceDef extends BaseNodeDef {
+  type: 'sequence'
+  children: BehaviorNodeDef[]
+}
+
+export interface SelectorDef extends BaseNodeDef {
+  type: 'selector'
+  children: BehaviorNodeDef[]
+}
+
+export interface ParallelDef extends BaseNodeDef {
+  type: 'parallel'
+  /** Minimum successes required to return success. Default: all children */
+  successThreshold?: number
+  children: BehaviorNodeDef[]
+}
+
+export interface InverterDef extends BaseNodeDef {
+  type: 'inverter'
+  child: BehaviorNodeDef
+}
+
+export interface RepeaterDef extends BaseNodeDef {
+  type: 'repeater'
+  /** Number of times to repeat. -1 = forever */
+  count: number
+  child: BehaviorNodeDef
+}
+
+export interface CooldownDef extends BaseNodeDef {
+  type: 'cooldown'
+  /** Cooldown in milliseconds */
+  durationMs: number
+  child: BehaviorNodeDef
+}
+
+export interface ConditionDef extends BaseNodeDef {
+  type: 'condition'
+  /** Predicate key — resolved by the engine's condition registry */
+  check: string
+  /** Optional args passed to the condition function */
+  args?: Record<string, unknown>
+}
+
+export interface ActionDef extends BaseNodeDef {
+  type: 'action'
+  /** Action key — resolved by the engine's action registry */
+  action: string
+  /** Optional args passed to the action function */
+  args?: Record<string, unknown>
+}
+
+export interface WaitDef extends BaseNodeDef {
+  type: 'wait'
+  /** Wait duration in milliseconds */
+  durationMs: number
+}
+
+// ─── Runtime Node (hydrated from def, carries state) ──────────
+
+export interface RuntimeNode {
+  def: BehaviorNodeDef
+  status: NodeStatus | 'idle'
+  /** Per-node ephemeral state (cooldown timers, repeat counters, etc.) */
+  state: Record<string, unknown>
+  children: RuntimeNode[]
+}
+
+// ─── Action / Condition Registries ────────────────────────────
+
+export type ActionFn = (
+  bb: Blackboard,
+  adapter: RobotAdapter,
+  args?: Record<string, unknown>,
+) => NodeStatus
+
+export type ConditionFn = (
+  bb: Blackboard,
+  args?: Record<string, unknown>,
+) => boolean
+
+// ─── Robot Adapter (hardware abstraction) ─────────────────────
+
+/**
+ * RobotAdapter is the bridge between the behavior tree engine and
+ * any physical/virtual output. Implement this interface to support
+ * a new robot platform.
+ *
+ * Built-in adapters:
+ *   - CanvasAdapter: renders agent on a 2D <canvas> (browser demo)
+ *
+ * Future adapters:
+ *   - WebSocketAdapter: sends commands over WebSocket to a robot
+ *   - BLEAdapter: communicates via Web Bluetooth
+ *   - SerialAdapter: communicates via Web Serial
+ */
+export interface RobotAdapter {
+  /** Unique identifier for this adapter type */
+  readonly type: string
+
+  /** Human-readable name */
+  readonly name: string
+
+  /** Called once when the behavior tree starts */
+  init(bb: Blackboard): void
+
+  /** Called every tick — render/send the current state */
+  update(bb: Blackboard): void
+
+  /** Called when the behavior tree stops */
+  destroy(): void
+
+  /** Send a specific command (motor, LED, sound, etc.) */
+  sendCommand(command: AdapterCommand): void
+}
+
+export interface AdapterCommand {
+  type: string
+  payload: Record<string, unknown>
+}
+
+// ─── Character Behavior Definition ────────────────────────────
+
+export interface CharacterBehavior {
+  /** Must match a Character.id */
+  characterId: string
+  /** Root of the behavior tree */
+  tree: BehaviorNodeDef
+  /** Initial blackboard overrides */
+  defaults?: Partial<Blackboard>
+  /** Tick interval in ms (default: 100 = 10 FPS for logic) */
+  tickIntervalMs?: number
+}
