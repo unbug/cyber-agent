@@ -20,3 +20,4 @@ dist/
 coverage/
 *.tsbuildinfo
 next-env.d.ts
+.vite/
