@@ -1,7 +1,15 @@
-import { Outlet, Link, useLocation } from 'react-router-dom'
+import { useState } from 'react'
+import { useOutlet, Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Bot, BookOpen, Grid3X3, Github } from 'lucide-react'
 import styles from './Layout.module.css'
+
+/** Freeze outlet so exit animation keeps old content */
+function FrozenOutlet() {
+  const o = useOutlet()
+  const [outlet] = useState(o)
+  return outlet
+}
 
 const NAV_ITEMS = [
   { path: '/', label: 'Home', icon: Bot },
@@ -56,7 +64,7 @@ export function Layout() {
             exit={{ opacity: 0, y: -12 }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
           >
-            <Outlet />
+            <FrozenOutlet />
           </motion.div>
         </AnimatePresence>
       </main>
