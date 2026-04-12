@@ -19,6 +19,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
       
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -34,6 +37,9 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Copy 404.html for SPA routing
+        run: cp dist/index.html dist/404.html
       
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
