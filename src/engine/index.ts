@@ -37,5 +37,8 @@ export { CanvasAdapter } from './canvas-adapter'
 // WebSocket adapter
 export { WebSocketAdapter, createWebSocketAdapter } from './websocket-adapter'
 
+// RoboMaster motion adapter
+export { RoboMasterMotionAdapter, createRoboMasterAdapter, createRoboMasterWebSocketAdapter, motionPrimitive } from './robomaster-robot-adaptor'
+
 // Character behaviors (re-exported from agents module)
 export { getBehavior, getAllBehaviors } from '../agents'
