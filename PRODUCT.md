@@ -27,6 +27,7 @@ Make character-driven AI accessible to every robot builder in the world. CyberAg
 - [x] Behavior Tree Engine v1: runtime executor with 9 node types (Sequence, Selector, Parallel, Inverter, Repeater, Cooldown, Condition, Action, Wait)
 - [x] RobotAdapter Interface: hardware abstraction layer (`src/engine/types.ts`)
 - [x] CanvasAdapter: built-in browser renderer with trail, glow, bounce effects
+- [x] RoboMaster Motion Adapter: motion primitives for physical robot control (motors, LED, sound)
 - [x] 8 Character Behaviors: loyal-dog, curious-cat, guard-dino, dance-bot, zen-turtle, scout-eagle, robot-helper, ws-demo
 - [x] Live Preview: interactive canvas on Agent page with real BT telemetry
 - [ ] Behavior Tree visual editor (drag-and-drop nodes)
