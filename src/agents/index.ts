@@ -17,10 +17,11 @@ import * as danceBot from './dance-bot'
 import * as zenTurtle from './zen-turtle'
 import * as scoutEagle from './scout-eagle'
 import * as wsDemo from './ws-demo'
+import * as robotHelper from './robot-helper'
 
 // ─── Registry ─────────────────────────────────────────────────
 
-const agents = [loyalDog, curiousCat, guardDino, danceBot, zenTurtle, scoutEagle, wsDemo]
+const agents = [loyalDog, curiousCat, guardDino, danceBot, zenTurtle, scoutEagle, wsDemo, robotHelper]
 
 const characterMap = new Map<string, Character>(
   agents.map((a) => [a.character.id, a.character]),

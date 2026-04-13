@@ -25,14 +25,15 @@ describe('Character behaviors', () => {
       'zen-turtle',
       'scout-eagle',
       'ws-demo',
+      'robot-helper',
     ]
     for (const id of ids) {
       expect(getBehavior(id)).toBeDefined()
     }
   })
 
-  it('getAllBehaviors returns all 7', () => {
-    expect(getAllBehaviors()).toHaveLength(7)
+  it('getAllBehaviors returns all 8', () => {
+    expect(getAllBehaviors()).toHaveLength(8)
   })
 
   it('each behavior tree can hydrate and tick without crashing', () => {
