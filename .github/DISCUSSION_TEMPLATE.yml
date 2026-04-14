@@ -1,0 +1,171 @@
+# Community Question Template
+
+> Welcome to the CyberAgent community! Please use one of the discussion templates below.
+
+---
+
+## 🐛 Bug Report
+
+**Before submitting**, please search existing issues to avoid duplicates.
+
+```markdown
+**Describe the bug**
+A clear and concise description of what the bug is.
+
+**To Reproduce**
+Steps to reproduce the bug:
+1. Navigate to '...'
+2. Click on '...'
+3. Scroll down to '...'
+4. See error
+
+**Expected behavior**
+A clear and concise description of what you expected to happen.
+
+**Screenshots**
+If applicable, add screenshots to help explain your problem.
+
+**Environment**
+- OS: [e.g. macOS, Windows, Linux]
+- Browser: [e.g. Chrome, Safari, Firefox]
+- CyberAgent version: [e.g. v1.0.0]
+
+**Additional context**
+Add any other context about the problem here.
+```
+
+---
+
+## 🚀 Feature Request
+
+```markdown
+**Describe the feature**
+A clear and concise description of what you want to happen.
+
+**Problem it solves**
+What problem are you trying to solve? Who would benefit from this feature?
+
+**Proposed solution**
+How would you implement this feature? Any ideas or technical thoughts?
+
+**Alternatives considered**
+Are there other ways to solve this problem that you've considered?
+
+**Additional context**
+Add any other context or screenshots about the feature request here.
+```
+
+---
+
+## 💬 General Question/Discussion
+
+```markdown
+**What's your question?**
+Be specific about what you're asking.
+
+**Context**
+Provide context about where you're stuck or what you're curious about.
+
+**What I've tried**
+What have you already tried or researched?
+
+**Additional context**
+Any other relevant information.
+```
+
+---
+
+## 🎉 Show & Tell
+
+Share what you've built with CyberAgent!
+
+```markdown
+**What did you build?**
+- Name of your character/project
+- Brief description
+
+**What's unique about it?**
+What makes it special or different?
+
+**Links/References**
+- GitHub repository link
+- Screenshot/demo video link
+- Any relevant documentation
+
+**What was the hardest part?**
+Share a challenge you overcame or a lesson you learned.
+
+**Want to contribute more?**
+Any ideas for expanding this project or other CyberAgent integrations you plan to try?
+```
+
+---
+
+## 📢 Announcements
+
+Use this template for official CyberAgent team announcements.
+
+```markdown
+**Announcement Title**
+Clear, specific title of the announcement.
+
+**What's changing?**
+- What is the announcement about?
+- When is it happening?
+- What are the key dates/timelines?
+
+**Impact on users**
+- How does this affect current users?
+- Do users need to take any action?
+- Will there be any downtime?
+
+**Links**
+- Documentation links
+- Migration guides
+- Related issues/PRs
+
+**Contact info**
+Who to reach out to for questions or support.
+```
+
+---
+
+## 🎯 Use-Case Discussion
+
+Share your specific use case or ask how CyberAgent could help.
+
+```markdown
+**My Use Case**
+- Robot type: [e.g., RoboMaster, DIY robot, educational kit]
+- Goal: [What you want to achieve]
+- Constraints: [Battery, processing power, etc.]
+
+**Current Status**
+What have you tried so far? What's working? What's not?
+
+**What you need help with**
+Be specific about what guidance or features you're looking for.
+
+**Any code examples?**
+Paste relevant snippets if applicable.
+```
+
+---
+
+## 📋 Guidelines
+
+### Before posting:
+1. ✅ **Search first** - Make sure your question/topic hasn't been answered
+2. ✅ **Use appropriate template** - Helps us categorize and respond faster
+3. ✅ **Be respectful** - All community members should feel welcome
+4. ✅ **Add tags** - Use labels to make your post discoverable
+
+### After posting:
+- 🎯 Update your post if you find the answer
+- 👍 Upvote helpful discussions
+- 🔖 Bookmark useful threads for future reference
+- 🙏 Thank people who helped you!
+
+---
+
+*This template helps us keep discussions organized and find answers faster. Thank you for being a valued member of the CyberAgent community! 🚀*
