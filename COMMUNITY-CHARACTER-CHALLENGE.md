@@ -25,7 +25,7 @@ All must be **production-ready** before community launch.
 ## Timeline
 
 | Milestone | Original | Current |
-|--|------|--------|
+|--|----|---|
 | Community challenge launch | Q2 2026 (April-June) | Q3 2026 (July-Sept) |
 | Technical foundation | After launch | Before launch |
 | Public whitepaper | Not planned | Q3 2026 (after launch) |
