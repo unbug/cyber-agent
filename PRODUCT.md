@@ -31,6 +31,8 @@ Make character-driven AI accessible to every robot builder in the world. CyberAg
 - [x] RoboMaster WebSocket Adapter: factory to create complete WebSocket + RoboMaster pipeline
 - [x] 8 Character Behaviors: loyal-dog, curious-cat, guard-dino, dance-bot, zen-turtle, scout-eagle, robot-helper, ws-demo
 - [x] Live Preview: interactive canvas on Agent page with real BT telemetry
+- [x] RoboMasterAdapterV2: Priority command queue with emergency stop support
+- [x] Production build pipeline passing all 31 tests
 - [ ] Behavior Tree visual editor (drag-and-drop nodes)
 - [ ] SDK v1: `npm install @cyber-agent/sdk`
 - [ ] Community: GitHub Discussions, contributor guide
