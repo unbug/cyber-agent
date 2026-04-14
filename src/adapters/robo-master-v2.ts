@@ -1,11 +1,17 @@
-import type { RobotAdapter, BTNode, Blackboard, BTStatus } from '../engine/types';
-import { CommandType, CommandPriority } from '../types';
+import type { RobotAdapter, AdapterCommand } from '../engine/types';
 
 interface RoboMasterAdapterV2Config {
   host: string;
   port: number;
   heartbeatInterval: number;  // 100ms (vs 2000ms in v1.0)
   useBinaryProtocol: boolean;
+}
+
+enum CommandPriority {
+  EMERGENCY_STOP = 1000,
+  HIGH = 500,
+  MED = 250,
+  REGULAR = 0,
 }
 
 interface CommandEntry {
@@ -20,7 +26,7 @@ interface CommandEntry {
  */
 class PriorityCommandQueue {
   private queues: Map<number, CommandEntry[]> = new Map();
-  private maxPriority: number = 0;
+  private maxPriority: number = -1;
   
   /**
    * Add command with priority. Higher priority values processed first.
@@ -37,25 +43,32 @@ class PriorityCommandQueue {
       retryCount: 0,
     };
     
-    this.queues.get(priority)!.push(entry);
+    const queue = this.queues.get(priority)!;
+    queue.push(entry);
     this.maxPriority = Math.max(this.maxPriority, priority);
-    return this.queues.get(priority)!.length - 1;
+    return queue.length - 1;
   }
   
   /**
    * Dequeue command with highest priority (always O(1))
    */
-  dequeue() {
+  dequeue(): CommandEntry | null {
     // Skip empty queues from high to low priority
     while (this.maxPriority >= 0 && !this.queues.get(this.maxPriority)!.length) {
+      this.queues.delete(this.maxPriority);
       this.maxPriority--;
-      if (this.maxPriority < 0) return null;
     }
+    
+    if (this.maxPriority < 0) return null;
     
     const entries = this.queues.get(this.maxPriority);
     if (!entries) return null;
     
-    const entry = entries.pop();
+    const entry = entries.pop()!;
+    if (entries.length === 0) {
+      this.queues.delete(this.maxPriority);
+      this.maxPriority--;
+    }
     return entry;
   }
   
@@ -64,7 +77,8 @@ class PriorityCommandQueue {
    */
   hasEmergency(): boolean {
     const entries = this.queues.get(CommandPriority.EMERGENCY_STOP);
-    return entries && entries.some(e => e.command.type === 'emergency_stop');
+    if (!entries) return false;
+    return entries.some(e => e.command.type === 'emergency_stop');
   }
   
   get length(): number {
@@ -78,6 +92,9 @@ class PriorityCommandQueue {
 class HeartbeatSystem {
   private ws: WebSocket | null = null;
   private heartbeatInterval: number = 100;
+  private reconnectAttempts: number = 0;
+  private maxReconnectAttempts: number = 10;
+  private reconnectTimer: number | null = null;
   
   constructor(private config: RoboMasterAdapterV2Config) {}
   
@@ -87,42 +104,59 @@ class HeartbeatSystem {
       
       this.ws.onopen = () => {
         console.log('[RoboMasterV2] Connected to', this.config.host);
+        this.reconnectAttempts = 0;
         this.startHeartbeat();
         resolve();
       };
       
       this.ws.onerror = (error) => {
+        console.error('[RoboMasterV2] WebSocket error:', error);
         reject(error);
       };
       
       this.ws.onclose = (event) => {
         console.log('[RoboMasterV2] Disconnected', event.code, event.reason);
-        this.attemptReconnect();
+        this.ws = null;
+        if (this.reconnectAttempts < this.maxReconnectAttempts) {
+          this.attemptReconnect();
+        } else {
+          console.error('[RoboMasterV2] Max reconnect attempts reached');
+        }
       };
     });
   }
   
   private startHeartbeat() {
+    this.heartbeatInterval = this.config.heartbeatInterval || 100;
     setInterval(() => {
-      const heartbeat = JSON.stringify({
-        type: 'heartbeat',
-        timestamp: Date.now(),
-        status: 'ok',
-      });
-      this.ws!.send(heartbeat);
+      if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+        const heartbeat = JSON.stringify({
+          type: 'heartbeat',
+          timestamp: Date.now(),
+          status: 'ok',
+        });
+        this.ws.send(heartbeat);
+      }
     }, this.heartbeatInterval);
   }
   
-  async attemptReconnect(): Promise<void> {
-    console.log('[RoboMasterV2] Attempting reconnect...');
-    await this.connect();
+  private attemptReconnect(): void {
+    this.reconnectAttempts++;
+    const delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts), 30000);
+    console.log(`[RoboMasterV2] Reconnect attempt ${this.reconnectAttempts} in ${delay}ms`);
+    this.reconnectTimer = window.setTimeout(() => {
+      this.connect();
+    }, delay);
   }
   
-  getWebSocket() {
+  getWebSocket(): WebSocket | null {
     return this.ws;
   }
   
-  async disconnect() {
+  async disconnect(): Promise<void> {
+    if (this.reconnectTimer) {
+      window.clearTimeout(this.reconnectTimer);
+    }
     if (this.ws) {
       this.ws.close();
     }
@@ -135,19 +169,23 @@ class HeartbeatSystem {
  * Target: <1ms tick latency, <100ms recovery, <1MB memory
  */
 export class RoboMasterAdapterV2 implements RobotAdapter {
-  private websocket: WebSocket | null = null;
-  private heartbeat: HeartbeatSystem | null = null;
-  private commandQueue: PriorityCommandQueue | null = null;
-  private blackboard: Blackboard | null = null;
+  readonly type = 'robo-master-v2';
+  readonly name = 'RoboMaster Adapter V2';
+  private readonly heartbeat: HeartbeatSystem;
+  private commandQueue: PriorityCommandQueue;
   private isConnecting: boolean = false;
   
-  private constructor(private config: RoboMasterAdapterV2Config) {
+  private constructor(config: RoboMasterAdapterV2Config) {
+    this.heartbeat = new HeartbeatSystem(config);
     this.commandQueue = new PriorityCommandQueue();
+    // Initialize immediately after construction
+    if (!this.commandQueue) {
+      throw new Error('Command queue initialization failed');
+    }
   }
   
   static create(config: RoboMasterAdapterV2Config): Promise<RoboMasterAdapterV2> {
     const adapter = new RoboMasterAdapterV2(config);
-    adapter.heartbeat = new HeartbeatSystem(config);
     return adapter.heartbeat.connect().then(() => adapter);
   }
   
@@ -159,7 +197,7 @@ export class RoboMasterAdapterV2 implements RobotAdapter {
     if (this.commandQueue.hasEmergency()) {
       const emergencyEntry = this.commandQueue.dequeue();
       if (emergencyEntry) {
-        await this.executeCommand(emergencyEntry.command);
+        await this.sendCommand(emergencyEntry.command);
         return;
       }
     }
@@ -167,35 +205,73 @@ export class RoboMasterAdapterV2 implements RobotAdapter {
     // Process next highest priority command
     const nextEntry = this.commandQueue.dequeue();
     if (nextEntry) {
-      this.heartbeat!.getWebSocket().send(JSON.stringify(nextEntry.command));
+      const socket = this.heartbeat.getWebSocket();
+      if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify(nextEntry.command));
+      }
     }
   }
   
   /**
    * Execute robot action -> queue with priority
    */
-  async executeAction(action: any): Promise<any> {
+  executeAction(action: any): Promise<any> {
     const priority = action.priority || CommandPriority.REGULAR;
-    this.commandQueue!.enqueue(action, priority);
-    return { success: true, delay: 0 };
+    this.commandQueue.enqueue(action, priority);
+    return Promise.resolve({ success: true, delay: 0 });
   }
   
-  async subscribeSensor(
-    callback: (data: any) => void,
-    sensorTypes: string[]
+  subscribeSensor(
+    _callback: (data: any) => void,
+    _sensorTypes: string[]
   ): () => void {
     // Implementation: subscribe to sensor data from robot
     return () => {};
   }
   
+  init(): void {
+    console.log('[RoboMasterV2] Adapter initialized');
+  }
+  
   async connect(): Promise<void> {
     if (this.isConnecting) return;
     this.isConnecting = true;
-    this.websocket = this.heartbeat!.getWebSocket();
+    console.log('[RoboMasterV2] Connection initiated');
   }
   
-  async disconnect(): Promise<void> {
-    this.heartbeat!.disconnect();
-    this.isConnecting = false;
+  update(): void {
+    // State updates are sent via tick method for priority commands
   }
+  
+  sendCommand(command: AdapterCommand): void {
+    this.commandQueue.enqueue(command, CommandPriority.REGULAR);
+  }
+  
+  async executeCommand(command: any): Promise<any> {
+    return this.executeAction(command);
+  }
+  
+  async destroy(): Promise<void> {
+    await this.heartbeat.disconnect();
+    this.isConnecting = false;
+    this.commandQueue = new PriorityCommandQueue();
+    console.log('[RoboMasterV2] Adapter destroyed');
+  }
+  
+  async emergencyStop(): Promise<void> {
+    this.commandQueue.enqueue(
+      { type: 'emergency_stop', payload: {} },
+      CommandPriority.EMERGENCY_STOP
+    );
+  }
+}
+
+// Factory function
+export function createRoboMasterAdapter(
+  config: Omit<RoboMasterAdapterV2Config, 'useBinaryProtocol'>
+): Promise<RoboMasterAdapterV2> {
+  return RoboMasterAdapterV2.create({
+    ...config,
+    useBinaryProtocol: false, // Currently not supported
+  });
 }
