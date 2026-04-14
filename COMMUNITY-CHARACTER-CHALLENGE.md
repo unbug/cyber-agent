@@ -1,106 +1,43 @@
-# 🎉 Community Character Challenge
+# 🛑 COMMUNITY CHARACTER CHALLENGE — [PAUSED]
 
-**Create a new CyberAgent character. Win $1K + hardware prizes and global recognition.**
-
----
-
-## 🏆 Prize Pool
-
-- **🥇 Grand Prize ($1,000)**: Best overall character
-- **🥈 Innovation Award ($800)**: Most creative mechanism
-- **🥉 Technical Excellence ($600)**: Cleanest implementation
-- **5 Special Mentions ($200 each)**: Most educational, best companion, etc.
-- **Hardware Grants**: Custom robotic kits for top 3 winners
-
-**Total Prize Pool: $2,600**
+> **Original intention**: Launch community-driven character creation with $2,600 prize
+> **Current status**: PAUSED pending technical foundation completion (Q3 2026)
+> **Resumption**: After 4 flagship robot adapters + emotional system v1.0 complete (Q3 2026)
 
 ---
 
-## 🎯 What to Submit
+## Why Paused?
 
-Create a new character with:
-1. **Unique personality** (not just copy of existing characters)
-2. **Clear behavior tree** (20-50 BT nodes max)
-3. **Custom actions** (at least 2 that define its special moves)
-4. **Good documentation** (README or character description)
+**Strategic Pivot**: From "community-first" to "technical moat-first"
 
-**Submissions due**: June 30, 2026  
-**Winners announced**: July 15, 2026
+- **Original plan**: Launch community in Q2 2026 to rapidly expand
+- **Current plan**: Technical foundation first (4 moats), community after (Q3 2026)
 
----
+## The Four Technical Moats
 
-## 🚀 How to Participate
+1. **Robot adapter breadth** (50+ platforms) — time barrier
+2. **Emotional system depth** (VAL model) — domain knowledge barrier
+3. **Sim→physical transfer** (90%+ accuracy) — resource barrier
+4. **ESP32 1ms tick, 50KB** — technical difficulty barrier
 
-1. **Read the [character template](character-template.md)**
-2. **Create your character** in `src/characters/your-name.ts`
-3. **Follow our CONTRIBUTING.md** for setup and testing
-4. **Create a Pull Request** (title: `feat: [Your Character] - Challenge Entry`)
-5. **Vote on submissions** (community voting counts for 30% of judging)
+All must be **production-ready** before community launch.
 
----
+## Timeline
 
-## 💡 Character Inspiration
+| Milestone | Original | Current |
+|--|------|--------|
+| Community challenge launch | Q2 2026 (April-June) | Q3 2026 (July-Sept) |
+| Technical foundation | After launch | Before launch |
+| Public whitepaper | Not planned | Q3 2026 (after launch) |
 
-**Categories we're especially looking for:**
-- 📚 Educational bots (teach, guide, mentor)
-- 🎭 Entertainers (dance, joke, perform)
-- 🛡️ Protectors (guard, help, assist)
-- 👥 Companions (emotional support, conversation)
+## What to do now?
 
-**Remember**: Simple > Complex. A character with ONE brilliant behavior is better than 10 mediocre ones.
+- Keep this document for future reference
+- Monitor technical foundation progress
+- Wait for Q3 2026 resumption signal
 
 ---
 
-## 🎨 Example Ideas
+*Technical foundation first. Community second. Deep work over broad reach.*
 
-- **Cyber Librarian**: Organizes data, helpful assistant
-- **Robot Caretaker**: Tends virtual plants, responds to environment
-- **Dance Party Host**: Synchronized routines, crowd interaction
-- **Emotional Advisor**: Detects others' moods, provides comfort
-- **Memory Keeper**: Records shared moments, tells stories
-
-**Have your own idea? Submit it!**
-
----
-
-## ⏰ Timeline
-
-| Date | Event |
-|------|-------|
-| May 15 | Challenge Launch |
-| May 20 | Q&A Session (Discord Hangout) |
-| June 15 | Check-in Point (share progress) |
-| **June 30** | **Final Submissions Due** |
-| July 7 | Judging Period |
-| **July 15** | **Winners Announced** |
-
----
-
-## 📋 Submission Checklist
-
-- [ ] Created character file following template
-- [ ] Added character to `characters.ts`
-- [ ] Tested locally with `npm test`
-- [ ] Wrote documentation
-- [ ] Created PR with correct title format
-- [ ] Tagged PR as `challenge-entry`
-
----
-
-## 🗣️ Get Help
-
-- **Technical questions**: GitHub Issues or Discord #builders
-- **Character design**: Discord #role-design channel
-- **Judging questions**: Core team via Discord
-
----
-
-## 📚 Resources
-
-- [CONTRIBUTING.md](https://github.com/unbug/cyber-agent/blob/main/CONTRIBUTING.md) - Complete contributor guide
-- [character-template.md](https://github.com/unbug/cyber-agent/blob/main/character-template.md) - Starter template
-- [ENGINE.md](https://github.com/unbug/cyber-agent/blob/main/ENGINE.md) - Behavior tree API
-
----
-
-**Ready to create something amazing? Let's make robots more joyful, one personality at a time! 🎉**
+**Paused as of: April 14, 2026**
