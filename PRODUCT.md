@@ -29,7 +29,7 @@ Make character-driven AI accessible to every robot builder in the world. CyberAg
 - [x] CanvasAdapter: built-in browser renderer with trail, glow, bounce effects
 - [x] RoboMasterMotionAdapter: motion primitives (motors, duration moves, rotation, LED control, sound)
 - [x] RoboMaster WebSocket Adapter: factory to create complete WebSocket + RoboMaster pipeline
-- [x] 8 Character Behaviors: loyal-dog, curious-cat, guard-dino, dance-bot, zen-turtle, scout-eagle, robot-helper, ws-demo
+|- [x] 11 Character Behaviors: loyal-dog, curious-cat, guard-dino, dance-bot, zen-turtle, scout-eagle, robot-helper, ws-demo, unitree-loyal-dog, unitree-scout, unitree-guardian
 - [x] Live Preview: interactive canvas on Agent page with real BT telemetry
 - [x] RoboMasterAdapterV2: Priority command queue with emergency stop support
 - [x] Production build pipeline passing all 31 tests
