@@ -26,14 +26,17 @@ describe('Character behaviors', () => {
       'scout-eagle',
       'ws-demo',
       'robot-helper',
+      'unitree-loyal-dog',
+      'unitree-scout',
+      'unitree-guardian',
     ]
     for (const id of ids) {
       expect(getBehavior(id)).toBeDefined()
     }
   })
 
-  it('getAllBehaviors returns all 8', () => {
-    expect(getAllBehaviors()).toHaveLength(8)
+  it('getAllBehaviors returns all 11', () => {
+    expect(getAllBehaviors()).toHaveLength(11)
   })
 
   it('each behavior tree can hydrate and tick without crashing', () => {
