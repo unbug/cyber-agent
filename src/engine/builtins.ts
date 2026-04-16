@@ -61,6 +61,21 @@ registerCondition('tickModulo', (bb, args) => {
 })
 
 // ═══════════════════════════════════════════════════════════════
+// Robotics-specific conditions
+// ═══════════════════════════════════════════════════════════════
+
+registerCondition('energyLow', (bb) => bb.energy < 0.3)
+registerCondition('energyHigh', (bb) => bb.energy > 0.7)
+registerCondition('onRoughTerrain', (_bb, _args) => false)
+registerCondition('balanceStable', (bb) => bb.emotion === 'idle')
+registerCondition('balanceCritical', (bb) => bb.energy < 0.2)
+registerCondition('isAlerted', (bb) => bb.emotion === 'alert')
+registerCondition('notAlerted', (bb) => bb.emotion !== 'alert')
+registerCondition('shouldMap', (bb) => bb.tick % 50 === 0)
+registerCondition('anomalyDetected', (_bb, _args) => false)
+registerCondition('positioningComplete', (_bb, _args) => Math.random() > 0.7)
+
+// ═══════════════════════════════════════════════════════════════
 //  ACTIONS — Movement
 // ═══════════════════════════════════════════════════════════════
 
@@ -205,8 +220,47 @@ registerAction('idle', (): NodeStatus => {
 })
 
 // ═══════════════════════════════════════════════════════════════
-//  ACTIONS — Robot Commands (forwarded to adapter)
+// Robotics-specific Actions (heartbeat, balance, terrain adaptation)
+// ═══════════════════════════════════════════════════════════
+
+registerAction('heartbeat', (_bb, _adapter, _args): NodeStatus => {
+  // Simulates heartbeat/sensor update — always succeeds
+  return 'success'
+})
+
+registerAction('followWithBalanceCheck', (bb, _adapter, _args): NodeStatus => {
+  // Follow action with balance check — safe follow for quadrupeds
+  const speed = (_args?.speed as number) ?? (bb.speed * 0.5)
+  if (bb.energy < 0.2) return 'failure' // Don't follow if critically low
+  const dx = bb.pointerX - bb.x
+  const dy = bb.pointerY - bb.y
+  const dist = Math.sqrt(dx * dx + dy * dy)
+  if (dist < speed) {
+    bb.x = bb.pointerX
+    bb.y = bb.pointerY
+    return 'success'
+  }
+  bb.x += (dx / dist) * speed
+  bb.y += (dy / dist) * speed
+  bb.rotation = Math.atan2(dy, dx) * (180 / Math.PI)
+  return 'running'
+})
+
+registerAction('adaptToTerrain', (_bb, _adapter, _args): NodeStatus => {
+  // Simulates terrain adaptation — adjusts speed based on roughness
+  // Always succeeds in simulation (real robots would query sensors)
+  return 'success'
+})
+
+registerAction('walkOnTerrain', (_bb, _adapter, _args): NodeStatus => {
+  // Simulates terrain-aware walking for scouting/mapping
+  // Adjusts gait based on simulation of terrain type
+  return 'running'
+})
+
 // ═══════════════════════════════════════════════════════════════
+//  ACTIONS — Robot Commands (forwarded to adapter)
+// ════════════════════════════════════════════════════════════════════
 
 registerAction('sendCommand', (_bb, adapter, args): NodeStatus => {
   const cmdType = (args?.type as string) ?? 'noop'
