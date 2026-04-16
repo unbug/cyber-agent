@@ -21,26 +21,65 @@ import * as robotHelper from './robot-helper'
 import * as unitreeLoyalDog from './unitree-loyal-dog'
 import * as unitreeScout from './unitree-scout'
 import * as unitreeGuardian from './unitree-guardian'
+// New agents
+import * as puppy from './puppy'
+import * as oldDog from './old-dog'
+import * as squirrelHunter from './squirrel-hunter'
+import * as beachCruiser from './beach-cruiser'
+import * as nightWatch from './night-watch'
+import * as courierBot from './courier-bot'
+import * as gardenerBot from './gardener-bot'
+import * as securityDrone from './security-drone'
+import * as playgroundBuddy from './playground-buddy'
 
-// ─── Registry ─────────────────────────────────────────────────
+// ─── Registry ────────────────────────────────────────────────
 
-const agents = [
-  loyalDog, curiousCat, guardDino, danceBot, zenTurtle, 
+const characterMap = new Map<string, Character>()
+const behaviorMap = new Map<string, CharacterBehavior>()
+
+// Agent module export types
+type AgentWithOnlyCharacter = { character: Character }
+type AgentWithBehavior = { character: Character; behavior: CharacterBehavior }
+
+function registerAgent(agent: AgentWithOnlyCharacter | AgentWithBehavior, id: string) {
+  characterMap.set(id, agent.character)
+  if ('behavior' in agent && agent.behavior) {
+    behaviorMap.set(id, agent.behavior)
+  }
+}
+
+registerAgent(loyalDog, 'loyal-dog')
+registerAgent(curiousCat, 'curious-cat')
+registerAgent(guardDino, 'guard-dino')
+registerAgent(danceBot, 'dance-bot')
+registerAgent(zenTurtle, 'zen-turtle')
+registerAgent(scoutEagle, 'scout-eagle')
+registerAgent(wsDemo, 'ws-demo')
+registerAgent(robotHelper, 'robot-helper')
+registerAgent(unitreeLoyalDog, 'unitree-loyal-dog')
+registerAgent(unitreeScout, 'unitree-scout')
+registerAgent(unitreeGuardian, 'unitree-guardian')
+registerAgent(puppy, 'puppy')
+registerAgent(oldDog, 'old-dog')
+registerAgent(squirrelHunter, 'squirrel-hunter')
+registerAgent(beachCruiser, 'beach-cruiser')
+registerAgent(nightWatch, 'night-watch')
+registerAgent(courierBot, 'courier-bot')
+registerAgent(gardenerBot, 'gardener-bot')
+registerAgent(securityDrone, 'security-drone')
+registerAgent(playgroundBuddy, 'playground-buddy')
+
+const agentList: Array<{ character: Character }> = [
+  loyalDog, curiousCat, guardDino, danceBot, zenTurtle,
   scoutEagle, wsDemo, robotHelper,
-  unitreeLoyalDog, unitreeScout, unitreeGuardian
+  unitreeLoyalDog, unitreeScout, unitreeGuardian,
+  puppy, oldDog, squirrelHunter, beachCruiser, nightWatch,
+  courierBot, gardenerBot, securityDrone, playgroundBuddy
 ]
 
-const characterMap = new Map<string, Character>(
-  agents.map((a) => [a.character.id, a.character]),
-)
+// ─── Public API ──────────────────────────────────────────────
 
-const behaviorMap = new Map<string, CharacterBehavior>(
-  agents.map((a) => [a.behavior.characterId, a.behavior]),
-)
-
-// ─── Public API ───────────────────────────────────────────────
-
-export const characters: Character[] = agents.map((a) => a.character)
+export const characters: Character[] = agentList.map((a) => a.character)
 
 export function getCharacter(id: string): Character | undefined {
   return characterMap.get(id)
@@ -58,7 +97,7 @@ export function getAllBehaviors(): CharacterBehavior[] {
   return Array.from(behaviorMap.values())
 }
 
-// ─── Re-exports ───────────────────────────────────────────────
+// ─── Re-exports ──────────────────────────────────────────────
 
 export type { Character } from './types'
 export type { CharacterBehavior, Blackboard, BehaviorNodeDef, NodeStatus, Emotion, RobotAdapter, AdapterCommand, ActionFn, ConditionFn } from '../engine/types'
