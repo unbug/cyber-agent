@@ -22,17 +22,18 @@ Make character-driven AI accessible to every robot builder in the world. CyberAg
 **Goal:** Build the best open-source character-to-robot platform.
 
 ### Y1 Milestones
-- [ ] Gallery v1: 20+ curated characters across 4 categories
+- [x] Gallery v1: 20+ curated characters across 4 categories
 - [x] WebSocket Robot Adapter: ESP32, Raspberry Pi, Arduino support with auto-reconnect, heartbeat, command queue
 - [x] Behavior Tree Engine v1: runtime executor with 9 node types (Sequence, Selector, Parallel, Inverter, Repeater, Cooldown, Condition, Action, Wait)
-- [x] RobotAdapter Interface: hardware abstraction layer (`src/engine/types.ts`)
+- [x] RoboMasterWebSocket adapter with priority command queue and emergency stop
+- [x] WebSocketAdapter: low-level WebSocket client for ESP32/RPi/Arduino
 - [x] CanvasAdapter: built-in browser renderer with trail, glow, bounce effects
-- [x] RoboMasterMotionAdapter: motion primitives (motors, duration moves, rotation, LED control, sound)
-- [x] RoboMaster WebSocket Adapter: factory to create complete WebSocket + RoboMaster pipeline
-|- [x] 11 Character Behaviors: loyal-dog, curious-cat, guard-dino, dance-bot, zen-turtle, scout-eagle, robot-helper, ws-demo, unitree-loyal-dog, unitree-scout, unitree-guardian
+- [x] 20 Character Behaviors: loyal-dog, curious-cat, guard-dino, dance-bot, zen-turtle, scout-eagle, robot-helper, ws-demo, and 9 new characters (puppy, old-dog, squirrel-hunter, beach-cruiser, night-watch, courier-bot, gardener-bot, security-drone, playground-buddy)
 - [x] Live Preview: interactive canvas on Agent page with real BT telemetry
-- [x] RoboMasterAdapterV2: Priority command queue with emergency stop support
 - [x] Production build pipeline passing all 31 tests
+- [x] RoboMasterMotionAdapter: motion primitives (motors, duration moves, rotation, LED control, sound)
+- [x] RoboMasterAdapterV2: Priority command queue with emergency stop support
+- [x] 11 Character Behaviors: loyal-dog, curious-cat, guard-dino, dance-bot, zen-turtle, scout-eagle, robot-helper, ws-demo, unitree-loyal-dog, unitree-scout, unitree-guardian
 - [ ] Behavior Tree visual editor (drag-and-drop nodes)
 - [ ] SDK v1: `npm install @cyber-agent/sdk`
 - [ ] Community: GitHub Discussions, contributor guide
