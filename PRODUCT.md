@@ -9,7 +9,7 @@ Make character-driven AI accessible to every robot builder in the world. CyberAg
 ## Core Value Proposition
 
 | For | We Solve |
-|-----|----------|
+|-----|------|
 | **Hobbyist builders** | Zero-to-personality in 5 minutes |
 | **Educators** | Engaging STEM curriculum through character robotics |
 | **Hardware companies** | Plug-and-play personality SDK for consumer robots |
@@ -28,13 +28,16 @@ Make character-driven AI accessible to every robot builder in the world. CyberAg
 - [x] RoboMasterWebSocket adapter with priority command queue and emergency stop
 - [x] WebSocketAdapter: low-level WebSocket client for ESP32/RPi/Arduino
 - [x] CanvasAdapter: built-in browser renderer with trail, glow, bounce effects
-- [x] 20 Character Behaviors: loyal-dog, curious-cat, guard-dino, dance-bot, zen-turtle, scout-eagle, robot-helper, ws-demo, and 9 new characters (puppy, old-dog, squirrel-hunter, beach-cruiser, night-watch, courier-bot, gardener-bot, security-drone, playground-buddy)
+- [x] 20 Character Behaviors: loyal-dog, curious-cat, guard-dino, dance-bot, zen-turtle, scout-eagle, robot-helper, ws-demo, puppy, old-dog, squirrel-hunter, beach-cruiser, night-watch, courier-bot, gardener-bot, security-drone, playground-buddy
 - [x] Live Preview: interactive canvas on Agent page with real BT telemetry
 - [x] Production build pipeline passing all 31 tests
 - [x] RoboMasterMotionAdapter: motion primitives (motors, duration moves, rotation, LED control, sound)
 - [x] RoboMasterAdapterV2: Priority command queue with emergency stop support
 - [x] 11 Character Behaviors: loyal-dog, curious-cat, guard-dino, dance-bot, zen-turtle, scout-eagle, robot-helper, ws-demo, unitree-loyal-dog, unitree-scout, unitree-guardian
-- [ ] Behavior Tree visual editor (drag-and-drop nodes)
+- [x] mBot adapter implementation
+- [x] Build pipeline fixes for TypeScript compilation errors
+- [x] GitHub Pages deploy returning 200 OK
+- [ ] Character Creator: web-based UI to design custom characters
 - [ ] SDK v1: `npm install @cyber-agent/sdk`
 - [ ] Community: GitHub Discussions, contributor guide
 - [x] Deploy: GitHub Pages SPA, zero-cost hosting
@@ -132,7 +135,7 @@ Make character-driven AI accessible to every robot builder in the world. CyberAg
 ## Architecture Decisions (Locked)
 
 | Decision | Choice | Rationale |
-|----------|--------|-----------|
+|-----|-----|---|
 | Frontend | Vite + React + TypeScript | Fast DX, ecosystem, type safety |
 | Styling | CSS Modules + CSS Custom Properties | Zero runtime, no vendor lock-in |
 | Animation | Framer Motion | Best React motion library |
