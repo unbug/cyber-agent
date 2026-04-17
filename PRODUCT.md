@@ -30,10 +30,10 @@ Make character-driven AI accessible to every robot builder in the world. CyberAg
 - [x] CanvasAdapter: built-in browser renderer with trail, glow, bounce effects
 - [x] 20 Character Behaviors: loyal-dog, curious-cat, guard-dino, dance-bot, zen-turtle, scout-eagle, robot-helper, ws-demo, puppy, old-dog, squirrel-hunter, beach-cruiser, night-watch, courier-bot, gardener-bot, security-drone, playground-buddy
 - [x] Live Preview: interactive canvas on Agent page with real BT telemetry
+- [x] Character Editor: BT tree JSON viewer + metadata editor (two-panel), auto-load selected character's behavior tree, custom JSON import modal, export BT/character as JSON buttons, reference grid of all 20 characters + behaviors
 - [x] Production build pipeline passing all 31 tests
 - [x] RoboMasterMotionAdapter: motion primitives (motors, duration moves, rotation, LED control, sound)
 - [x] RoboMasterAdapterV2: Priority command queue with emergency stop support
-- [x] 11 Character Behaviors: loyal-dog, curious-cat, guard-dino, dance-bot, zen-turtle, scout-eagle, robot-helper, ws-demo, unitree-loyal-dog, unitree-scout, unitree-guardian
 - [x] mBot adapter implementation
 - [x] Build pipeline fixes for TypeScript compilation errors
 - [x] GitHub Pages deploy returning 200 OK
