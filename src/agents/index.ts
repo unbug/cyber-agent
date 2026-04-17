@@ -97,6 +97,39 @@ export function getAllBehaviors(): CharacterBehavior[] {
   return Array.from(behaviorMap.values())
 }
 
+/**
+ * Save a custom character definition as a JSON file
+ */
+export function saveCharacterAsJSON(
+  name: string,
+  description: string,
+  tags: string[],
+  difficulty: string,
+  emoji: string,
+  behaviorTree: any
+): void {
+  const characterData = {
+    id: name.toLowerCase().replace(/\s+/g, '-'),
+    name,
+    emoji,
+    description,
+    tags,
+    difficulty,
+    category: 'custom' as const,
+    behaviorTree,
+  }
+
+  const blob = new Blob([JSON.stringify(characterData, null, 2)], { type: 'application/json' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `${characterData.id}-character.json`
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+  URL.revokeObjectURL(url)
+}
+
 // ─── Re-exports ──────────────────────────────────────────────
 
 export type { Character } from './types'

@@ -1,9 +1,31 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Search, ArrowRight } from 'lucide-react'
+import { Search, ArrowRight, FileCode } from 'lucide-react'
 import { characters, type Character } from '@/agents'
 import styles from './Gallery.module.css'
+
+const EMOJI_MAP: Record<string, string> = {
+  'loyal-dog': '🐕',
+  'curious-cat': '🐈',
+  'guard-dino': '🦖',
+  'dance-bot': '🤖',
+  'zen-turtle': '🐢',
+  'scout-eagle': '🦅',
+  'robot-helper': '🤖',
+  'ws-demo': '🤖',
+  'unitree-loyal-dog': '🤖',
+  'unitree-scout': '🦅',
+  'unitree-guardian': '🛡️',
+  'puppy': '🐶',
+  'old-dog': '🐕',
+  'squirrel-hunter': '🦫',
+  'beach-cruiser': '🏄',
+  'courier-bot': '📦',
+  'gardener-bot': '🌱',
+  'security-drone': '🚁',
+  'playground-buddy': '🎠',
+}
 
 const CATEGORIES = [
   { key: 'all', label: 'All' },
@@ -90,26 +112,31 @@ function CharacterCard({ character }: { character: Character }) {
       exit={{ opacity: 0, scale: 0.95 }}
       transition={{ duration: 0.25 }}
     >
-      <Link to={`/agent/${character.id}`} className={styles.card}>
-        <div className={styles.cardEmoji}>{character.emoji}</div>
-        <div className={styles.cardBody}>
-          <div className={styles.cardHeader}>
-            <h3 className={styles.cardTitle}>{character.name}</h3>
-            <span className={styles.cardDifficulty} data-level={character.difficulty}>
-              {character.difficulty}
-            </span>
-          </div>
-          <p className={styles.cardDesc}>{character.description}</p>
-          <div className={styles.cardFooter}>
-            <div className={styles.cardTags}>
-              {character.tags.map((tag) => (
-                <span key={tag} className={styles.tag}>{tag}</span>
-              ))}
+      <div style={{ display: 'flex', gap: '0.5rem' }}>
+        <Link to={`/agent/${character.id}`} className={styles.card}>
+          <div className={styles.cardEmoji}>{EMOJI_MAP[character.id] || character.emoji}</div>
+          <div className={styles.cardBody}>
+            <div className={styles.cardHeader}>
+              <h3 className={styles.cardTitle}>{character.name}</h3>
+              <span className={styles.cardDifficulty} data-level={character.difficulty}>
+                {character.difficulty}
+              </span>
             </div>
-            <ArrowRight size={16} className={styles.cardArrow} />
+            <p className={styles.cardDesc}>{character.description}</p>
+            <div className={styles.cardFooter}>
+              <div className={styles.cardTags}>
+                {character.tags.map((tag) => (
+                  <span key={tag} className={styles.tag}>{tag}</span>
+                ))}
+              </div>
+              <ArrowRight size={16} className={styles.cardArrow} />
+            </div>
           </div>
-        </div>
-      </Link>
+        </Link>
+        <Link to={`/agent/${character.id}/editor`} className={styles.editorButton} title="Edit in BT Editor">
+          <FileCode size={16} />
+        </Link>
+      </div>
     </motion.div>
   )
 }

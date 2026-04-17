@@ -4,7 +4,7 @@
  * Architecture:
  *   BehaviorTree ← defines character logic as a tree of nodes
  *   Blackboard   ← shared key-value state (sensors, emotions, flags)
- *   RobotAdapter ← hardware abstraction (browser canvas, WebSocket, BLE, serial...)
+ *   RobotAdapter ← hardware abstraction (browser canvas, WebSocket, BLE, serial...
  *
  * Node types:
  *   Composite: Sequence, Selector, Parallel
@@ -12,11 +12,11 @@
  *   Leaf:      Action, Wait
  */
 
-// ─── Node Status ──────────────────────────────────────────────
+// ─── Node Status ────────────────────────────────────────────────
 
 export type NodeStatus = 'success' | 'failure' | 'running'
 
-// ─── Blackboard (shared world state) ──────────────────────────
+// ─── Blackboard (shared world state) ────────────────────────────
 
 export interface Blackboard {
   // Perception
@@ -66,7 +66,7 @@ export function createBlackboard(canvasWidth = 400, canvasHeight = 300): Blackbo
   }
 }
 
-// ─── Node Definitions (serializable JSON) ─────────────────────
+// ─── Node Definitions (serializable JSON) ───────────────────────
 
 export type BehaviorNodeDef =
   | SequenceDef
@@ -142,7 +142,7 @@ export interface WaitDef extends BaseNodeDef {
   durationMs: number
 }
 
-// ─── Runtime Node (hydrated from def, carries state) ──────────
+// ─── Runtime Node (hydrated from def, carries state) ────────────
 
 export interface RuntimeNode {
   def: BehaviorNodeDef
@@ -152,7 +152,7 @@ export interface RuntimeNode {
   children: RuntimeNode[]
 }
 
-// ─── Action / Condition Registries ────────────────────────────
+// ─── Action / Condition Registries ──────────────────────────────
 
 export type ActionFn = (
   bb: Blackboard,
@@ -165,7 +165,7 @@ export type ConditionFn = (
   args?: Record<string, unknown>,
 ) => boolean
 
-// ─── Robot Adapter (hardware abstraction) ─────────────────────
+// ─── Robot Adapter (hardware abstraction) ───────────────────────
 
 /**
  * RobotAdapter is the bridge between the behavior tree engine and
@@ -205,7 +205,7 @@ export interface AdapterCommand {
   payload: Record<string, unknown>
 }
 
-// ─── Character Behavior Definition ────────────────────────────
+// ─── Character Behavior Definition ──────────────────────────────
 
 export interface CharacterBehavior {
   /** Must match a Character.id */
@@ -216,4 +216,69 @@ export interface CharacterBehavior {
   defaults?: Partial<Blackboard>
   /** Tick interval in ms (default: 100 = 10 FPS for logic) */
   tickIntervalMs?: number
+}
+
+// ─── Simplified node type for editor ────────────────────────────
+
+export interface BTNodeWithChildren {
+  type: string
+  id: string
+  children: BTNodeWithChildren[]
+  args?: any
+}
+
+export type BTNodeType = 'root' | 'sequence' | 'selector' | 'parallel' | 'inverter' | 'repeater' | 'cooldown' | 'condition' | 'action' | 'wait'
+
+export type BTNode = 
+  | { type: 'sequence'; children?: BTNodeWithChildren[]; id?: string }
+  | { type: 'selector'; children?: BTNodeWithChildren[]; id?: string }
+  | { type: 'parallel'; successThreshold?: number; children?: BTNodeWithChildren[]; id?: string }
+  | { type: 'inverter'; child: BTNode; id?: string }
+  | { type: 'repeater'; count: number; child: BTNode; id?: string }
+  | { type: 'cooldown'; durationMs: number; child: BTNode; id?: string }
+  | { type: 'condition'; condition: string; args?: any; id?: string }
+  | { type: 'action'; name: string; args?: any; id?: string }
+  | { type: 'wait'; durationMs?: number; id?: string }
+  | { type: 'root'; children?: BTNodeWithChildren[]; id?: string }
+
+// ─── BT Editor-specific types ─────────────────────────────
+
+export interface BTEditionNode {
+  type: string
+  id: string
+  children?: BTEditionNode[]
+  args?: any
+  condition?: string
+  name?: string
+  durationMs?: number
+  count?: number
+  child?: BTEditionNode
+  successThreshold?: number
+}
+
+// ─── Built-in actions/conditions ─────────────────────────────────
+
+export const actions: Record<string, string> = {
+  moveToPointer: 'moves to cursor position',
+  turnToPointer: 'turns to face cursor',
+  wagTail: 'wags tail/tail-like appendage',
+  speak: 'speaks a phrase',
+  jump: 'performs a jump animation',
+  spin: 'spins around',
+  dance: 'performs a dance routine',
+  attack: 'attacks nearby objects',
+  follow: 'follows target',
+  idle: 'performs idle animations',
+}
+
+export const conditions: Record<string, string> = {
+  isHovering: 'pointer is over a region',
+  isColliding: 'agent is colliding with another object',
+  isNear: 'agent is near a specific point',
+  hasLowEnergy: 'energy is below threshold',
+  isFacingTarget: 'agent is facing a target',
+  isObstacleAhead: 'there is an obstacle ahead',
+  isPathClear: 'path to target is clear',
+  isNight: 'environment is dark/nighttime',
+  isDaylight: 'environment is bright/daytime',
 }
