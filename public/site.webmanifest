@@ -1,0 +1,22 @@
+{
+  "name": "CyberAgent",
+  "short_name": "CyberAgent",
+  "description": "Give your robot a soul — AI character personalities for robots",
+  "start_url": "/cyber-agent/",
+  "scope": "/cyber-agent/",
+  "display": "standalone",
+  "background_color": "#09090b",
+  "theme_color": "#6366f1",
+  "icons": [
+    {
+      "src": "/cyber-agent/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/cyber-agent/apple-touch-icon.svg",
+      "sizes": "180x180",
+      "type": "image/svg+xml"
+    }
+  ]
+}

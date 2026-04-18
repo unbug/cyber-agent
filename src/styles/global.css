@@ -1,8 +1,10 @@
 /* ============================================================
-   CyberAgent Design System — Dark-first, Linear-inspired
+   CyberAgent Design System — Dark/Light, Linear-inspired
    ============================================================ */
 
 :root {
+  color-scheme: dark;
+
   /* Backgrounds */
   --bg-base: #09090b;
   --bg-surface: #111113;
@@ -56,6 +58,56 @@
   /* Typography */
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  /* Header backdrop */
+  --header-bg: rgba(9, 9, 11, 0.8);
+
+  /* Canvas overlay */
+  --overlay-bg: rgba(9, 9, 11, 0.7);
+}
+
+/* ============================================================
+   Light Theme
+   ============================================================ */
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  /* Backgrounds */
+  --bg-base: #ffffff;
+  --bg-surface: #f8f8fa;
+  --bg-elevated: #f0f0f3;
+  --bg-hover: #e8e8ec;
+
+  /* Text */
+  --text-primary: #18181b;
+  --text-secondary: #52525b;
+  --text-muted: #a1a1aa;
+
+  /* Accent — keep same hue, slightly deeper for contrast */
+  --accent: #4f46e5;
+  --accent-hover: #6366f1;
+  --accent-muted: rgba(79, 70, 229, 0.1);
+
+  /* Status */
+  --success: #16a34a;
+  --warning: #d97706;
+  --error: #dc2626;
+
+  /* Border */
+  --border: rgba(0, 0, 0, 0.08);
+  --border-hover: rgba(0, 0, 0, 0.15);
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+  --shadow-glow: 0 0 24px rgba(79, 70, 229, 0.12);
+
+  /* Header backdrop */
+  --header-bg: rgba(255, 255, 255, 0.8);
+
+  /* Canvas overlay */
+  --overlay-bg: rgba(255, 255, 255, 0.7);
 }
 
 /* Reset */
@@ -77,6 +129,8 @@ body {
   color: var(--text-primary);
   line-height: 1.6;
   min-height: 100vh;
+  min-height: 100dvh;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 a {
@@ -101,7 +155,7 @@ img {
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 var(--space-6);
+  padding: 0 max(var(--space-6), env(safe-area-inset-left)) 0 max(var(--space-6), env(safe-area-inset-right));
 }
 
 .sr-only {

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { ArrowRight, Bot, Cpu, Wifi, Sparkles } from 'lucide-react'
+import { BorderBeam } from 'border-beam'
 import styles from './Home.module.css'
 
 const FEATURES = [
@@ -97,12 +98,16 @@ export function HomePage() {
             viewport={{ once: true, margin: '-80px' }}
           >
             {FEATURES.map((f) => (
-              <motion.div key={f.title} className={styles.featureCard} variants={item}>
-                <div className={styles.featureIcon}>
-                  <f.icon size={22} />
-                </div>
-                <h3 className={styles.featureTitle}>{f.title}</h3>
-                <p className={styles.featureDesc}>{f.desc}</p>
+              <motion.div key={f.title} variants={item}>
+                <BorderBeam size="md" colorVariant="ocean" strength={0.5}>
+                  <div className={styles.featureCard}>
+                    <div className={styles.featureIcon}>
+                      <f.icon size={22} />
+                    </div>
+                    <h3 className={styles.featureTitle}>{f.title}</h3>
+                    <p className={styles.featureDesc}>{f.desc}</p>
+                  </div>
+                </BorderBeam>
               </motion.div>
             ))}
           </motion.div>
@@ -121,15 +126,18 @@ export function HomePage() {
             ].map((step) => (
               <motion.div
                 key={step.num}
-                className={styles.step}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: parseInt(step.num) * 0.1 }}
               >
-                <span className={styles.stepNum}>{step.num}</span>
-                <h3 className={styles.stepTitle}>{step.title}</h3>
-                <p className={styles.stepDesc}>{step.desc}</p>
+                <BorderBeam size="sm" colorVariant="mono" strength={0.3}>
+                  <div className={styles.step}>
+                    <span className={styles.stepNum}>{step.num}</span>
+                    <h3 className={styles.stepTitle}>{step.title}</h3>
+                    <p className={styles.stepDesc}>{step.desc}</p>
+                  </div>
+                </BorderBeam>
               </motion.div>
             ))}
           </div>
@@ -140,20 +148,23 @@ export function HomePage() {
       <section className={styles.ctaSection}>
         <div className="container">
           <motion.div
-            className={styles.ctaCard}
             initial={{ opacity: 0, scale: 0.96 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.4 }}
           >
-            <h2 className={styles.ctaTitle}>Ready to bring your robot to life?</h2>
-            <p className={styles.ctaDesc}>
-              Start with our free character gallery. No account needed.
-            </p>
-            <Link to="/gallery" className={styles.btnPrimary}>
-              <span>Get Started</span>
-              <ArrowRight size={16} />
-            </Link>
+            <BorderBeam size="md" colorVariant="colorful" strength={0.7}>
+              <div className={styles.ctaCard}>
+                <h2 className={styles.ctaTitle}>Ready to bring your robot to life?</h2>
+                <p className={styles.ctaDesc}>
+                  Start with our free character gallery. No account needed.
+                </p>
+                <Link to="/gallery" className={styles.btnPrimary}>
+                  <span>Get Started</span>
+                  <ArrowRight size={16} />
+                </Link>
+              </div>
+            </BorderBeam>
           </motion.div>
         </div>
       </section>

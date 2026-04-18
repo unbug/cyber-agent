@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useOutlet, Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Bot, BookOpen, Grid3X3, Github } from 'lucide-react'
+import { Bot, BookOpen, Grid3X3, Github, Sun, Moon, Monitor } from 'lucide-react'
+import { useTheme, type Theme } from '@/hooks/useTheme'
 import styles from './Layout.module.css'
 
 /** Freeze outlet so exit animation keeps old content */
@@ -19,6 +20,17 @@ const NAV_ITEMS = [
 
 export function Layout() {
   const location = useLocation()
+  const { theme, setTheme } = useTheme()
+
+  const THEME_CYCLE: Theme[] = ['light', 'dark', 'system']
+  const nextTheme = () => {
+    const idx = THEME_CYCLE.indexOf(theme)
+    const next = THEME_CYCLE[(idx + 1) % THEME_CYCLE.length]!
+    setTheme(next)
+  }
+
+  const ThemeIcon = theme === 'light' ? Sun : theme === 'dark' ? Moon : Monitor
+  const themeLabel = theme === 'light' ? 'Light' : theme === 'dark' ? 'Dark' : 'System'
 
   return (
     <div className={styles.layout}>
@@ -44,14 +56,24 @@ export function Layout() {
             ))}
           </nav>
 
-          <a
-            href="https://github.com/unbug/cyber-agent"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.githubLink}
-          >
-            <Github size={20} />
-          </a>
+          <div className={styles.headerActions}>
+            <button
+              onClick={nextTheme}
+              className={styles.themeToggle}
+              title={`Theme: ${themeLabel}`}
+              aria-label={`Switch theme, current: ${themeLabel}`}
+            >
+              <ThemeIcon size={18} />
+            </button>
+            <a
+              href="https://github.com/unbug/cyber-agent"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.githubLink}
+            >
+              <Github size={20} />
+            </a>
+          </div>
         </div>
       </header>
 
