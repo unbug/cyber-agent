@@ -5,6 +5,9 @@ import { GalleryPage } from './pages/Gallery'
 import { AgentPage } from './pages/Agent'
 import { DocsPage } from './pages/Docs'
 import CharacterEditor from './pages/CharacterEditor'
+import BTGraphEditor from './pages/BTGraphEditor'
+import { useState } from 'react'
+import type { BTEditionNode } from './engine/types'
 
 export function App() {
   return (
@@ -15,7 +18,13 @@ export function App() {
         <Route path="/agent/:id" element={<AgentPage />} />
         <Route path="/docs" element={<DocsPage />} />
         <Route path="/agent/:id/editor" element={<CharacterEditor />} />
+        <Route path="/editor" element={<BTGraphEditorPage />} />
       </Route>
     </Routes>
   )
+}
+
+function BTGraphEditorPage() {
+  const [root, setRoot] = useState<BTEditionNode | null>(null)
+  return <BTGraphEditor root={root} onChange={setRoot} onSave={setRoot} />
 }
