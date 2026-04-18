@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Search, ArrowRight, FileCode } from 'lucide-react'
+import { BorderBeam } from 'border-beam'
 import { characters, type Character } from '@/agents'
 import styles from './Gallery.module.css'
 
@@ -61,25 +62,35 @@ export function GalleryPage() {
 
         {/* Filters */}
         <div className={styles.toolbar}>
-          <div className={styles.searchBox}>
-            <Search size={16} className={styles.searchIcon} />
-            <input
-              type="text"
-              placeholder="Search characters..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className={styles.searchInput}
-            />
+          <div className={styles.searchShell}>
+            <BorderBeam size="line" colorVariant="ocean" strength={0.55}>
+              <div className={styles.searchBox}>
+                <Search size={16} className={styles.searchIcon} />
+                <input
+                  type="text"
+                  placeholder="Search characters..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className={styles.searchInput}
+                />
+              </div>
+            </BorderBeam>
           </div>
           <div className={styles.filters}>
             {CATEGORIES.map(({ key, label }) => (
-              <button
+              <BorderBeam
                 key={key}
-                onClick={() => setFilter(key)}
-                className={`${styles.filterBtn} ${filter === key ? styles.filterActive : ''}`}
+                size="line"
+                colorVariant={filter === key ? 'sunset' : 'mono'}
+                strength={filter === key ? 0.75 : 0.35}
               >
-                {label}
-              </button>
+                <button
+                  onClick={() => setFilter(key)}
+                  className={`${styles.filterBtn} ${filter === key ? styles.filterActive : ''}`}
+                >
+                  {label}
+                </button>
+              </BorderBeam>
             ))}
           </div>
         </div>
@@ -112,30 +123,36 @@ function CharacterCard({ character }: { character: Character }) {
       exit={{ opacity: 0, scale: 0.95 }}
       transition={{ duration: 0.25 }}
     >
-      <div style={{ display: 'flex', gap: '0.5rem' }}>
-        <Link to={`/agent/${character.id}`} className={styles.card}>
-          <div className={styles.cardEmoji}>{EMOJI_MAP[character.id] || character.emoji}</div>
-          <div className={styles.cardBody}>
-            <div className={styles.cardHeader}>
-              <h3 className={styles.cardTitle}>{character.name}</h3>
-              <span className={styles.cardDifficulty} data-level={character.difficulty}>
-                {character.difficulty}
-              </span>
-            </div>
-            <p className={styles.cardDesc}>{character.description}</p>
-            <div className={styles.cardFooter}>
-              <div className={styles.cardTags}>
-                {character.tags.map((tag) => (
-                  <span key={tag} className={styles.tag}>{tag}</span>
-                ))}
+      <div className={styles.cardRow}>
+        <div className={styles.cardMain}>
+          <BorderBeam size="md" colorVariant="colorful" strength={0.62}>
+            <Link to={`/agent/${character.id}`} className={styles.card}>
+              <div className={styles.cardEmoji}>{EMOJI_MAP[character.id] || character.emoji}</div>
+              <div className={styles.cardBody}>
+                <div className={styles.cardHeader}>
+                  <h3 className={styles.cardTitle}>{character.name}</h3>
+                  <span className={styles.cardDifficulty} data-level={character.difficulty}>
+                    {character.difficulty}
+                  </span>
+                </div>
+                <p className={styles.cardDesc}>{character.description}</p>
+                <div className={styles.cardFooter}>
+                  <div className={styles.cardTags}>
+                    {character.tags.map((tag) => (
+                      <span key={tag} className={styles.tag}>{tag}</span>
+                    ))}
+                  </div>
+                  <ArrowRight size={16} className={styles.cardArrow} />
+                </div>
               </div>
-              <ArrowRight size={16} className={styles.cardArrow} />
-            </div>
-          </div>
-        </Link>
-        <Link to={`/agent/${character.id}/editor`} className={styles.editorButton} title="Edit in BT Editor">
-          <FileCode size={16} />
-        </Link>
+            </Link>
+          </BorderBeam>
+        </div>
+        <BorderBeam size="sm" colorVariant="sunset" strength={0.8}>
+          <Link to={`/agent/${character.id}/editor`} className={styles.editorButton} title="Edit in BT Editor">
+            <FileCode size={16} />
+          </Link>
+        </BorderBeam>
       </div>
     </motion.div>
   )

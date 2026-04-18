@@ -29,10 +29,16 @@
   flex-wrap: wrap;
 }
 
-.searchBox {
-  position: relative;
+.searchShell {
   flex: 1;
   min-width: 200px;
+}
+
+.searchBox {
+  position: relative;
+  width: 100%;
+  border-radius: var(--radius-md);
+  overflow: hidden;
 }
 
 .searchIcon {
@@ -67,11 +73,14 @@
 .filters {
   display: flex;
   gap: var(--space-1);
+  flex-wrap: wrap;
 }
 
 .filterBtn {
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
   font-size: 0.8125rem;
   font-weight: 500;
   color: var(--text-secondary);
@@ -105,6 +114,15 @@
   border: 1px solid var(--border);
   transition: all 0.2s ease;
   text-decoration: none;
+}
+
+.cardRow {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.cardMain {
+  flex: 1;
 }
 
 .card:hover {
@@ -240,5 +258,8 @@
   }
   .grid {
     grid-template-columns: 1fr;
+  }
+  .cardRow {
+    align-items: stretch;
   }
 }

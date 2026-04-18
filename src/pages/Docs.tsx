@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { BookOpen, Zap, Settings, Terminal, Blocks, GitBranch } from 'lucide-react';
+import { BorderBeam } from 'border-beam';
 import styles from './Docs.module.css';
 
 const sections = [
@@ -156,35 +157,44 @@ export function DocsPage() {
       </div>
 
       <div className={styles.layout}>
-        <nav className={styles.sidebar}>
-          <span className={styles.navTitle}>On this page</span>
-          {sections.map((s) => (
-            <a key={s.id} href={`#${s.id}`} className={styles.navLink}>
-              {s.icon}
-              {s.title}
-            </a>
-          ))}
-        </nav>
+        <BorderBeam size="md" colorVariant="ocean" strength={0.52}>
+          <nav className={styles.sidebar}>
+            <span className={styles.navTitle}>On this page</span>
+            {sections.map((s) => (
+              <a key={s.id} href={`#${s.id}`} className={styles.navLink}>
+                {s.icon}
+                {s.title}
+              </a>
+            ))}
+          </nav>
+        </BorderBeam>
 
         <div className={styles.content}>
           {sections.map((section, i) => (
             <motion.section
               key={section.id}
               id={section.id}
-              className={styles.section}
               initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-40px' }}
               transition={{ delay: i * 0.05 }}
             >
-              <h2 className={styles.sectionTitle}>
-                {section.icon}
-                {section.title}
-              </h2>
-              <div
-                className={styles.sectionBody}
-                dangerouslySetInnerHTML={{ __html: renderMarkdown(section.content) }}
-              />
+              <BorderBeam
+                size="md"
+                colorVariant={i % 2 === 0 ? 'colorful' : 'sunset'}
+                strength={0.6}
+              >
+                <div className={styles.section}>
+                  <h2 className={styles.sectionTitle}>
+                    {section.icon}
+                    {section.title}
+                  </h2>
+                  <div
+                    className={styles.sectionBody}
+                    dangerouslySetInnerHTML={{ __html: renderMarkdown(section.content) }}
+                  />
+                </div>
+              </BorderBeam>
             </motion.section>
           ))}
         </div>

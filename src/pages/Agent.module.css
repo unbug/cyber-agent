@@ -25,12 +25,15 @@
 
 /* Info panel */
 .info {
-  position: sticky;
-  top: 72px;
   padding: var(--space-6);
   border-radius: var(--radius-lg);
   background: var(--bg-surface);
   border: 1px solid var(--border);
+}
+
+.layout > :first-child {
+  position: sticky;
+  top: 72px;
 }
 
 .avatar {
@@ -317,7 +320,7 @@
   .layout {
     grid-template-columns: 1fr;
   }
-  .info {
+  .layout > :first-child {
     position: static;
   }
 }
