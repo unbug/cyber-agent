@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { BookOpen, Zap, Settings, Terminal, Blocks, GitBranch } from 'lucide-react';
-import { BorderBeam } from 'border-beam';
+import { HoverBeam } from '@/components/HoverBeam';
 import styles from './Docs.module.css';
 
 const sections = [
@@ -157,7 +157,7 @@ export function DocsPage() {
       </div>
 
       <div className={styles.layout}>
-        <BorderBeam size="md" colorVariant="ocean" strength={0.52}>
+        <HoverBeam size="md" colorVariant="ocean" strength={0.52}>
           <nav className={styles.sidebar}>
             <span className={styles.navTitle}>On this page</span>
             {sections.map((s) => (
@@ -167,7 +167,7 @@ export function DocsPage() {
               </a>
             ))}
           </nav>
-        </BorderBeam>
+        </HoverBeam>
 
         <div className={styles.content}>
           {sections.map((section, i) => (
@@ -179,7 +179,7 @@ export function DocsPage() {
               viewport={{ once: true, margin: '-40px' }}
               transition={{ delay: i * 0.05 }}
             >
-              <BorderBeam
+              <HoverBeam
                 size="md"
                 colorVariant={i % 2 === 0 ? 'colorful' : 'sunset'}
                 strength={0.6}
@@ -194,7 +194,7 @@ export function DocsPage() {
                     dangerouslySetInnerHTML={{ __html: renderMarkdown(section.content) }}
                   />
                 </div>
-              </BorderBeam>
+              </HoverBeam>
             </motion.section>
           ))}
         </div>

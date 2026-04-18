@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { ArrowRight, Bot, Cpu, Wifi, Sparkles } from 'lucide-react'
-import { BorderBeam } from 'border-beam'
+import { HoverBeam } from '@/components/HoverBeam'
 import styles from './Home.module.css'
 
 const FEATURES = [
@@ -99,7 +99,7 @@ export function HomePage() {
           >
             {FEATURES.map((f) => (
               <motion.div key={f.title} variants={item}>
-                <BorderBeam size="md" colorVariant="ocean" strength={0.5}>
+                <HoverBeam size="md" colorVariant="ocean" strength={0.5}>
                   <div className={styles.featureCard}>
                     <div className={styles.featureIcon}>
                       <f.icon size={22} />
@@ -107,7 +107,7 @@ export function HomePage() {
                     <h3 className={styles.featureTitle}>{f.title}</h3>
                     <p className={styles.featureDesc}>{f.desc}</p>
                   </div>
-                </BorderBeam>
+                </HoverBeam>
               </motion.div>
             ))}
           </motion.div>
@@ -131,13 +131,13 @@ export function HomePage() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: parseInt(step.num) * 0.1 }}
               >
-                <BorderBeam size="sm" colorVariant="mono" strength={0.3}>
+                <HoverBeam size="sm" colorVariant="mono" strength={0.3}>
                   <div className={styles.step}>
                     <span className={styles.stepNum}>{step.num}</span>
                     <h3 className={styles.stepTitle}>{step.title}</h3>
                     <p className={styles.stepDesc}>{step.desc}</p>
                   </div>
-                </BorderBeam>
+                </HoverBeam>
               </motion.div>
             ))}
           </div>
@@ -153,7 +153,7 @@ export function HomePage() {
             viewport={{ once: true }}
             transition={{ duration: 0.4 }}
           >
-            <BorderBeam size="md" colorVariant="colorful" strength={0.7}>
+            <HoverBeam size="md" colorVariant="colorful" strength={0.7}>
               <div className={styles.ctaCard}>
                 <h2 className={styles.ctaTitle}>Ready to bring your robot to life?</h2>
                 <p className={styles.ctaDesc}>
@@ -164,7 +164,7 @@ export function HomePage() {
                   <ArrowRight size={16} />
                 </Link>
               </div>
-            </BorderBeam>
+            </HoverBeam>
           </motion.div>
         </div>
       </section>

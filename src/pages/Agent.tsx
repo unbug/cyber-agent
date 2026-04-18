@@ -2,7 +2,7 @@ import { useParams, Link } from 'react-router-dom'
 import { useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowLeft, Play, Square, Pause, Zap, Activity } from 'lucide-react'
-import { BorderBeam } from 'border-beam'
+import { HoverBeam } from '@/components/HoverBeam'
 import { getCharacter } from '@/agents'
 import { useBehaviorTree } from '@/hooks/useBehaviorTree'
 import styles from './Agent.module.css'
@@ -49,7 +49,7 @@ export function AgentPage() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.3 }}
           >
-            <BorderBeam size="md" colorVariant="ocean" strength={0.6}>
+            <HoverBeam size="md" colorVariant="ocean" strength={0.6}>
               <div className={styles.info}>
                 <div className={styles.avatar}>{character.emoji}</div>
                 <h1 className={styles.name}>{character.name}</h1>
@@ -74,7 +74,7 @@ export function AgentPage() {
                   </div>
                 </div>
               </div>
-            </BorderBeam>
+            </HoverBeam>
           </motion.div>
 
           {/* Right: Live behavior tree */}
@@ -85,7 +85,7 @@ export function AgentPage() {
             transition={{ duration: 0.3, delay: 0.1 }}
           >
             {/* Canvas scene */}
-            <BorderBeam size="md" colorVariant="colorful" strength={0.68}>
+            <HoverBeam size="md" colorVariant="colorful" strength={0.68}>
               <div className={styles.section}>
                 <h2 className={styles.sectionTitle}>
                   <Activity size={18} />
@@ -109,10 +109,10 @@ export function AgentPage() {
                   </div>
                 </div>
               </div>
-            </BorderBeam>
+            </HoverBeam>
 
             {/* Controls */}
-            <BorderBeam size="line" colorVariant="sunset" strength={0.65}>
+            <HoverBeam size="line" colorVariant="sunset" strength={0.65}>
               <div className={styles.section}>
                 <h2 className={styles.sectionTitle}>
                   <Zap size={18} />
@@ -152,10 +152,10 @@ export function AgentPage() {
                   </span>
                 </div>
               </div>
-            </BorderBeam>
+            </HoverBeam>
 
             {/* Telemetry — real data from blackboard */}
-            <BorderBeam size="md" colorVariant="mono" strength={0.45}>
+            <HoverBeam size="md" colorVariant="mono" strength={0.45}>
               <div className={styles.section}>
                 <h2 className={styles.sectionTitle}>Telemetry</h2>
                 <div className={styles.telemetryGrid}>
@@ -185,7 +185,7 @@ export function AgentPage() {
                   </div>
                 </div>
               </div>
-            </BorderBeam>
+            </HoverBeam>
           </motion.div>
         </div>
       </div>

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Search, ArrowRight, FileCode } from 'lucide-react'
-import { BorderBeam } from 'border-beam'
+import { HoverBeam } from '@/components/HoverBeam'
 import { characters, type Character } from '@/agents'
 import styles from './Gallery.module.css'
 
@@ -63,7 +63,7 @@ export function GalleryPage() {
         {/* Filters */}
         <div className={styles.toolbar}>
           <div className={styles.searchShell}>
-            <BorderBeam size="line" colorVariant="ocean" strength={0.55}>
+            <HoverBeam size="line" colorVariant="ocean" strength={0.55}>
               <div className={styles.searchBox}>
                 <Search size={16} className={styles.searchIcon} />
                 <input
@@ -74,11 +74,11 @@ export function GalleryPage() {
                   className={styles.searchInput}
                 />
               </div>
-            </BorderBeam>
+            </HoverBeam>
           </div>
           <div className={styles.filters}>
             {CATEGORIES.map(({ key, label }) => (
-              <BorderBeam
+              <HoverBeam
                 key={key}
                 size="line"
                 colorVariant={filter === key ? 'sunset' : 'mono'}
@@ -90,7 +90,7 @@ export function GalleryPage() {
                 >
                   {label}
                 </button>
-              </BorderBeam>
+              </HoverBeam>
             ))}
           </div>
         </div>
@@ -125,7 +125,7 @@ function CharacterCard({ character }: { character: Character }) {
     >
       <div className={styles.cardRow}>
         <div className={styles.cardMain}>
-          <BorderBeam size="md" colorVariant="colorful" strength={0.62}>
+          <HoverBeam size="md" colorVariant="colorful" strength={0.62}>
             <Link to={`/agent/${character.id}`} className={styles.card}>
               <div className={styles.cardEmoji}>{EMOJI_MAP[character.id] || character.emoji}</div>
               <div className={styles.cardBody}>
@@ -146,13 +146,13 @@ function CharacterCard({ character }: { character: Character }) {
                 </div>
               </div>
             </Link>
-          </BorderBeam>
+          </HoverBeam>
         </div>
-        <BorderBeam size="sm" colorVariant="sunset" strength={0.8}>
+        <HoverBeam size="sm" colorVariant="sunset" strength={0.8}>
           <Link to={`/agent/${character.id}/editor`} className={styles.editorButton} title="Edit in BT Editor">
             <FileCode size={16} />
           </Link>
-        </BorderBeam>
+        </HoverBeam>
       </div>
     </motion.div>
   )
