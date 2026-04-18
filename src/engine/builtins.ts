@@ -258,13 +258,145 @@ registerAction('walkOnTerrain', (_bb, _adapter, _args): NodeStatus => {
   return 'running'
 })
 
-// ═══════════════════════════════════════════════════════════════
-//  ACTIONS — Robot Commands (forwarded to adapter)
-// ════════════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════════
+//  Actions — Robot Commands (forwarded to adapter)
+// ═══════════════════════════════════════════════════════════════════
 
 registerAction('sendCommand', (_bb, adapter, args): NodeStatus => {
   const cmdType = (args?.type as string) ?? 'noop'
   const payload = (args?.payload as Record<string, unknown>) ?? {}
   adapter.sendCommand({ type: cmdType, payload })
   return 'success'
+})
+
+// ════════════════════════════════════════════════════════════════════
+//  ACTIONS — Enhanced Movement (spiral, patrol with randomization)
+// ═════════════════════════════════════════════════════════════════════
+
+registerAction('spiralInward', (bb, _adapter, args): NodeStatus => {
+  const speed = (args?.speed as number) ?? (bb.speed ?? 2)
+  const cx = bb.canvasWidth / 2
+  const cy = bb.canvasHeight / 2
+  const dx = cx - bb.x
+  const dy = cy - bb.y
+  const dist = Math.sqrt(dx * dx + dy * dy)
+  const angle = Math.atan2(dy, dx) + (bb.tick * 0.1)
+  // Spiral: combine radial movement with rotation
+  const spiralX = Math.cos(angle) * speed
+  const spiralY = Math.sin(angle) * speed
+  bb.x += spiralX
+  bb.y += spiralY
+  bb.rotation = Math.atan2(dy, dx) * (180 / Math.PI)
+  return dist < speed * 3 ? 'success' : 'running'
+})
+
+registerAction('orbit', (bb, _adapter, args): NodeStatus => {
+  const speed = (args?.speed as number) ?? (bb.speed ?? 2)
+  const cx = (args?.centerX as number) ?? bb.canvasWidth / 2
+  const cy = (args?.centerY as number) ?? bb.canvasHeight / 2
+  const prevRadius = (bb as any).orbitRadius as number | undefined
+  const prevAngle = (bb as any).orbitAngle as number | undefined
+  let radius = prevRadius ?? (args?.radius as number) ?? 60
+  let angle = prevAngle ?? Math.atan2(bb.y - cy, bb.x - cx)
+  angle += speed / radius
+  ;(bb as any).orbitRadius = radius
+  ;(bb as any).orbitAngle = angle
+  bb.x = cx + Math.cos(angle) * radius
+  bb.y = cy + Math.sin(angle) * radius
+  bb.rotation = (angle * 180) / Math.PI
+  return 'running'
+})
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  ACTIONS — Sound & Response
+// ═══════════════════════════════════════════════════════════════════════════
+
+registerAction('speakPhrase', (_bb, adapter, args): NodeStatus => {
+  const phrase = (args?.text as string) ?? 'hello'
+  adapter.sendCommand({ type: 'speak', payload: { text: phrase } })
+  return 'success'
+})
+
+registerAction('playSound', (_bb, adapter, args): NodeStatus => {
+  const freq = (args?.frequency as number) ?? 440
+  const dur = (args?.duration as number) ?? 500
+  adapter.sendCommand({ type: 'sound', payload: { frequency: freq, duration: dur } })
+  return 'success'
+})
+
+registerAction('flashLED', (_bb, adapter, args): NodeStatus => {
+  const _color = (args?.color as string) ?? '#ffffff'
+  adapter.sendCommand({ type: 'led', payload: { r: parseInt(_color.slice(1, 3), 16), g: parseInt(_color.slice(3, 5), 16), b: parseInt(_color.slice(5, 7), 16) } })
+  return 'success'
+})
+
+// ════════════════════════════════════════════════════════════════════
+//  ACTIONS — Emotion & State (extended)
+// ═════════════════════════════════════════════════════════════════════
+
+registerAction('randomEmotion', (bb): NodeStatus => {
+  const emotions: NonNullable<Blackboard['emotion']>[] = ['happy', 'curious', 'playful', 'alert', 'idle']
+  const e = emotions[Math.floor(Math.random() * emotions.length)] ?? 'idle'
+  bb.emotion = e
+  return 'success'
+})
+
+registerAction('setExcitement', (bb, _adapter, args): NodeStatus => {
+  const target = (args?.level as number) ?? 0
+  bb.excitement = Math.max(0, Math.min(1, target))
+  return 'success'
+})
+
+// ════════════════════════════════════════════════════════════════════
+//  CONDITIONS — Extended (spatial, temporal, state-based)
+// ════════════════════════════════════════════════════════════════════
+
+registerCondition('pointerFarAway', (bb, args) => {
+  const radius = (args?.radius as number) ?? 80
+  const dx = bb.pointerX - bb.x
+  const dy = bb.pointerY - bb.y
+  return Math.sqrt(dx * dx + dy * dy) > radius
+})
+
+registerCondition('energyEqual', (bb, args) => {
+  const value = (args?.value as number) ?? 0.5
+  return Math.abs(bb.energy - value) < 0.01
+})
+
+registerCondition('emotionNot', (bb, args) => {
+  return bb.emotion !== (args?.emotion as string)
+})
+
+registerCondition('excitementBelow', (bb, args) => {
+  const threshold = (args?.threshold as number) ?? 0.3
+  return bb.excitement < threshold
+})
+
+registerCondition('atEdge', (bb, args) => {
+  const margin = (args?.margin as number) ?? 30
+  return (
+    bb.x <= margin ||
+    bb.x >= bb.canvasWidth - margin ||
+    bb.y <= margin ||
+    bb.y >= bb.canvasHeight - margin
+  )
+})
+
+registerCondition('atCenter', (bb, args) => {
+  const tolerance = (args?.tolerance as number) ?? 30
+  const cx = bb.canvasWidth / 2
+  const cy = bb.canvasHeight / 2
+  const dx = bb.x - cx
+  const dy = bb.y - cy
+  return Math.sqrt(dx * dx + dy * dy) < tolerance
+})
+
+registerCondition('notNearEdge', (bb, args) => {
+  const margin = (args?.margin as number) ?? 30
+  return (
+    bb.x > margin &&
+    bb.x < bb.canvasWidth - margin &&
+    bb.y > margin &&
+    bb.y < bb.canvasHeight - margin
+  )
 })
