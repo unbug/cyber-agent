@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ArrowRight, Bot, Cpu, Wifi, Sparkles } from 'lucide-react'
+import { ArrowRight, Bot, Cpu, Wifi, Sparkles, ArrowUpRight } from 'lucide-react'
 import { HoverBeam } from '@/components/HoverBeam'
+import { characters } from '@/agents'
 import styles from './Home.module.css'
 
 const FEATURES = [
@@ -140,6 +141,44 @@ export function HomePage() {
                 </HoverBeam>
               </motion.div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Characters */}
+      <section className={styles.featuredSection}>
+        <div className="container">
+          <h2 className={styles.sectionTitle}>Meet {characters.length} Characters</h2>
+          <p className={styles.sectionSub}>
+            From loyal companions to fierce guards — each with unique behavior trees.
+          </p>
+          <div className={styles.featuredGrid}>
+            {characters.slice(0, 8).map((char, i) => (
+              <motion.div
+                key={char.id}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.35, delay: i * 0.05 }}
+              >
+                <HoverBeam size="sm" colorVariant="colorful" strength={0.55}>
+                  <Link to={`/agent/${char.id}`} className={styles.featuredCard}>
+                    <span className={styles.featuredEmoji}>{char.emoji}</span>
+                    <div>
+                      <span className={styles.featuredName}>{char.name}</span>
+                      <span className={styles.featuredCat}>{char.category}</span>
+                    </div>
+                    <ArrowUpRight size={14} className={styles.featuredArrow} />
+                  </Link>
+                </HoverBeam>
+              </motion.div>
+            ))}
+          </div>
+          <div style={{ textAlign: 'center', marginTop: 'var(--space-8)' }}>
+            <Link to="/gallery" className={styles.btnSecondary}>
+              <span>View All Characters</span>
+              <ArrowRight size={16} />
+            </Link>
           </div>
         </div>
       </section>

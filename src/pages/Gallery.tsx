@@ -6,6 +6,8 @@ import { HoverBeam } from '@/components/HoverBeam'
 import { characters, type Character } from '@/agents'
 import styles from './Gallery.module.css'
 
+const TOTAL_CHARACTERS = characters.length
+
 const EMOJI_MAP: Record<string, string> = {
   'loyal-dog': '🐕',
   'curious-cat': '🐈',
@@ -63,7 +65,10 @@ export function GalleryPage() {
     <div className={styles.page}>
       <div className="container">
         <div className={styles.header}>
-          <h1 className={styles.title}>Character Gallery</h1>
+          <h1 className={styles.title}>
+            Character Gallery
+            <span className={styles.count}>{TOTAL_CHARACTERS}</span>
+          </h1>
           <p className={styles.subtitle}>
             Choose an AI personality for your robot. Each character has unique
             behavior trees that define how your robot acts, reacts, and feels.

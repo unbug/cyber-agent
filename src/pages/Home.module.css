@@ -213,6 +213,73 @@
   padding: var(--space-16) 0 var(--space-20);
 }
 
+/* Featured Characters */
+.featuredSection {
+  padding: var(--space-16) 0;
+}
+
+.sectionSub {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.9375rem;
+  margin-top: var(--space-4);
+  margin-bottom: var(--space-10);
+}
+
+.featuredGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-4);
+}
+
+.featuredCard {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  transition: all 0.2s ease;
+  text-decoration: none;
+  color: inherit;
+}
+
+.featuredCard:hover {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px);
+}
+
+.featuredEmoji {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.featuredName {
+  display: block;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.featuredCat {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-transform: capitalize;
+}
+
+.featuredArrow {
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.featuredCard:hover .featuredArrow {
+  color: var(--accent);
+  transform: translate(1px, -1px);
+}
+
 .ctaCard {
   text-align: center;
   padding: var(--space-12) var(--space-6);
