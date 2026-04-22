@@ -133,5 +133,5 @@ export function saveCharacterAsJSON(
 // ─── Re-exports ──────────────────────────────────────────────
 
 export type { Character } from './types'
-export type { CharacterBehavior, Blackboard, BehaviorNodeDef, NodeStatus, Emotion, RobotAdapter, AdapterCommand, ActionFn, ConditionFn } from '../engine/types'
+export type { CharacterBehavior, Blackboard, BehaviorNodeDef, NodeStatus, Emotion, RobotAdapter, AdapterCommand, ActionFn, ConditionFn, BTEditionNode } from '../engine/types'
 export { cond, act, seq, sel, wait, cooldown, repeat } from './helpers'

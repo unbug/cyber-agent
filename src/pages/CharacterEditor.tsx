@@ -1,238 +1,245 @@
 /**
  * Character Editor
  *
- * A two-panel editor:
- * - LEFT: character metadata (name, emoji, description, tags, difficulty)
- * - RIGHT: Behavior Tree visual editor (import/export trees)
- *
- * When a character is selected from the dropdown, its behavior tree loads
- * automatically so you can inspect and modify it.
+ * A unified editor for:
+ * - Creating new characters from scratch
+ * - Editing existing characters' metadata and behavior trees
+ * - Visual behavior tree editing with the BTGraphEditor
+ * - Export/import of character and behavior tree definitions
  */
 
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { characters, getBehavior, saveCharacterAsJSON, getAllBehaviors } from '@/agents'
-import type { BTEditionNode, CharacterBehavior, BehaviorNodeDef } from '@/engine/types'
+import type { BTEditionNode } from '@/agents'
+import type { BehaviorNodeDef } from '@/engine/types'
+import BTGraphEditor from './BTGraphEditor'
+
+// ─── Default tree for new characters ──────────────────────────
+
+function createDefaultTree(): BTEditionNode {
+  return {
+    type: 'selector',
+    id: 'root',
+    children: [
+      {
+        type: 'sequence',
+        id: 'node_idle',
+        children: [
+          { type: 'condition', id: 'cond_energy', condition: 'isNear', args: { distance: 50 } },
+          { type: 'action', id: 'act_idle', name: 'idle' },
+        ],
+      },
+      {
+        type: 'sequence',
+        id: 'node_move',
+        children: [
+          { type: 'condition', id: 'cond_near', condition: 'isNear', args: { distance: 100 } },
+          { type: 'action', id: 'act_move', name: 'moveToPointer' },
+        ],
+      },
+    ],
+  }
+}
+
+// ─── Constants ────────────────────────────────────────────────
+
+const DEFAULT_CHAR = {
+  name: 'New Character',
+  emoji: '🤖',
+  description: 'A custom character created in the CyberAgent editor.',
+  tags: ['custom'],
+  difficulty: 'medium',
+} as const
+
+const CATEGORIES = ['companion', 'guard', 'performer', 'explorer'] as const
+
+// ─── Main Component ──────────────────────────────────────────
 
 export default function CharacterEditor() {
-  const [selectedId, setSelectedId] = useState<string>(
-    () => 'loyal-dog' // default
-  )
-  const [customName, setCustomName] = useState<string>('')
-  const [customDesc, setCustomDesc] = useState<string>('')
-  const [customTags, setCustomTags] = useState<string[]>([])
-  const [customDifficulty, setCustomDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium')
-  const [customEmoji, setCustomEmoji] = useState<string>('')
+  const navigate = useNavigate()
+  const { agentId } = useParams<{ agentId: string }>()
+
+  // Mode: 'existing' (editing a character) | 'create' (making a new one)
+  const [mode, setMode] = useState<'existing' | 'create'>('existing')
+
+  // Character metadata
+  const [name, setName] = useState('')
+  const [emoji, setEmoji] = useState('🤖')
+  const [description, setDescription] = useState('')
+  const [tags, setTags] = useState<string[]>(['custom'])
+  const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium')
+  const [category, setCategory] = useState<string>('companion')
+
+  // Behavior tree
   const [btRoot, setBtRoot] = useState<BTEditionNode | null>(null)
+
+  // UI state
   const [showImportDialog, setShowImportDialog] = useState(false)
   const [importedJson, setImportedJson] = useState('')
   const [notification, setNotification] = useState<string | null>(null)
 
-  const { agentId } = useParams<{ agentId: string }>()
-  const navigate = useNavigate()
+  // ─── Load character from URL or create mode ───────────────
 
-  // Auto-load from URL if agentId is present
   useEffect(() => {
     if (agentId) {
-      setSelectedId(agentId)
       const char = characters.find(c => c.id === agentId)
       if (char) {
-        setCustomName(char.name)
-        setCustomDesc(char.description)
-        setCustomTags([...char.tags])
-        setCustomEmoji(char.emoji)
+        setMode('existing')
+        setName(char.name)
+        setEmoji(char.emoji)
+        setDescription(char.description)
+        setTags([...char.tags])
+        setDifficulty(char.difficulty)
+        setCategory(char.category)
+        const behavior = getBehavior(agentId)
+        if (behavior && behavior.tree) {
+          setBtRoot(convertToEdition(behavior.tree))
+        } else {
+          setBtRoot(createDefaultTree())
+        }
+      } else {
+        setMode('create')
+        resetForm()
       }
+    } else {
+      setMode('create')
+      resetForm()
     }
   }, [agentId])
 
-  // Reset form when character selection changes
-  useEffect(() => {
-    const char = characters.find(c => c.id === selectedId)
-    if (char) {
-      setCustomName(char.name)
-      setCustomDesc(char.description)
-      setCustomTags([...char.tags])
-      setCustomDifficulty(char.difficulty)
-      setCustomEmoji(char.emoji)
-      // Load the character's behavior tree
-      const behavior = getBehavior(selectedId)
-      if (behavior) {
-        loadCharacterBehaviorAsEdition(behavior)
-      } else {
-        setBtRoot(null)
-      }
-    } else {
-      // Custom character — keep current values if already set
-      if (!customEmoji) setCustomEmoji('🤖')
-    }
-  }, [selectedId])
-
-  const loadCharacterBehaviorAsEdition = (behavior: CharacterBehavior) => {
-    const convertToEdition = (def: BehaviorNodeDef): BTEditionNode | null => {
-      const base: BTEditionNode = {
-        type: def.type,
-        id: `node_${Math.random().toString(36).substr(2, 9)}`,
-        children: [],
-      }
-      if ('name' in def && typeof def.name === 'string') base.name = def.name
-      if ('condition' in def && typeof def.condition === 'string') base.condition = def.condition
-      if ('name' in def && typeof def === 'object') base.name = def.name ?? base.name
-      if ('durationMs' in def) base.durationMs = def.durationMs
-      if ('count' in def) base.count = def.count
-      if ('successThreshold' in def) base.successThreshold = def.successThreshold
-      if ('args' in def && def.args) base.args = def.args
-      if ('child' in def && def.child) {
-        const child = convertToEdition(def.child)
-        if (child) base.child = child
-      }
-      if ('children' in def && Array.isArray(def.children)) {
-        const children = def.children.map(convertToEdition).filter(Boolean) as BTEditionNode[]
-        base.children = children
-      }
-      return base
-    }
-
-    setBtRoot(convertToEdition(behavior.tree))
+  const resetForm = () => {
+    setName(DEFAULT_CHAR.name)
+    setEmoji(DEFAULT_CHAR.emoji)
+    setDescription(DEFAULT_CHAR.description)
+    setTags(['custom'])
+    setDifficulty('medium')
+    setCategory('companion')
+    setBtRoot(createDefaultTree())
   }
 
-  const handleSelectCharacter = (id: string) => {
-    setSelectedId(id)
-  }
+  // ─── Helpers ──────────────────────────────────────────────
 
-  const handleExport = () => {
-    // Export full character data (as character editor does)
-    if (customName) {
-      saveCharacterAsJSON(
-        customName,
-        customDesc,
-        customTags.length ? customTags : ['custom'],
-        customDifficulty,
-        customEmoji || '🤖',
-        btRoot
-      )
+  const convertToEdition = (def: BehaviorNodeDef): BTEditionNode => {
+    const base: BTEditionNode = {
+      type: def.type,
+      id: `node_${Math.random().toString(36).substr(2, 9)}`,
+      children: [],
     }
+    if ('name' in def && typeof def.name === 'string') base.name = def.name
+    if ('condition' in def && typeof def.condition === 'string') base.condition = def.condition
+    if ('durationMs' in def) base.durationMs = def.durationMs
+    if ('count' in def) base.count = def.count
+    if ('successThreshold' in def) base.successThreshold = def.successThreshold
+    if ('args' in def && def.args) base.args = def.args
+    if ('child' in def && def.child) {
+      base.child = convertToEdition(def.child as BehaviorNodeDef)
+    }
+    if ('children' in def && Array.isArray(def.children)) {
+      base.children = (def.children as BehaviorNodeDef[]).map(convertToEdition).filter(Boolean) as BTEditionNode[]
+    }
+    return base
   }
 
-  const handleExportBtJson = () => {
+  const showNotify = (msg: string) => {
+    setNotification(msg)
+    setTimeout(() => setNotification(null), 3000)
+  }
+
+  // ─── Export ───────────────────────────────────────────────
+
+  const handleExportCharacter = () => {
+    saveCharacterAsJSON(name, description, tags, difficulty, emoji, btRoot)
+    showNotify('Character JSON exported!')
+  }
+
+  const handleExportBT = () => {
     if (!btRoot) return
     const blob = new Blob([JSON.stringify(btRoot, null, 2)], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `${(customName || selectedId).toLowerCase().replace(/\s+/g, '-')}-behavior-tree.json`
+    a.download = `${name.toLowerCase().replace(/\s+/g, '-')}-behavior-tree.json`
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
+    showNotify('Behavior tree JSON exported!')
   }
 
-  // handleImport is intentionally unused — import JSON via the import dialog button instead
-  function UNUSED_handleImport() {}
-  void UNUSED_handleImport
+  const handleExportAll = () => {
+    handleExportCharacter()
+    handleExportBT()
+    showNotify('Character and behavior tree exported!')
+  }
 
-  const handleImportJsonText = () => {
+  // ─── Import ───────────────────────────────────────────────
+
+  const handleImportJson = () => {
     try {
       const node = JSON.parse(importedJson) as BTEditionNode
       setBtRoot(node)
       setShowImportDialog(false)
       setImportedJson('')
-      setNotification('Behavior tree imported successfully!')
-      setTimeout(() => setNotification(null), 3000)
+      showNotify('Behavior tree imported successfully!')
     } catch {
-      setNotification('Failed to parse JSON. Make sure it is valid.')
-      setTimeout(() => setNotification(null), 3000)
+      showNotify('Failed to parse JSON. Please check the format.')
     }
   }
 
-  const handleSaveAll = () => {
-    if (!btRoot) {
-      setNotification('Please have a behavior tree saved before exporting.')
-      setTimeout(() => setNotification(null), 3000)
-      return
-    }
-    handleExportBtJson()
-    handleExport()
-    setNotification('Exported both behavior tree JSON and character JSON.')
-    setTimeout(() => setNotification(null), 3000)
+  // ─── Create New from Gallery ──────────────────────────────
+
+  const handleCreateNew = () => {
+    setMode('create')
+    navigate('/editor/create')
+    resetForm()
   }
 
-  const handleBack = () => navigate('/gallery')
+  // ─── Render ───────────────────────────────────────────────
 
-  // Derived info
-  const currentChar = characters.find(c => c.id === selectedId)
-  const displayName = customName || currentChar?.name || 'Custom Character'
-  const displayEmoji = customEmoji || (currentChar?.emoji ?? '🤖')
+  const isNew = mode === 'create'
+  const displayName = name || 'New Character'
+  const displayEmoji = emoji || '🤖'
 
   return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(180deg, #0a0a0f 0%, #0d0d1a 100%)', color: '#fff' }}
-      className="editor-page">
+    <div className="editor-page">
       {/* Top bar */}
-      <header style={{
-        padding: '1rem 1.5rem',
-        background: '#0f0f1aee',
-        borderBottom: '1px solid #2a2a3a',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        gap: '1rem',
-        flexWrap: 'wrap',
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <button onClick={handleBack}
-            style={{ background: 'none', border: 'none', color: '#3b82f6', cursor: 'pointer', fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem' }}>
+      <header className="editor-header">
+        <div className="editor-header-left">
+          <Link to="/gallery" className="editor-back-btn">
             ← Back to Gallery
-          </button>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <span style={{ fontSize: '2rem' }}>{displayEmoji}</span>
-            <h1 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0 }}>
-              Character Editor
+          </Link>
+          <div className="editor-title">
+            <span className="editor-emoji">{displayEmoji}</span>
+            <h1>
+              {isNew ? 'Create Character' : 'Character Editor'}
             </h1>
           </div>
+          {!isNew && (
+            <button onClick={handleCreateNew} className="editor-new-btn">
+              + New
+            </button>
+          )}
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
-          <select value={selectedId} onChange={e => handleSelectCharacter(e.target.value)}
-            style={{
-              padding: '0.5rem 0.75rem',
-              background: '#1a1a2e',
-              color: '#fff',
-              border: '1px solid #333',
-              borderRadius: '0.375rem',
-              fontSize: '0.875rem',
-              cursor: 'pointer',
-            }}>
-            {characters.map(char => (
-              <option key={char.id} value={char.id}>
-                {char.emoji} {char.name}
-              </option>
-            ))}
-          </select>
+        <div className="editor-header-right">
+          {!isNew && (
+            <select
+              value={category}
+              onChange={e => setCategory(e.target.value)}
+              className="editor-select"
+            >
+              {CATEGORIES.map(c => (
+                <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>
+              ))}
+            </select>
+          )}
 
-          <button onClick={() => setShowImportDialog(true)}
-            style={{
-              padding: '0.5rem 1rem',
-              background: '#8b5cf6',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '0.375rem',
-              fontSize: '0.8rem',
-              cursor: 'pointer',
-              fontWeight: 600,
-            }}>
-            📂 Import JSON
+          <button onClick={() => setShowImportDialog(true)} className="editor-btn editor-btn--import">
+            📂 Import
           </button>
 
-          <button onClick={handleSaveAll}
-            style={{
-              padding: '0.5rem 1rem',
-              background: '#22c55e',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '0.375rem',
-              fontSize: '0.8rem',
-              cursor: 'pointer',
-              fontWeight: 600,
-            }}>
+          <button onClick={handleExportAll} className="editor-btn editor-btn--export">
             💾 Export All
           </button>
         </div>
@@ -240,125 +247,65 @@ export default function CharacterEditor() {
 
       {/* Notification */}
       {notification && (
-        <div style={{
-          padding: '0.75rem 1.5rem',
-          background: '#8b5cf622',
-          border: '1px solid #8b5cf6',
-          borderRadius: '0.375rem',
-          margin: '1rem 1.5rem 0',
-          fontSize: '0.875rem',
-          color: '#c4b5fd',
-        }}>
+        <div className="editor-notification">
           {notification}
         </div>
       )}
 
       {/* Two-panel layout */}
-      <div style={{
-        display: 'flex',
-        gap: '0',
-        height: 'calc(100vh - 60px - (notification ? 48 : 0))',
-        minHeight: 400,
-      }}>
+      <div className="editor-body">
         {/* LEFT: Character metadata */}
-        <div style={{
-          width: 280,
-          minWidth: 280,
-          background: '#0f0f1a',
-          borderRight: '1px solid #2a2a3a',
-          padding: '1.5rem',
-          overflowY: 'auto',
-        }}>
-          <h2 style={{ fontSize: '0.85rem', fontWeight: 600, color: '#888', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '1rem' }}>
-            Character Info
-          </h2>
+        <aside className="editor-sidebar">
+          <h2 className="editor-sidebar-title">Character Info</h2>
 
-          <div style={{ marginBottom: '1rem' }}>
-            <label style={{ display: 'block', fontSize: '0.75rem', color: '#888', marginBottom: '0.375rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              Emoji
-            </label>
-            <input value={customEmoji} onChange={e => setCustomEmoji(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '0.5rem',
-                background: '#1a1a2e',
-                border: '1px solid #333',
-                borderRadius: '0.375rem',
-                color: '#fff',
-                fontSize: '1.25rem',
-                textAlign: 'center',
-              }}
+          <div className="editor-field">
+            <label>Emoji</label>
+            <input
+              value={emoji}
+              onChange={e => setEmoji(e.target.value)}
+              className="editor-input editor-input--emoji"
+              placeholder="🤖"
             />
           </div>
 
-          <div style={{ marginBottom: '1rem' }}>
-            <label style={{ display: 'block', fontSize: '0.75rem', color: '#888', marginBottom: '0.375rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              Name
-            </label>
-            <input value={customName} onChange={e => setCustomName(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '0.5rem',
-                background: '#1a1a2e',
-                border: '1px solid #333',
-                borderRadius: '0.375rem',
-                color: '#fff',
-                fontSize: '0.875rem',
-              }}
+          <div className="editor-field">
+            <label>Name</label>
+            <input
+              value={name}
+              onChange={e => setName(e.target.value)}
+              className="editor-input"
+              placeholder="Character name"
             />
           </div>
 
-          <div style={{ marginBottom: '1rem' }}>
-            <label style={{ display: 'block', fontSize: '0.75rem', color: '#888', marginBottom: '0.375rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              Description
-            </label>
-            <textarea value={customDesc} onChange={e => setCustomDesc(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '0.5rem',
-                background: '#1a1a2e',
-                border: '1px solid #333',
-                borderRadius: '0.375rem',
-                color: '#fff',
-                fontSize: '0.875rem',
-                minHeight: 80,
-                resize: 'vertical',
-              }}
+          <div className="editor-field">
+            <label>Description</label>
+            <textarea
+              value={description}
+              onChange={e => setDescription(e.target.value)}
+              className="editor-textarea"
+              placeholder="What does this character do?"
+              rows={4}
             />
           </div>
 
-          <div style={{ marginBottom: '1rem' }}>
-            <label style={{ display: 'block', fontSize: '0.75rem', color: '#888', marginBottom: '0.375rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              Tags (comma-separated)
-            </label>
-            <input value={customTags.join(', ')} onChange={e => setCustomTags(e.target.value.split(',').map(t => t.trim()).filter(Boolean))}
+          <div className="editor-field">
+            <label>Tags</label>
+            <input
+              value={tags.join(', ')}
+              onChange={e => setTags(e.target.value.split(',').map(t => t.trim()).filter(Boolean))}
+              className="editor-input"
               placeholder="tag1, tag2, tag3"
-              style={{
-                width: '100%',
-                padding: '0.5rem',
-                background: '#1a1a2e',
-                border: '1px solid #333',
-                borderRadius: '0.375rem',
-                color: '#fff',
-                fontSize: '0.875rem',
-              }}
             />
           </div>
 
-          <div style={{ marginBottom: '1rem' }}>
-            <label style={{ display: 'block', fontSize: '0.75rem', color: '#888', marginBottom: '0.375rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              Difficulty
-            </label>
-            <select value={customDifficulty} onChange={e => setCustomDifficulty(e.target.value as 'easy' | 'medium' | 'hard')}
-              style={{
-                width: '100%',
-                padding: '0.5rem',
-                background: '#1a1a2e',
-                border: '1px solid #333',
-                borderRadius: '0.375rem',
-                color: '#fff',
-                fontSize: '0.875rem',
-              }}>
+          <div className="editor-field">
+            <label>Difficulty</label>
+            <select
+              value={difficulty}
+              onChange={e => setDifficulty(e.target.value as 'easy' | 'medium' | 'hard')}
+              className="editor-select"
+            >
               <option value="easy">Easy ★</option>
               <option value="medium">Medium ★★</option>
               <option value="hard">Hard ★★★</option>
@@ -366,197 +313,113 @@ export default function CharacterEditor() {
           </div>
 
           {/* Summary */}
-          <div style={{
-            marginTop: '2rem',
-            padding: '1rem',
-            background: '#1a1a2e',
-            borderRadius: '0.5rem',
-            border: '1px solid #333',
-          }}>
-            <h3 style={{ fontSize: '0.75rem', color: '#888', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>
-              Summary
-            </h3>
-            <div style={{ fontSize: '0.85rem', lineHeight: 1.6, color: '#ccc' }}>
-              <div>📦 ID: <span style={{ fontFamily: 'monospace' }}>{customName ? customName.toLowerCase().replace(/\s+/g, '-') : selectedId}</span></div>
-              <div>🏷️ Category: <span style={{ fontFamily: 'monospace' }}>{currentChar?.category ?? 'custom'}</span></div>
-              <div>📊 Difficulty: <span style={{ fontFamily: 'monospace' }}>{customDifficulty}</span></div>
-              <div>🌳 BT Nodes: <span style={{ fontFamily: 'monospace' }}>{countTreeNodes(btRoot)}</span></div>
+          <div className="editor-summary">
+            <h3>Summary</h3>
+            <div className="editor-summary-row">
+              <span>📦 ID:</span>
+              <code>{name.toLowerCase().replace(/\s+/g, '-') || 'new-character'}</code>
+            </div>
+            <div className="editor-summary-row">
+              <span>🏷️ Category:</span>
+              <code>{category}</code>
+            </div>
+            <div className="editor-summary-row">
+              <span>📊 Difficulty:</span>
+              <code>{difficulty}</code>
+            </div>
+            <div className="editor-summary-row">
+              <span>🌳 BT Nodes:</span>
+              <code>{countTreeNodes(btRoot)}</code>
             </div>
           </div>
-        </div>
+        </aside>
 
-        {/* RIGHT: Behavior Tree visualization and tree editing */}
-        <div style={{ flex: 1, overflow: 'auto', padding: '1.5rem', background: '#0a0a0f' }}>
-          <h2 style={{ fontSize: '1rem', fontWeight: 600, color: '#888', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '1rem' }}>
+        {/* RIGHT: Behavior Tree Editor */}
+        <main className="editor-main">
+          <h2 className="editor-main-title">
             Behavior Tree — {displayName}
           </h2>
 
-          {btRoot ? (
-            <div style={{
-              background: '#1a1a2e',
-              border: '1px solid #333',
-              borderRadius: '0.5rem',
-              padding: '1rem',
-              overflowX: 'auto',
-            }}>
-              <pre style={{
-                margin: 0,
-                fontSize: '0.8rem',
-                lineHeight: 1.6,
-                color: '#a5f3fc',
-                overflowX: 'auto',
-                fontFamily: 'monospace',
-              }}>
-                {JSON.stringify(btRoot, null, 2)}
-              </pre>
-            </div>
-          ) : (
-            <div style={{
-              textAlign: 'center',
-              padding: '3rem',
-              color: '#888',
-              background: '#1a1a2e',
-              borderRadius: '0.5rem',
-              border: '1px dashed #333',
-            }}>
-              <p style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>🎯 No behavior tree loaded</p>
-              <p style={{ fontSize: '0.85rem' }}>Select a character from the dropdown to load its tree, or import a custom BT JSON.</p>
-            </div>
-          )}
+          <div className="editor-editor-wrapper">
+            <BTGraphEditor
+              root={btRoot}
+              onChange={setBtRoot}
+              onSave={setBtRoot}
+            />
+          </div>
 
-          {/* Action buttons */}
-          <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1rem', flexWrap: 'wrap' }}>
-            <button onClick={handleExportBtJson}
-              disabled={!btRoot}
-              style={{
-                padding: '0.5rem 1rem',
-                background: btRoot ? '#8b5cf6' : '#333',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '0.375rem',
-                fontSize: '0.8rem',
-                cursor: btRoot ? 'pointer' : 'not-allowed',
-                fontWeight: 600,
-              }}>
+          {/* Quick actions */}
+          <div className="editor-actions">
+            <button onClick={handleExportBT} disabled={!btRoot} className="editor-btn editor-btn--secondary">
               📄 Export BT as JSON
             </button>
-            <button onClick={() => {
-              if (btRoot) {
-                const blob = new Blob([JSON.stringify(btRoot, null, 2)], { type: 'text/plain' })
-                const url = URL.createObjectURL(blob)
-                prompt('Copy this JSON:', JSON.stringify(btRoot, null, 2))
-                URL.revokeObjectURL(url)
-              }
-            }}
+            <button
+              onClick={() => {
+                if (btRoot) {
+                  prompt('Copy this JSON:', JSON.stringify(btRoot, null, 2))
+                }
+              }}
               disabled={!btRoot}
-              style={{
-                padding: '0.5rem 1rem',
-                background: btRoot ? '#3b82f6' : '#333',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '0.375rem',
-                fontSize: '0.8rem',
-                cursor: btRoot ? 'pointer' : 'not-allowed',
-                fontWeight: 600,
-              }}>
+              className="editor-btn editor-btn--secondary"
+            >
               📋 Copy to Clipboard
             </button>
-            <Link to="/docs"
-              style={{
-                padding: '0.5rem 1rem',
-                background: '#2a2a3a',
-                color: '#ccc',
-                border: '1px solid #444',
-                borderRadius: '0.375rem',
-                fontSize: '0.8rem',
-                cursor: 'pointer',
-                textDecoration: 'none',
-                fontWeight: 600,
-                textAlign: 'center',
-                display: 'inline-flex',
-                alignItems: 'center',
-              }}>
+            <Link to="/docs" className="editor-btn editor-btn--outline">
               📖 Docs
             </Link>
           </div>
 
-          {/* All available behaviors reference */}
-          <div style={{ marginTop: '2rem', padding: '1rem', background: '#0f0f1a', borderRadius: '0.5rem', border: '1px solid #2a2a3a' }}>
-            <h3 style={{ fontSize: '0.8rem', color: '#888', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>
-              All Characters & Behaviors Reference
-            </h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '0.5rem' }}>
+          {/* Reference: all characters */}
+          <div className="editor-reference">
+            <h3>Reference — All Characters</h3>
+            <div className="editor-ref-grid">
               {getAllBehaviors().map((b, i) => {
                 const ch = characters.find(c => c.id === b.characterId)
                 return (
-                  <button key={i} onClick={() => {
-                    setSelectedId(b.characterId)
-                    loadCharacterBehaviorAsEdition(b)
-                  }}
-                    style={{
-                      padding: '0.375rem 0.75rem',
-                      background: selectedId === b.characterId ? '#8b5cf6' : '#1a1a2e',
-                      color: selectedId === b.characterId ? '#fff' : '#ccc',
-                      border: '1px solid #333',
-                      borderRadius: '0.25rem',
-                      fontSize: '0.75rem',
-                      cursor: 'pointer',
-                      textAlign: 'left',
-                    }}>
+                  <button
+                    key={i}
+                    onClick={() => {
+                      setMode('existing')
+                      navigate(`/agent/${b.characterId}/editor`)
+                      setName(ch?.name || b.characterId)
+                      setEmoji(ch?.emoji || '🤖')
+                      setDescription(ch?.description || '')
+                      setTags([...ch?.tags || []])
+                      setDifficulty(ch?.difficulty || 'medium')
+                      setCategory(ch?.category || 'companion')
+                      const behavior = getBehavior(b.characterId)
+                      if (behavior && behavior.tree) {
+                        setBtRoot(convertToEdition(behavior.tree))
+                      }
+                    }}
+                    className="editor-ref-btn"
+                  >
                     {ch?.emoji ?? '🤖'} {b.characterId}
                   </button>
                 )
               })}
             </div>
           </div>
-        </div>
+        </main>
       </div>
 
       {/* Import JSON modal */}
       {showImportDialog && (
-        <div style={{
-          position: 'fixed', inset: 0,
-          background: '#000000cc',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          zIndex: 100,
-        }} onClick={() => setShowImportDialog(false)}>
-          <div style={{
-            background: '#0f0f1a',
-            border: '1px solid #333',
-            borderRadius: '0.75rem',
-            padding: '1.5rem',
-            width: 'min(500px, 90vw)',
-            maxWidth: '500px',
-            color: '#fff',
-          }} onClick={e => e.stopPropagation()}>
-            <h2 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '1rem' }}>Import Behavior Tree JSON</h2>
+        <div className="editor-modal-overlay" onClick={() => setShowImportDialog(false)}>
+          <div className="editor-modal" onClick={e => e.stopPropagation()}>
+            <h2>Import Behavior Tree JSON</h2>
             <textarea
               value={importedJson}
               onChange={e => setImportedJson(e.target.value)}
               placeholder='{"type":"selector","children":[...]}'
-              style={{
-                width: '100%',
-                minHeight: 200,
-                padding: '0.75rem',
-                background: '#1a1a2e',
-                border: '1px solid #333',
-                borderRadius: '0.375rem',
-                color: '#a5f3fc',
-                fontSize: '0.85rem',
-                fontFamily: 'monospace',
-                resize: 'vertical',
-                marginBottom: '1rem',
-              }}
+              className="editor-modal-textarea"
+              rows={8}
             />
-            <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
-              <button onClick={() => setShowImportDialog(false)}
-                style={{ padding: '0.5rem 1rem', background: '#666', color: '#fff', border: 'none', borderRadius: '0.375rem', cursor: 'pointer' }}>
+            <div className="editor-modal-actions">
+              <button onClick={() => setShowImportDialog(false)} className="editor-btn editor-btn--outline">
                 Cancel
               </button>
-              <button onClick={handleImportJsonText}
-                style={{ padding: '0.5rem 1rem', background: '#22c55e', color: '#fff', border: 'none', borderRadius: '0.375rem', cursor: 'pointer', fontWeight: 600 }}>
+              <button onClick={handleImportJson} className="editor-btn editor-btn--export">
                 Import
               </button>
             </div>
@@ -567,7 +430,8 @@ export default function CharacterEditor() {
   )
 }
 
-// Utility function to count all nodes in a tree
+// ─── Utility ──────────────────────────────────────────────────
+
 function countTreeNodes(node: BTEditionNode | null | undefined): number {
   if (!node) return 0
   let count = 1
