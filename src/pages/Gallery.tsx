@@ -26,6 +26,16 @@ const EMOJI_MAP: Record<string, string> = {
   'gardener-bot': '🌱',
   'security-drone': '🚁',
   'playground-buddy': '🎠',
+  'fox': '🦊',
+  'parrot': '🦜',
+  'panda': '🐼',
+  'tiger': '🐯',
+  'jellyfish': '🪼',
+  'dragon': '🐉',
+  'rabbit': '🐰',
+  'wolf': '🐺',
+  'butterfly': '🦋',
+  'koala': '🐨',
 }
 
 const CATEGORIES = [

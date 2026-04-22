@@ -29,14 +29,33 @@ describe('Character behaviors', () => {
       'unitree-loyal-dog',
       'unitree-scout',
       'unitree-guardian',
+      'puppy',
+      'old-dog',
+      'squirrel-hunter',
+      'beach-cruiser',
+      'night-watch',
+      'courier-bot',
+      'gardener-bot',
+      'security-drone',
+      'playground-buddy',
+      'fox',
+      'parrot',
+      'panda',
+      'tiger',
+      'jellyfish',
+      'dragon',
+      'rabbit',
+      'wolf',
+      'butterfly',
+      'koala',
     ]
     for (const id of ids) {
       expect(getBehavior(id)).toBeDefined()
     }
   })
 
-  it('getAllBehaviors returns all 20', () => {
-    expect(getAllBehaviors()).toHaveLength(20)
+  it('getAllBehaviors returns all 30', () => {
+    expect(getAllBehaviors()).toHaveLength(30)
   })
 
   it('each behavior tree can hydrate and tick without crashing', () => {

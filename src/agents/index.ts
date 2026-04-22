@@ -31,6 +31,17 @@ import * as courierBot from './courier-bot'
 import * as gardenerBot from './gardener-bot'
 import * as securityDrone from './security-drone'
 import * as playgroundBuddy from './playground-buddy'
+// New agents
+import * as fox from './fox'
+import * as parrot from './parrot'
+import * as panda from './panda'
+import * as tiger from './tiger'
+import * as jellyfish from './jellyfish'
+import * as dragon from './dragon'
+import * as rabbit from './rabbit'
+import * as wolf from './wolf'
+import * as butterfly from './butterfly'
+import * as koala from './koala'
 
 // ─── Registry ────────────────────────────────────────────────
 
@@ -68,13 +79,25 @@ registerAgent(courierBot, 'courier-bot')
 registerAgent(gardenerBot, 'gardener-bot')
 registerAgent(securityDrone, 'security-drone')
 registerAgent(playgroundBuddy, 'playground-buddy')
+registerAgent(fox, 'fox')
+registerAgent(parrot, 'parrot')
+registerAgent(panda, 'panda')
+registerAgent(tiger, 'tiger')
+registerAgent(jellyfish, 'jellyfish')
+registerAgent(dragon, 'dragon')
+registerAgent(rabbit, 'rabbit')
+registerAgent(wolf, 'wolf')
+registerAgent(butterfly, 'butterfly')
+registerAgent(koala, 'koala')
 
 const agentList: Array<{ character: Character }> = [
   loyalDog, curiousCat, guardDino, danceBot, zenTurtle,
   scoutEagle, wsDemo, robotHelper,
   unitreeLoyalDog, unitreeScout, unitreeGuardian,
   puppy, oldDog, squirrelHunter, beachCruiser, nightWatch,
-  courierBot, gardenerBot, securityDrone, playgroundBuddy
+  courierBot, gardenerBot, securityDrone, playgroundBuddy,
+  fox, parrot, panda, tiger, jellyfish,
+  dragon, rabbit, wolf, butterfly, koala
 ]
 
 // ─── Public API ──────────────────────────────────────────────
