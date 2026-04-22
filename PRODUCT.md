@@ -37,7 +37,7 @@ Make character-driven AI accessible to every robot builder in the world. CyberAg
 - [x] mBot adapter implementation
 - [x] Build pipeline fixes for TypeScript compilation errors
 - [x] GitHub Pages deploy returning 200 OK
-- [ ] Character Creator: web-based UI to design custom characters
+- [x] Character Creator: web-based UI to design custom characters (2026-04-23)
 - [ ] SDK v1: `npm install @cyber-agent/sdk`
 - [ ] Community: GitHub Discussions, contributor guide
 - [x] Deploy: GitHub Pages SPA, zero-cost hosting
