@@ -42,6 +42,12 @@ import * as rabbit from './rabbit'
 import * as wolf from './wolf'
 import * as butterfly from './butterfly'
 import * as koala from './koala'
+// New agents
+import * as owl from './owl'
+import * as cobra from './cobra'
+import * as shark from './shark'
+import * as hummingbird from './hummingbird'
+import * as scorpion from './scorpion'
 
 // ─── Registry ────────────────────────────────────────────────
 
@@ -89,6 +95,11 @@ registerAgent(rabbit, 'rabbit')
 registerAgent(wolf, 'wolf')
 registerAgent(butterfly, 'butterfly')
 registerAgent(koala, 'koala')
+registerAgent(owl, 'owl')
+registerAgent(cobra, 'cobra')
+registerAgent(shark, 'shark')
+registerAgent(hummingbird, 'hummingbird')
+registerAgent(scorpion, 'scorpion')
 
 const agentList: Array<{ character: Character }> = [
   loyalDog, curiousCat, guardDino, danceBot, zenTurtle,
@@ -97,7 +108,8 @@ const agentList: Array<{ character: Character }> = [
   puppy, oldDog, squirrelHunter, beachCruiser, nightWatch,
   courierBot, gardenerBot, securityDrone, playgroundBuddy,
   fox, parrot, panda, tiger, jellyfish,
-  dragon, rabbit, wolf, butterfly, koala
+  dragon, rabbit, wolf, butterfly, koala,
+  owl, cobra, shark, hummingbird, scorpion
 ]
 
 // ─── Public API ──────────────────────────────────────────────

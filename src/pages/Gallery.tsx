@@ -1,12 +1,10 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Search, ArrowRight, FileCode } from 'lucide-react'
+import { Search, ArrowRight, FileCode, Plus } from 'lucide-react'
 import { HoverBeam } from '@/components/HoverBeam'
 import { characters, type Character } from '@/agents'
 import styles from './Gallery.module.css'
-
-const TOTAL_CHARACTERS = characters.length
 
 const EMOJI_MAP: Record<string, string> = {
   'loyal-dog': '🐕',
@@ -38,6 +36,11 @@ const EMOJI_MAP: Record<string, string> = {
   'wolf': '🐺',
   'butterfly': '🦋',
   'koala': '🐨',
+  'owl': '🦉',
+  'cobra': '🐍',
+  'shark': '🦈',
+  'hummingbird': '🐦',
+  'scorpion': '🦂',
 }
 
 const CATEGORIES = [
@@ -65,10 +68,16 @@ export function GalleryPage() {
     <div className={styles.page}>
       <div className="container">
         <div className={styles.header}>
-          <h1 className={styles.title}>
-            Character Gallery
-            <span className={styles.count}>{TOTAL_CHARACTERS}</span>
-          </h1>
+          <div className={styles.headerTop}>
+            <h1 className={styles.title}>
+              Character Gallery
+              <span className={styles.count}>{characters.length}</span>
+            </h1>
+            <Link to="/editor/new" className={styles.createBtn}>
+              <Plus size={16} />
+              <span>Create New</span>
+            </Link>
+          </div>
           <p className={styles.subtitle}>
             Choose an AI personality for your robot. Each character has unique
             behavior trees that define how your robot acts, reacts, and feels.
