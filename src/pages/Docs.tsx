@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { BookOpen, Zap, Settings, Terminal, Blocks, GitBranch } from 'lucide-react';
+import { BookOpen, Zap, Settings, Terminal, Blocks, GitBranch, Package } from 'lucide-react';
 import { HoverBeam } from '@/components/HoverBeam';
 import styles from './Docs.module.css';
 
@@ -112,6 +112,83 @@ class MyRobotAdapter implements RobotAdapter {
   sendCommand(cmd) { /* forward to hardware */ }
 }
 \`\`\`
+    `.trim(),
+  },
+  {
+    id: 'sdk',
+    icon: <Package size={18} />,
+    title: 'SDK',
+    content: `
+**@cyber-agent/sdk** is the standalone package for building custom characters and robot adapters.
+
+### Installation
+
+\`\`\`bash
+npm install @cyber-agent/sdk
+\`\`\`
+
+### Quick Start
+
+\`\`\`typescript
+import {
+  BehaviorTreeRunner,
+  CanvasAdapter,
+  registerAction,
+} from '@cyber-agent/sdk';
+
+// Register custom actions
+registerAction('dance', (bb) => {
+  bb.excitement = Math.min(bb.excitement + 0.3, 1);
+  return 'success';
+});
+
+// Define character behavior
+const myCharacter = {
+  characterId: 'my-puppy',
+  tree: { type: 'selector', children: [
+    { type: 'condition', check: 'isPointerActive' },
+    { type: 'action', action: 'moveToPointer' },
+    { type: 'action', action: 'dance' },
+  ] },
+  defaults: { emotion: 'happy', speed: 3 },
+};
+
+// Run!
+const adapter = new CanvasAdapter(canvasElement);
+const runner = new BehaviorTreeRunner(myCharacter, adapter);
+runner.start();
+\`\`\`
+
+### API
+
+| Export | Description |
+|--------|-------------|
+| \`BehaviorTreeRunner\` | Manages the BT tick loop |
+| \`CanvasAdapter\` | 2D canvas renderer |
+| \`WebSocketAdapter\` | WebSocket robot adapter |
+| \`registerAction()\` | Register custom actions |
+| \`registerCondition()\` | Register custom conditions |
+| \`createBlackboard()\` | Create blackboard state |
+| \`hydrate()\` | Convert BT def → runtime |
+| \`tick()\` | Execute one BT frame |
+
+### Behavior Tree Nodes
+
+| Type | Category | Description |
+|------|----------|-------------|
+| \`sequence\` | Composite | Left→right, fails on first failure |
+| \`selector\` | Composite | Left→right, succeeds on first success |
+| \`parallel\` | Composite | All children, threshold-based |
+| \`inverter\` | Decorator | Flips result |
+| \`repeater\` | Decorator | Repeats N times |
+| \`cooldown\` | Decorator | Rate limits child |
+| \`condition\` | Leaf | Predicate check |
+| \`action\` | Leaf | Executes action |
+| \`wait\` | Leaf | Waits duration |
+
+Built-in actions: \`moveForward\`, \`moveBackward\`, \`turnLeft\`, \`turnRight\`, \`moveToPointer\`, \`idle\`, \`setEmotion\`.
+
+Built-in conditions: \`atBoundary\`, \`isPointerActive\`, \`hasLowEnergy\`, \`isNear\`.
     `.trim(),
   },
   {
