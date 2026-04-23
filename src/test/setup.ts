@@ -1,5 +1,17 @@
 import '@testing-library/jest-dom';
 
+// Mock ResizeObserver for canvas-based components
+class MockResizeObserver {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+
+Object.defineProperty(window, 'ResizeObserver', {
+  writable: true,
+  value: MockResizeObserver,
+});
+
 // Mock IntersectionObserver for framer-motion's whileInView
 class MockIntersectionObserver {
   observe() {}

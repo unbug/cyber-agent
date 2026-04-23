@@ -3,14 +3,22 @@ import { useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowLeft, Play, Square, Pause, Zap, Activity } from 'lucide-react'
 import { HoverBeam } from '@/components/HoverBeam'
+import { TelemetryDashboard } from '@/components/TelemetryDashboard'
 import { getCharacter } from '@/agents'
 import { useBehaviorTree } from '@/hooks/useBehaviorTree'
+import { useTelemetry } from '@/hooks/useTelemetry'
 import styles from './Agent.module.css'
 
 export function AgentPage() {
   const { id } = useParams<{ id: string }>()
   const character = id ? getCharacter(id) : undefined
   const { canvasRef, snapshot, state, start, stop, pause, resume } = useBehaviorTree(id ?? '')
+  const { data: telemetryData, addSnapshot } = useTelemetry()
+
+  // Feed snapshots to telemetry hook
+  useEffect(() => {
+    addSnapshot(snapshot)
+  }, [snapshot, addSnapshot])
 
   // Auto-start the behavior tree when the page mounts
   useEffect(() => {
@@ -30,7 +38,6 @@ export function AgentPage() {
     )
   }
 
-  const bb = snapshot?.blackboard
   const isRunning = state === 'running'
   const isPaused = state === 'paused'
 
@@ -154,36 +161,14 @@ export function AgentPage() {
               </div>
             </HoverBeam>
 
-            {/* Telemetry — real data from blackboard */}
+            {/* Telemetry dashboard — real-time visualizations */}
             <HoverBeam size="md" colorVariant="mono" strength={0.45}>
               <div className={styles.section}>
-                <h2 className={styles.sectionTitle}>Telemetry</h2>
-                <div className={styles.telemetryGrid}>
-                  <div className={styles.metric}>
-                    <span className={styles.metricLabel}>Emotion</span>
-                    <span className={styles.metricValue}>
-                      {bb?.emotion?.toUpperCase() ?? '—'}
-                    </span>
-                  </div>
-                  <div className={styles.metric}>
-                    <span className={styles.metricLabel}>Energy</span>
-                    <span className={styles.metricValue}>
-                      {bb ? `${Math.round(bb.energy * 100)}%` : '—'}
-                    </span>
-                  </div>
-                  <div className={styles.metric}>
-                    <span className={styles.metricLabel}>Position</span>
-                    <span className={styles.metricValue}>
-                      {bb ? `${Math.round(bb.x)}, ${Math.round(bb.y)}` : '—'}
-                    </span>
-                  </div>
-                  <div className={styles.metric}>
-                    <span className={styles.metricLabel}>Excitement</span>
-                    <span className={styles.metricValue}>
-                      {bb ? `${Math.round(bb.excitement * 100)}%` : '—'}
-                    </span>
-                  </div>
-                </div>
+                <h2 className={styles.sectionTitle}>
+                  <Activity size={18} />
+                  Telemetry Dashboard
+                </h2>
+                <TelemetryDashboard data={telemetryData} />
               </div>
             </HoverBeam>
           </motion.div>

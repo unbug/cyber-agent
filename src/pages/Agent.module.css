@@ -275,34 +275,6 @@
   cursor: not-allowed;
 }
 
-/* Telemetry */
-.telemetryGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-3);
-}
-
-.metric {
-  padding: var(--space-3);
-  border-radius: var(--radius-sm);
-  background: var(--bg-elevated);
-}
-
-.metricLabel {
-  display: block;
-  font-size: 0.6875rem;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin-bottom: var(--space-1);
-}
-
-.metricValue {
-  font-size: 1rem;
-  font-weight: 600;
-  font-family: var(--font-mono);
-}
-
 .notFound {
   text-align: center;
   padding: var(--space-16);
