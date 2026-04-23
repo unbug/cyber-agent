@@ -41,6 +41,11 @@ const EMOJI_MAP: Record<string, string> = {
   'shark': '🦈',
   'hummingbird': '🐦',
   'scorpion': '🦂',
+  'peacock': '🦚',
+  'firefly': '✨',
+  'elephant': '🐘',
+  'phoenix': '🔥',
+  'penguin': '🐧',
 }
 
 const CATEGORIES = [

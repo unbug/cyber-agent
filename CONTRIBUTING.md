@@ -1,112 +1,251 @@
-# 贡献者指南 —— CyberAgent 开放标准项目
+# Contributing to CyberAgent
 
-## 🦾 为什么参与贡献？
+Thank you for your interest in contributing to CyberAgent! This guide will help you get started.
 
-**构建机器人行业的通用语言**
+## 🚀 Quick Start
 
-- **你的贡献会被** 10000+ 机器人实时使用
-- **学习真实的机器人行为树架构** (工业级技能)
-- **直接获得硬件赞助** (年度最佳角色开发奖 $5000+)
-- **成为行业先驱**：参与制定 IEEE/W3C 标准基础
-
-## 🎯 你可以贡献什么？
-
-### Tier 1: 角色开发 (入门级)
-- 为现有机器人平台创建新角色
-- 优化现有行为树逻辑
-- 添加新的情绪状态和反应机制
-
-### Tier 2: 硬件适配器 (中级)
-- ESP32/Arduino 通信协议
-- ROS/ROS2 集成
-- BLE/WiFi/Pi 专用驱动
-
-### Tier 3: 核心引擎 (专家级)
-- 行为树运行时优化
-- CDF 格式扩展
-- 跨语言运行时实现
-
-## 🚀 30 分钟启动你的贡献
-
-### 1. 克隆项目
 ```bash
-git clone https://github.com/unbug/cyber-agent
+# Clone and setup
+git clone https://github.com/unbug/cyber-agent.git
 cd cyber-agent
 npm install
+npm run dev
 ```
 
-### 2. 找到第一个贡献任务
-- 查看标记为 `good-first-issue` 的 issue
-- 查看 `help-wanted` 标签的复杂任务
-- 浏览 `src/characters` 文件夹，添加你的角色
+Visit http://localhost:5173/cyber-agent to see the app.
 
-### 3. 提交你的第一个 PR
-- Fork 仓库
-- 创建特性分支 `feature/your-rolex-name`
-- 添加测试 ( vitest run)
-- 推送并打开 Pull Request
+## 📦 Project Structure
 
-## 📚 学习路径
+```
+cyber-agent/
+├── src/
+│   ├── agents/           # Character definitions (one dir per character)
+│   │   ├── loyal-dog/    # Each character has:
+│   │   │   ├── character.ts  # Metadata (name, emoji, category)
+│   │   │   ├── behavior.ts   # Behavior tree (BT logic)
+│   │   │   └── index.ts      # Re-exports
+│   │   └── index.ts      # Registry — add new agents here
+│   ├── engine/           # Behavior Tree engine
+│   │   ├── executor.ts   # BT runtime (tick, hydrate, reset)
+│   │   ├── runner.ts     # BehaviorTreeRunner (tick loop)
+│   │   ├── builtins.ts   # Built-in actions & conditions
+│   │   └── types.ts      # Shared types
+│   ├── sdk/              # @cyber-agent/sdk (standalone package)
+│   ├── pages/            # React pages
+│   └── components/       # Shared React components
+├── PRODUCT.md            # Product vision & roadmap
+└── Q2-2026-EXECUTION-PLAN.md
+```
 
-### 新手 → 角色开发者
-- 阅读 `ENGINE.md`：行为树基础概念
-- 研究 `src/characters/loyal-dog.ts`：示例角色
-- 实践：创建你的第一个角色 "my-pet-cyberdog"
+## ✨ Adding a New Character
 
-### 开发者 → 硬件工程师
-- 阅读 `ADAPTERS.md`：适配器设计模式
-- 研究 `src/adapters/ws-demo.ts`：WebSocket 示例
-- 实践：为你的机器人平台实现适配器
+Each character is a self-contained directory with 3 files:
 
-### 工程师 → 核心贡献者
-- 参与 RFC 讨论：新功能提案
-- 审查社区 PR
-- 贡献核心运行时优化
+### 1. `character.ts` — Metadata
 
-## 🏆 贡献者激励
+```typescript
+import type { Character } from '../types'
 
-- **Monthly Hack**: 每月一次全球协作黑客松
-- **Hardware Grants**: 每月最佳角色获得定制硬件
-- **Title System**: contributor → expert → master → legendary
-- **Conference Speaking**: 年度 CyberAgent 大会演讲机会
+export const character: Character = {
+  id: 'my-character',
+  name: 'My Character',
+  emoji: '🎭',
+  category: 'companion', // companion | guard | performer | explorer
+  description: 'A brief description of what this character does.',
+  tags: ['friendly', 'active'],
+  personality: ['curious', 'playful'],
+  difficulty: 'easy', // easy | medium | hard
+}
+```
 
-## 🤝 协作工具
+### 2. `behavior.ts` — Behavior Tree
 
-- **GitHub Issues**: 任务追踪、Bug 报告
-- **GitHub Discussions**: 社区讨论、问题解答
-- **Discord**: 实时协作频道 (#builders, #role-design, #hardware)
+```typescript
+import type { CharacterBehavior } from '../../engine/types'
+import { cond, act, seq, sel } from '../helpers'
 
-## 📜 行为准则
+export const behavior: CharacterBehavior = {
+  characterId: 'my-character',
+  tickIntervalMs: 100,
+  defaults: { speed: 2.0, energy: 0.8 },
+  tree: sel('Root',
+    // Priority 1: Rest when tired
+    seq('Rest',
+      cond('energyBelow', { threshold: 0.15 }),
+      act('setEmotion', { emotion: 'sleepy' }),
+      act('moveToCenter', { speed: 0.3 }),
+      act('restoreEnergy', { rate: 0.005 }),
+    ),
+    // Priority 2: Follow pointer
+    seq('Follow',
+      cond('pointerNearby', { radius: 100 }),
+      act('setEmotion', { emotion: 'happy' }),
+      act('moveToPointer', { speed: 2.5 }),
+    ),
+    // Priority 3: Wander
+    seq('Wander',
+      act('setEmotion', { emotion: 'idle' }),
+      act('wander', { speed: 1.0 }),
+    ),
+  ),
+}
+```
 
-遵循 [Contributor Covenant v2.0](https://www.contributor-covenant.org/version/2/0/code_of_conduct/)
+### 3. `index.ts` — Re-export
 
-- 尊重所有贡献者
-- 建设性反馈
-- 包容、多元
+```typescript
+export { character } from './character'
+export { behavior } from './behavior'
+```
 
-## 🎁 第一次贡献
+### Register the Character
 
-### 最小可行贡献 (MVP)
+Add to `src/agents/index.ts`:
+
+```typescript
+// Import
+import * as myCharacter from './my-character'
+
+// Register
+registerAgent(myCharacter, 'my-character')
+
+// Add to agentList
+myCharacter,
+```
+
+### Available BT Nodes
+
+| Node | Usage | Description |
+|------|-------|-------------|
+| `cond(name, args)` | Condition check | Returns success/failure |
+| `act(name, args)` | Action | Returns success/running/failure |
+| `seq(name, ...children)` | Sequence | Runs all children in order |
+| `sel(name, ...children)` | Selector | Runs first success, or all failures |
+| `wait(ms)` | Wait | Returns running until duration passes |
+| `cooldown(ms, child)` | Cooldown | Skips child if run too recently |
+| `repeat(count, child)` | Repeat | Runs child N times |
+
+### Built-in Conditions
+
+| Condition | Args | Description |
+|-----------|------|-------------|
+| `pointerNearby` | `{ radius: number }` | Pointer within radius |
+| `pointerActive` | — | Pointer is active |
+| `pointerFarAway` | `{ radius: number }` | Pointer outside radius |
+| `energyAbove` | `{ threshold: number }` | Energy above threshold |
+| `energyBelow` | `{ threshold: number }` | Energy below threshold |
+| `energyAt` | `{ value, tolerance }` | Energy near exact value |
+| `excitementAbove` | `{ threshold: number }` | Excitement above threshold |
+| `excitementAt` | `{ value, tolerance }` | Excitement near exact value |
+| `nearEdge` | `{ margin: number }` | Near canvas edge |
+| `atCenter` | `{ tolerance: number }` | Near canvas center |
+| `emotionIs` | `{ emotion: string }` | Current emotion matches |
+| `emotionNot` | `{ emotion: string }` | Current emotion differs |
+| `random` | `{ chance: number }` | Random chance (0-1) |
+| `tickModulo` | `{ mod: number }` | Every N ticks |
+
+### Built-in Actions
+
+| Action | Args | Description |
+|--------|------|-------------|
+| `moveToPointer` | `{ speed: number }` | Move toward pointer |
+| `wander` | `{ speed: number }` | Wander to random target |
+| `patrol` | `{ speed: number }` | Patrol canvas perimeter |
+| `moveToCenter` | `{ speed: number }` | Move to canvas center |
+| `chargeAt` | `{ speed: number }` | Rapid movement toward pointer |
+| `retreat` | `{ speed: number }` | Move backward |
+| `circle` | `{ centerX, centerY, radius, speed }` | Orbit a point |
+| `zigzag` | `{ speed, amplitude, period }` | Erratic zigzag movement |
+| `bounceFromEdge` | — | Bounce off canvas edges |
+| `setEmotion` | `{ emotion: string }` | Set emotion state |
+| `drainEnergy` | `{ rate: number }` | Drain energy |
+| `restoreEnergy` | `{ rate: number }` | Restore energy |
+| `increaseExcitement` | `{ amount: number }` | Increase excitement |
+| `decayExcitement` | — | Decay excitement |
+| `idle` | — | Do nothing |
+| `pulse` | `{ intensity, duration, totalTicks }` | Pulse effect |
+| `speakPhrase` | `{ text: string }` | Speak (adapter) |
+| `playSound` | `{ frequency, duration }` | Play tone (adapter) |
+| `flashLED` | `{ color: string }` | Flash LED (adapter) |
+| `sendCommand` | `{ type, payload }` | Send raw command (adapter) |
+
+## 🧪 Testing
+
 ```bash
-# 1. 选择一个任务：https://github.com/unbug/cyber-agent/issues?q=is:issue+is:open+label:"good-first-issue"
-
-# 2. 克隆并运行：
-git clone https://github.com/your-username/cyber-agent
-cd cyber-agent
-npm install
-npm dev
-
-# 3. 修改一个文件并提交：
-git add -A && git commit -m "feat: add my-char" 
-git push origin feature/my-char
+npm test          # Run all tests
+npm test -- --watch  # Watch mode
 ```
 
-### 最佳第一次贡献
-- 修复文档错误
-- 更新 README
-- 添加一个简单角色
-- 优化一个翻译字符串
+## 🏗 Building
 
-## 🙏 谢谢你的贡献！
+```bash
+npm run build     # Build to dist/
+```
 
-**我们正在构建一个全新的行业标准。你的每一行代码，都在为 10000+ 机器人赋予灵魂。**
+## 📚 SDK
+
+The SDK is a standalone package at `sdk/`:
+
+```bash
+cd sdk
+npm install
+npm test
+npm run build
+```
+
+Usage:
+
+```typescript
+import {
+  BehaviorTreeRunner,
+  CanvasAdapter,
+  registerBuiltins,
+  createCanvasRunner,
+} from '@cyber-agent/sdk'
+
+// Quick start
+const runner = createCanvasRunner(behavior, canvasElement)
+runner.start()
+```
+
+## 📝 Code Style
+
+- TypeScript strict mode
+- 2-space indent
+- Single quotes
+- Semicolons
+- PascalCase for components/classes
+- camelCase for functions/variables
+- Descriptive names — no abbreviations
+
+## 🔄 PR Process
+
+1. Create a feature branch
+2. Make your changes
+3. Run `npm test` and `npm run build`
+4. Submit a PR with a clear description
+5. Update HEARTBEAT.md if relevant
+
+## 🎯 Good First Issues
+
+- Add a new character with a unique behavior
+- Improve the Character Editor UI
+- Add new built-in actions or conditions
+- Improve documentation
+- Add unit tests for edge cases
+
+## 🤝 Community
+
+- **GitHub Discussions**: Share character ideas, report bugs, ask questions
+- **GitHub Issues**: File bugs and feature requests
+- **Pull Requests**: Contribute code, characters, or documentation
+
+## 📖 Resources
+
+- [PRODUCT.md](./PRODUCT.md) — Product vision & roadmap
+- [SDK README](./sdk/README.md) — SDK documentation
+- [Behavior Tree Wiki](https://en.wikipedia.org/wiki/Behavior_tree_(artificial_intelligence,_robotics_and_control)) — BT theory
+
+---
+
+Thank you for helping make CyberAgent better! 🚀
