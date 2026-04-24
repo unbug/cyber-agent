@@ -3,28 +3,29 @@ import { motion } from 'framer-motion'
 import { ArrowRight, Bot, Cpu, Wifi, Sparkles, ArrowUpRight } from 'lucide-react'
 import { HoverBeam } from '@/components/HoverBeam'
 import { characters } from '@/agents'
+import { useI18n } from '@/i18n'
 import styles from './Home.module.css'
 
 const FEATURES = [
   {
     icon: Bot,
-    title: 'Character Gallery',
-    desc: 'Unique AI personalities — dogs, cats, dinosaurs, and more. Each with its own behavior tree that defines how it acts and reacts.',
+    labelKey: 'feature_agents_title',
+    descKey: 'feature_agents_desc',
   },
   {
     icon: Cpu,
-    title: 'Live Behavior Trees',
-    desc: 'Real decision-making in your browser. Watch characters wander, follow your cursor, rest, and react — all driven by a behavior tree engine.',
+    labelKey: 'feature_robot_title',
+    descKey: 'feature_robot_desc',
   },
   {
     icon: Wifi,
-    title: 'Extensible Adapters',
-    desc: 'Open adapter architecture. Built-in Canvas renderer, with a plugin interface ready for WebSocket, BLE, and serial robot connections.',
+    labelKey: 'feature_evolve_title',
+    descKey: 'feature_evolve_desc',
   },
   {
     icon: Sparkles,
-    title: 'Open Source',
-    desc: 'MIT licensed. Fork characters, create your own behavior trees, build custom robot adapters. The platform grows with the community.',
+    labelKey: 'nav.docs',
+    descKey: 'feature_evolve_desc',
   },
 ]
 
@@ -42,6 +43,8 @@ const item = {
 }
 
 export function HomePage() {
+  const { t } = useI18n()
+
   return (
     <div className={styles.page}>
       {/* Hero */}
@@ -58,19 +61,16 @@ export function HomePage() {
           </div>
 
           <h1 className={styles.heroTitle}>
-            Give your robot {' '}
-            <span className={styles.heroAccent}>a soul</span>
+            {t('home.hero_title')}
           </h1>
 
           <p className={styles.heroDesc}>
-            Pick a virtual AI character. Connect your robot.
-            Watch it come alive at home — with personality,
-            emotions, and intelligence.
+            {t('home.hero_subtitle')}
           </p>
 
           <div className={styles.heroCTA}>
             <Link to="/gallery" className={styles.btnPrimary}>
-              <span>Explore Characters</span>
+              <span>{t('home.hero_cta')}</span>
               <ArrowRight size={16} />
             </Link>
             <a
@@ -99,14 +99,14 @@ export function HomePage() {
             viewport={{ once: true, margin: '-80px' }}
           >
             {FEATURES.map((f) => (
-              <motion.div key={f.title} variants={item}>
+              <motion.div key={f.labelKey} variants={item}>
                 <HoverBeam size="md" colorVariant="ocean" strength={0.5}>
                   <div className={styles.featureCard}>
                     <div className={styles.featureIcon}>
                       <f.icon size={22} />
                     </div>
-                    <h3 className={styles.featureTitle}>{f.title}</h3>
-                    <p className={styles.featureDesc}>{f.desc}</p>
+                    <h3 className={styles.featureTitle}>{t(f.labelKey)}</h3>
+                    <p className={styles.featureDesc}>{t(f.descKey)}</p>
                   </div>
                 </HoverBeam>
               </motion.div>
@@ -118,12 +118,12 @@ export function HomePage() {
       {/* How It Works */}
       <section className={styles.howSection}>
         <div className="container">
-          <h2 className={styles.sectionTitle}>How it works</h2>
+          <h2 className={styles.sectionTitle}>{t('home.how_it_works_title')}</h2>
           <div className={styles.steps}>
             {[
-              { num: '01', title: 'Pick a character', desc: 'Browse the gallery and choose an AI personality for your robot.' },
-              { num: '02', title: 'Connect your robot', desc: 'Pair via Wi-Fi, BLE, or USB. Auto-detects supported hardware.' },
-              { num: '03', title: 'Watch it come alive', desc: 'The behavior tree takes over — your robot acts, reacts, and feels.' },
+              { num: '01', titleKey: 'home.step_1_title', descKey: 'home.step_1_desc' },
+              { num: '02', titleKey: 'home.step_2_title', descKey: 'home.step_2_desc' },
+              { num: '03', titleKey: 'home.step_3_title', descKey: 'home.step_3_desc' },
             ].map((step) => (
               <motion.div
                 key={step.num}
@@ -135,8 +135,8 @@ export function HomePage() {
                 <HoverBeam size="sm" colorVariant="mono" strength={0.3}>
                   <div className={styles.step}>
                     <span className={styles.stepNum}>{step.num}</span>
-                    <h3 className={styles.stepTitle}>{step.title}</h3>
-                    <p className={styles.stepDesc}>{step.desc}</p>
+                    <h3 className={styles.stepTitle}>{t(step.titleKey)}</h3>
+                    <p className={styles.stepDesc}>{t(step.descKey)}</p>
                   </div>
                 </HoverBeam>
               </motion.div>
@@ -148,9 +148,9 @@ export function HomePage() {
       {/* Featured Characters */}
       <section className={styles.featuredSection}>
         <div className="container">
-          <h2 className={styles.sectionTitle}>Meet {characters.length} Characters</h2>
+          <h2 className={styles.sectionTitle}>{t('home.agents_title')}</h2>
           <p className={styles.sectionSub}>
-            From loyal companions to fierce guards — each with unique behavior trees.
+            {t('home.agents_subtitle')}
           </p>
           <div className={styles.featuredGrid}>
             {characters.slice(0, 8).map((char, i) => (
@@ -176,7 +176,7 @@ export function HomePage() {
           </div>
           <div style={{ textAlign: 'center', marginTop: 'var(--space-8)' }}>
             <Link to="/gallery" className={styles.btnSecondary}>
-              <span>View All Characters</span>
+              <span>{t('home.all_agents')}</span>
               <ArrowRight size={16} />
             </Link>
           </div>
@@ -194,12 +194,12 @@ export function HomePage() {
           >
             <HoverBeam size="md" colorVariant="colorful" strength={0.7}>
               <div className={styles.ctaCard}>
-                <h2 className={styles.ctaTitle}>Ready to bring your robot to life?</h2>
+                <h2 className={styles.ctaTitle}>{t('home.cta_title')}</h2>
                 <p className={styles.ctaDesc}>
-                  Start with our free character gallery. No account needed.
+                  {t('home.cta_desc')}
                 </p>
                 <Link to="/gallery" className={styles.btnPrimary}>
-                  <span>Get Started</span>
+                  <span>{t('home.cta_button')}</span>
                   <ArrowRight size={16} />
                 </Link>
               </div>

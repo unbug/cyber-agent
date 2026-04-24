@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { Search, ArrowRight, FileCode, Plus } from 'lucide-react'
 import { HoverBeam } from '@/components/HoverBeam'
 import { characters, type Character } from '@/agents'
+import { useI18n } from '@/i18n'
 import styles from './Gallery.module.css'
 
 const EMOJI_MAP: Record<string, string> = {
@@ -49,16 +50,17 @@ const EMOJI_MAP: Record<string, string> = {
 }
 
 const CATEGORIES = [
-  { key: 'all', label: 'All' },
-  { key: 'companion', label: 'Companions' },
-  { key: 'guard', label: 'Guards' },
-  { key: 'performer', label: 'Performers' },
-  { key: 'explorer', label: 'Explorers' },
+  { key: 'all', labelKey: 'gallery.all' },
+  { key: 'companion', labelKey: 'gallery.companions' },
+  { key: 'guard', labelKey: 'gallery.guards' },
+  { key: 'performer', labelKey: 'gallery.performers' },
+  { key: 'explorer', labelKey: 'gallery.explorers' },
 ] as const
 
 export function GalleryPage() {
   const [filter, setFilter] = useState<string>('all')
   const [search, setSearch] = useState('')
+  const { t } = useI18n()
 
   const filtered = characters.filter((c) => {
     const matchCategory = filter === 'all' || c.category === filter
@@ -75,17 +77,16 @@ export function GalleryPage() {
         <div className={styles.header}>
           <div className={styles.headerTop}>
             <h1 className={styles.title}>
-              Character Gallery
+              {t('gallery.title')}
               <span className={styles.count}>{characters.length}</span>
             </h1>
             <Link to="/editor/new" className={styles.createBtn}>
               <Plus size={16} />
-              <span>Create New</span>
+              <span>{t('gallery.create_new')}</span>
             </Link>
           </div>
           <p className={styles.subtitle}>
-            Choose an AI personality for your robot. Each character has unique
-            behavior trees that define how your robot acts, reacts, and feels.
+            {t('gallery.subtitle')}
           </p>
         </div>
 
@@ -97,7 +98,7 @@ export function GalleryPage() {
                 <Search size={16} className={styles.searchIcon} />
                 <input
                   type="text"
-                  placeholder="Search characters..."
+                  placeholder={t('gallery.search_placeholder')}
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   className={styles.searchInput}
@@ -106,7 +107,7 @@ export function GalleryPage() {
             </HoverBeam>
           </div>
           <div className={styles.filters}>
-            {CATEGORIES.map(({ key, label }) => (
+            {CATEGORIES.map(({ key, labelKey }) => (
               <HoverBeam
                 key={key}
                 size="line"
@@ -117,7 +118,7 @@ export function GalleryPage() {
                   onClick={() => setFilter(key)}
                   className={`${styles.filterBtn} ${filter === key ? styles.filterActive : ''}`}
                 >
-                  {label}
+                  {t(labelKey)}
                 </button>
               </HoverBeam>
             ))}
@@ -134,7 +135,7 @@ export function GalleryPage() {
           ))}
           {filtered.length === 0 && (
             <div className={styles.empty}>
-              No characters match your search.
+              {t('gallery.no_results')}
             </div>
           )}
         </motion.div>

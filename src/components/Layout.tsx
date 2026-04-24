@@ -3,6 +3,8 @@ import { useOutlet, Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Bot, BookOpen, Grid3X3, Github, Sun, Moon, Monitor } from 'lucide-react'
 import { useTheme, type Theme } from '@/hooks/useTheme'
+import { useI18n } from '@/i18n'
+import { LanguageToggle } from './LanguageToggle'
 import styles from './Layout.module.css'
 
 /** Freeze outlet so exit animation keeps old content */
@@ -13,14 +15,15 @@ function FrozenOutlet() {
 }
 
 const NAV_ITEMS = [
-  { path: '/', label: 'Home', icon: Bot },
-  { path: '/gallery', label: 'Gallery', icon: Grid3X3 },
-  { path: '/docs', label: 'Docs', icon: BookOpen },
+  { path: '/', label: 'nav.home', icon: Bot },
+  { path: '/gallery', label: 'nav.gallery', icon: Grid3X3 },
+  { path: '/docs', label: 'nav.docs', icon: BookOpen },
 ]
 
 export function Layout() {
   const location = useLocation()
   const { theme, setTheme } = useTheme()
+  const { t } = useI18n()
 
   const THEME_CYCLE: Theme[] = ['light', 'dark', 'system']
   const nextTheme = () => {
@@ -31,6 +34,12 @@ export function Layout() {
 
   const ThemeIcon = theme === 'light' ? Sun : theme === 'dark' ? Moon : Monitor
   const themeLabel = theme === 'light' ? 'Light' : theme === 'dark' ? 'Dark' : 'System'
+
+  const translatedNav = NAV_ITEMS.map(({ path, label: labelKey, icon: Icon }) => ({
+    path,
+    label: t(labelKey),
+    icon: Icon,
+  }))
 
   return (
     <div className={styles.layout}>
@@ -44,7 +53,7 @@ export function Layout() {
           </Link>
 
           <nav className={styles.nav}>
-            {NAV_ITEMS.map(({ path, label, icon: Icon }) => (
+            {translatedNav.map(({ path, label, icon: Icon }) => (
               <Link
                 key={path}
                 to={path}
@@ -57,6 +66,7 @@ export function Layout() {
           </nav>
 
           <div className={styles.headerActions}>
+            <LanguageToggle />
             <button
               onClick={nextTheme}
               className={styles.themeToggle}
@@ -94,7 +104,7 @@ export function Layout() {
       <footer className={styles.footer}>
         <div className={styles.footerInner}>
           <span className={styles.footerText}>
-            CyberAgent — Give your robot a soul
+            {t('footer.rights')}
           </span>
           <span className={styles.footerMuted}>
             &copy; {new Date().getFullYear()} unbug

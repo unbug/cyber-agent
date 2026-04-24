@@ -1,14 +1,108 @@
 import { motion } from 'framer-motion';
 import { BookOpen, Zap, Settings, Terminal, Blocks, GitBranch, Package } from 'lucide-react';
 import { HoverBeam } from '@/components/HoverBeam';
+import { useI18n } from '@/i18n';
 import styles from './Docs.module.css';
 
 const sections = [
   {
     id: 'quickstart',
     icon: <Zap size={18} />,
-    title: 'Quick Start',
-    content: `
+    titleKey: 'docs.getting_started',
+  },
+  {
+    id: 'architecture',
+    icon: <Blocks size={18} />,
+    titleKey: 'docs.architecture',
+  },
+  {
+    id: 'characters',
+    icon: <Settings size={18} />,
+    titleKey: 'docs.api_reference',
+  },
+  {
+    id: 'api',
+    icon: <Terminal size={18} />,
+    titleKey: 'docs.sdk',
+  },
+  {
+    id: 'sdk',
+    icon: <Package size={18} />,
+    titleKey: 'docs.robots',
+  },
+  {
+    id: 'contributing',
+    icon: <GitBranch size={18} />,
+    titleKey: 'docs.agents_guide',
+  },
+];
+
+export function DocsPage() {
+  const { t } = useI18n();
+
+  return (
+    <motion.div
+      className={styles.page}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
+      <div className={styles.header}>
+        <BookOpen size={24} />
+        <h1>{t('docs.title')}</h1>
+        <p>{t('docs.getting_started_desc')}</p>
+      </div>
+
+      <div className={styles.layout}>
+        <HoverBeam size="md" colorVariant="ocean" strength={0.52}>
+          <nav className={styles.sidebar}>
+            <span className={styles.navTitle}>{t('docs.on_this_page')}</span>
+            {sections.map((s) => (
+              <a key={s.id} href={`#${s.id}`} className={styles.navLink}>
+                {s.icon}
+                {t(s.titleKey)}
+              </a>
+            ))}
+          </nav>
+        </HoverBeam>
+
+        <div className={styles.content}>
+          {sections.map((section, i) => (
+            <motion.section
+              key={section.id}
+              id={section.id}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-40px' }}
+              transition={{ delay: i * 0.05 }}
+            >
+              <HoverBeam
+                size="md"
+                colorVariant={i % 2 === 0 ? 'colorful' : 'sunset'}
+                strength={0.6}
+              >
+                <div className={styles.section}>
+                  <h2 className={styles.sectionTitle}>
+                    {section.icon}
+                    {t(section.titleKey)}
+                  </h2>
+                  <div
+                    className={styles.sectionBody}
+                    dangerouslySetInnerHTML={{ __html: renderMarkdown(getSectionContent(section.id)) }}
+                  />
+                </div>
+              </HoverBeam>
+            </motion.section>
+          ))}
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+function getSectionContent(id: string): string {
+  const contents: Record<string, string> = {
+    quickstart: `
 1. **Clone the repo** and start the dev server:
 
 \`\`\`bash
@@ -22,12 +116,7 @@ npm run dev
 3. **Open the Agent page** — the behavior tree starts automatically.
 4. **Move your mouse** over the canvas — watch the character react in real-time.
     `.trim(),
-  },
-  {
-    id: 'architecture',
-    icon: <Blocks size={18} />,
-    title: 'Architecture',
-    content: `
+    architecture: `
 CyberAgent uses a **Behavior Tree** engine to give characters autonomous decision-making.
 
 - **Behavior Tree Engine** — A composable tree of nodes (Sequence, Selector, Parallel, decorators, and leaf nodes) that evaluates every tick.
@@ -37,12 +126,7 @@ CyberAgent uses a **Behavior Tree** engine to give characters autonomous decisio
 
 The engine runs at a fixed tick rate for logic (10 FPS default) and uses \`requestAnimationFrame\` for smooth rendering — decoupled for consistency.
     `.trim(),
-  },
-  {
-    id: 'characters',
-    icon: <Settings size={18} />,
-    title: 'Behavior Tree Nodes',
-    content: `
+    characters: `
 **Composite Nodes** — control flow:
 
 | Node | Behavior |
@@ -69,12 +153,7 @@ The engine runs at a fixed tick rate for logic (10 FPS default) and uses \`reque
 
 Built-in actions include: \`moveToPointer\`, \`wander\`, \`patrol\`, \`bounceFromEdge\`, \`setEmotion\`, \`drainEnergy\`, \`restoreEnergy\`, and more.
     `.trim(),
-  },
-  {
-    id: 'api',
-    icon: <Terminal size={18} />,
-    title: 'Extending the Engine',
-    content: `
+    api: `
 ### Custom Actions
 
 Register new actions that your characters can use:
@@ -113,12 +192,7 @@ class MyRobotAdapter implements RobotAdapter {
 }
 \`\`\`
     `.trim(),
-  },
-  {
-    id: 'sdk',
-    icon: <Package size={18} />,
-    title: 'SDK',
-    content: `
+    sdk: `
 **@cyber-agent/sdk** is the standalone package for building custom characters and robot adapters.
 
 ### Installation
@@ -190,12 +264,7 @@ Built-in actions: \`moveForward\`, \`moveBackward\`, \`turnLeft\`, \`turnRight\`
 
 Built-in conditions: \`atBoundary\`, \`isPointerActive\`, \`hasLowEnergy\`, \`isNear\`.
     `.trim(),
-  },
-  {
-    id: 'contributing',
-    icon: <GitBranch size={18} />,
-    title: 'Contributing',
-    content: `
+    contributing: `
 We welcome contributions! Here's how to get started:
 
 \`\`\`bash
@@ -216,68 +285,8 @@ npm run dev
 2. Add the character data in \`src/data/characters.ts\`
 3. The behavior tree engine will auto-register and run it
     `.trim(),
-  },
-];
-
-export function DocsPage() {
-  return (
-    <motion.div
-      className={styles.page}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-    >
-      <div className={styles.header}>
-        <BookOpen size={24} />
-        <h1>Documentation</h1>
-        <p>Everything you need to build character-driven robots</p>
-      </div>
-
-      <div className={styles.layout}>
-        <HoverBeam size="md" colorVariant="ocean" strength={0.52}>
-          <nav className={styles.sidebar}>
-            <span className={styles.navTitle}>On this page</span>
-            {sections.map((s) => (
-              <a key={s.id} href={`#${s.id}`} className={styles.navLink}>
-                {s.icon}
-                {s.title}
-              </a>
-            ))}
-          </nav>
-        </HoverBeam>
-
-        <div className={styles.content}>
-          {sections.map((section, i) => (
-            <motion.section
-              key={section.id}
-              id={section.id}
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-40px' }}
-              transition={{ delay: i * 0.05 }}
-            >
-              <HoverBeam
-                size="md"
-                colorVariant={i % 2 === 0 ? 'colorful' : 'sunset'}
-                strength={0.6}
-              >
-                <div className={styles.section}>
-                  <h2 className={styles.sectionTitle}>
-                    {section.icon}
-                    {section.title}
-                  </h2>
-                  <div
-                    className={styles.sectionBody}
-                    dangerouslySetInnerHTML={{ __html: renderMarkdown(section.content) }}
-                  />
-                </div>
-              </HoverBeam>
-            </motion.section>
-          ))}
-        </div>
-      </div>
-    </motion.div>
-  );
+  };
+  return contents[id] || '';
 }
 
 /** Minimal markdown → HTML (good enough for docs) */

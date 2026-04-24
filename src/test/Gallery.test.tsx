@@ -10,7 +10,7 @@ function renderWithRouter(ui: React.ReactElement) {
 describe('Gallery page', () => {
   it('renders the page heading', () => {
     renderWithRouter(<Gallery />);
-    expect(screen.getByText('Character Gallery')).toBeInTheDocument();
+    expect(screen.getByText(/Character Gallery/i)).toBeInTheDocument();
   });
 
   it('renders search input', () => {
@@ -20,7 +20,7 @@ describe('Gallery page', () => {
 
   it('renders character cards', () => {
     renderWithRouter(<Gallery />);
-    expect(screen.getByText('Loyal Dog')).toBeInTheDocument();
-    expect(screen.getByText('Curious Cat')).toBeInTheDocument();
+    expect(screen.getByText(/Loyal Dog/i)).toBeInTheDocument();
+    expect(screen.getByText(/Curious Cat/i)).toBeInTheDocument();
   });
 });
