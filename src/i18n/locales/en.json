@@ -3,7 +3,8 @@
     "home": "Home",
     "gallery": "Gallery",
     "docs": "Docs",
-    "challenge": "Challenge"
+    "challenge": "Challenge",
+    "marketplace": "Marketplace"
   },
   "home": {
     "hero_title": "Bring Your Characters to Life",
@@ -106,5 +107,20 @@
     "min": "Min:",
     "avg": "Avg:",
     "max": "Max:"
+  },
+  "marketplace": {
+    "title": "Character Marketplace",
+    "subtitle": "Browse, discover, and download AI characters for your robot. Each character comes with a unique personality and behavior tree.",
+    "total_chars": "Characters",
+    "categories": "Categories",
+    "possibilities": "Possibilities",
+    "search_placeholder": "Search characters...",
+    "no_results": "No characters found matching your search.",
+    "submit_title": "Submit Your Character",
+    "submit_desc": "Have a character design you're proud of? Share it with the community!",
+    "submit_step1": "Create your character",
+    "submit_step2": "Export as JSON",
+    "submit_step3": "Submit a PR",
+    "submit_cta": "Open GitHub Issue"
   }
 }

@@ -3,7 +3,8 @@
     "home": "首页",
     "gallery": "角色库",
     "docs": "文档",
-    "challenge": "挑战"
+    "challenge": "挑战",
+    "marketplace": "角色市场"
   },
   "home": {
     "hero_title": "让你的角色活起来",
@@ -106,5 +107,20 @@
     "min": "最低:",
     "avg": "平均:",
     "max": "最高:"
+  },
+  "marketplace": {
+    "title": "角色市场",
+    "subtitle": "浏览、发现并下载机器人的 AI 角色。每个角色都有独特的性格和行为树。",
+    "total_chars": "角色",
+    "categories": "分类",
+    "possibilities": "可能性",
+    "search_placeholder": "搜索角色...",
+    "no_results": "没有找到匹配的角色。",
+    "submit_title": "提交你的角色",
+    "submit_desc": "有引以为傲的角色设计？分享给社区吧！",
+    "submit_step1": "创建角色",
+    "submit_step2": "导出 JSON",
+    "submit_step3": "提交 PR",
+    "submit_cta": "打开 GitHub Issue"
   }
 }
