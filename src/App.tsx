@@ -4,6 +4,7 @@ import { HomePage } from './pages/Home'
 import { GalleryPage } from './pages/Gallery'
 import { AgentPage } from './pages/Agent'
 import { DocsPage } from './pages/Docs'
+import { ChallengePage } from './pages/ChallengePage'
 import CharacterEditor from './pages/CharacterEditor'
 import BTGraphEditor from './pages/BTGraphEditor'
 import { useState } from 'react'
@@ -17,6 +18,7 @@ export function App() {
         <Route path="/gallery" element={<GalleryPage />} />
         <Route path="/agent/:id" element={<AgentPage />} />
         <Route path="/docs" element={<DocsPage />} />
+        <Route path="/challenge" element={<ChallengePage />} />
         <Route path="/agent/:id/editor" element={<CharacterEditor />} />
         <Route path="/editor" element={<BTGraphEditorPage />} />
       </Route>

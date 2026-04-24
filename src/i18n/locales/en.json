@@ -2,7 +2,8 @@
   "nav": {
     "home": "Home",
     "gallery": "Gallery",
-    "docs": "Docs"
+    "docs": "Docs",
+    "challenge": "Challenge"
   },
   "home": {
     "hero_title": "Bring Your Characters to Life",
@@ -12,7 +13,7 @@
     "feature_agents_title": "Virtual Agent Ecosystem",
     "feature_agents_desc": "Each agent has unique behavior trees defining personality, reactions, and movement patterns.",
     "feature_robot_title": "Robot Integration",
-    "feature_robot_desc": "Bridge virtual agents to physical hardware \u2014 RoboMaster, LEGO, and more.",
+    "feature_robot_desc": "Bridge virtual agents to physical hardware — RoboMaster, LEGO, and more.",
     "feature_evolve_title": "Self-Evolving Platform",
     "feature_evolve_desc": "Every day, autonomously review, iterate, and improve the platform.",
     "agents_title": "Virtual Agents",
@@ -93,7 +94,7 @@
   },
   "language": {
     "en": "EN",
-    "zh": "\u4e2d\u6587"
+    "zh": "中文"
   },
   "telemetry": {
     "emotion": "Emotion",
