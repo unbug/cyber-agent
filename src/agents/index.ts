@@ -66,6 +66,12 @@ import * as hedgehog from './hedgehog'
 import * as flamingo from './flamingo'
 import * as octopus from './octopus'
 import * as tapir from './tapir'
+// New agents
+import * as lion from './lion'
+import * as cicada from './cicada'
+import * as seahorse from './seahorse'
+import * as gecko from './gecko'
+import * as mandrill from './mandrill'
 
 // ─── Registry ────────────────────────────────────────────────
 

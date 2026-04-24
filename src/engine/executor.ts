@@ -28,6 +28,14 @@ export function registerCondition(name: string, fn: ConditionFn) {
   conditionRegistry.set(name, fn)
 }
 
+export function getActionRegistry(): Map<string, ActionFn> {
+  return actionRegistry
+}
+
+export function getConditionRegistry(): Map<string, ConditionFn> {
+  return conditionRegistry
+}
+
 // ─── Hydrate: Def → RuntimeNode ──────────────────────────────
 
 export function hydrate(def: BehaviorNodeDef): RuntimeNode {

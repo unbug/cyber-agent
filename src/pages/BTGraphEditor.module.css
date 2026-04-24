@@ -1,0 +1,428 @@
+/* ─── BTGraphEditor Styles ─── */
+
+.container {
+  display: flex;
+  height: 100%;
+  min-height: calc(100vh - 80px);
+}
+
+/* ─── Node Palette ─── */
+
+.palette {
+  width: 220px;
+  background: var(--bg-base);
+  border-right: 1px solid var(--border);
+  padding: 1rem;
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+
+.paletteCategory {
+  margin-bottom: 0.75rem;
+}
+
+.paletteCategoryTitle {
+  font-weight: 600;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+
+.paletteNode {
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  cursor: grab;
+  width: 100%;
+  text-align: left;
+  margin-bottom: 0.25rem;
+  font-size: 0.8125rem;
+  transition: all 0.15s;
+}
+
+.paletteNode:hover {
+  border-color: var(--accent);
+  color: var(--text-primary);
+  background: var(--bg-elevated);
+}
+
+.paletteNode:active {
+  cursor: grabbing;
+}
+
+/* ─── Toolbar ─── */
+
+.toolbar {
+  padding: 1rem 1.5rem;
+  background: var(--bg-base);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.toolbarTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.toolbarActions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.toolbarBtn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.375rem;
+  font-weight: 600;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.toolbarBtn--save {
+  background: var(--accent);
+  color: white;
+}
+
+.toolbarBtn--save:hover {
+  background: var(--accent-hover);
+  box-shadow: var(--shadow-glow);
+}
+
+.toolbarBtn--clear {
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+
+.toolbarBtn--clear:hover {
+  border-color: var(--border-hover);
+  color: var(--text-primary);
+}
+
+/* ─── Editor Area ─── */
+
+.editorArea {
+  flex: 1;
+  padding: 1rem;
+  overflow: auto;
+  background: var(--bg-base);
+}
+
+.emptyState {
+  text-align: center;
+  padding: 3rem;
+  color: var(--text-muted);
+}
+
+/* ─── Node Editor ─── */
+
+.nodeEditor {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 0.375rem;
+  margin-bottom: 0.5rem;
+}
+
+.nodeEditor--selected {
+  border-color: var(--accent);
+  background: var(--bg-elevated);
+}
+
+.nodeLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.nodeLabel--strong {
+  font-weight: 600;
+}
+
+.nodeLabel--dim {
+  opacity: 0.7;
+}
+
+.nodeLabel--args {
+  color: var(--warning);
+}
+
+.nodeLabel--action {
+  color: var(--accent);
+}
+
+.nodeActions {
+  display: flex;
+  gap: 0.375rem;
+  align-items: center;
+}
+
+.nodeActionBtn {
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.25rem;
+  border: none;
+  cursor: pointer;
+  font-size: 0.8125rem;
+  transition: all 0.15s;
+}
+
+.nodeActionBtn--edit {
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+
+.nodeActionBtn--edit:hover {
+  border-color: var(--accent);
+  color: var(--text-primary);
+}
+
+.nodeActionBtn--add {
+  background: var(--success);
+  color: white;
+}
+
+.nodeActionBtn--add:hover {
+  background: #16a34a;
+}
+
+.nodeActionBtn--delete {
+  background: rgba(239, 68, 68, 0.8);
+  color: white;
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1;
+}
+
+.nodeActionBtn--delete:hover {
+  background: #dc2626;
+}
+
+/* ─── Edit Mode ─── */
+
+.editMode {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  background: var(--bg-base);
+  border-radius: 0.375rem;
+}
+
+.editInput {
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 0.25rem;
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  width: 100%;
+  font-size: 0.875rem;
+  font-family: var(--font-mono);
+}
+
+.editInput::placeholder {
+  color: var(--text-muted);
+}
+
+.editTextarea {
+  width: 100%;
+  height: 120px;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 0.375rem;
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  resize: vertical;
+}
+
+.editTextarea::placeholder {
+  color: var(--text-muted);
+}
+
+.editActions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.editBtn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.8125rem;
+  transition: all 0.15s;
+}
+
+.editBtn--save {
+  background: var(--success);
+  color: white;
+}
+
+.editBtn--save:hover {
+  background: #16a34a;
+}
+
+.editBtn--cancel {
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+
+.editBtn--cancel:hover {
+  border-color: var(--border-hover);
+  color: var(--text-primary);
+}
+
+/* ─── Empty Children ─── */
+
+.emptyChildren {
+  padding: 0.75rem;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 0.25rem;
+  margin-top: 0.5rem;
+}
+
+.emptyChildrenText {
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+}
+
+.emptyChildrenActions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.emptyChildBtn {
+  padding: 0.375rem 0.75rem;
+  border: none;
+  border-radius: 0.25rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.15s;
+}
+
+.emptyChildBtn--sequence {
+  background: var(--success);
+  color: white;
+}
+
+.emptyChildBtn--selector {
+  background: var(--accent);
+  color: white;
+}
+
+.emptyChildBtn--parallel {
+  background: var(--warning);
+  color: #1a1a2e;
+}
+
+.emptyChildBtn--action {
+  background: var(--accent-light);
+  color: white;
+}
+
+.emptyChildBtn--condition {
+  background: var(--success-light);
+  color: #1a1a2e;
+}
+
+.emptyChildBtn--decorator {
+  background: var(--text-muted);
+  color: white;
+}
+
+.emptyChildBtn:hover {
+  opacity: 0.85;
+}
+
+/* ─── Add Root Button ─── */
+
+.addRootBtn {
+  padding: 0.75rem 1.5rem;
+  background: var(--success);
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: all 0.15s;
+}
+
+.addRootBtn:hover {
+  background: #16a34a;
+}
+
+/* ─── Tree Node Wrapper ─── */
+
+.treeNode {
+  margin-bottom: 0.5rem;
+}
+
+/* ─── Node Type Badges ─── */
+
+.badge {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 0.25rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.badge--composite {
+  background: rgba(139, 92, 246, 0.15);
+  color: #a78bfa;
+}
+
+.badge--decorator {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+}
+
+.badge--leaf {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+}
+
+/* ─── Responsive ─── */
+
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
+
+  .palette {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    max-height: 200px;
+  }
+
+  .editorArea {
+    padding: 0.75rem;
+  }
+}

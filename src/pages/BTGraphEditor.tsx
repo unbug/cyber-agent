@@ -1,41 +1,76 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import type { BTEditionNode } from '../engine/types'
+import { getActionRegistry, getConditionRegistry } from '../engine/executor'
+import styles from './BTGraphEditor.module.css'
+
+interface PaletteItem {
+  label: string
+  type: string
+  description: string
+}
+
+const typeLabel: Record<string, string> = {
+  sequence: 'Sequence', selector: 'Selector', parallel: 'Parallel',
+  inverter: 'Inverter', repeater: 'Repeater', cooldown: 'Cooldown',
+  action: 'Action', condition: 'Condition'
+}
 
 const NodePalette = () => {
-  const categories = [
-    { name: 'Composite', nodes: ['Sequence', 'Selector'] },
-    { name: 'Decorator', nodes: ['Inverter', 'Repeater'] },
-    { name: 'Leaf', nodes: ['Action', 'Condition'] }
-  ]
+  const [items, setItems] = useState<PaletteItem[]>([])
+
+  useEffect(() => {
+    const actionMap = getActionRegistry()
+    const conditionMap = getConditionRegistry()
+    const results: PaletteItem[] = []
+
+    // Composite
+    for (const t of ['sequence', 'selector', 'parallel'] as const) {
+      results.push({ label: typeLabel[t]!, type: t, description: t })
+    }
+    // Decorator
+    for (const t of ['inverter', 'repeater', 'cooldown'] as const) {
+      results.push({ label: typeLabel[t]!, type: t, description: t })
+    }
+    // Actions
+    for (const [name] of actionMap) {
+      results.push({ label: name, type: 'action', description: 'Built-in action' })
+    }
+    // Conditions
+    for (const [name] of conditionMap) {
+      results.push({ label: name, type: 'condition', description: 'Built-in condition' })
+    }
+    setItems(results)
+  }, [])
+
+  const grouped = useMemo(() => {
+    const groups: { name: string; items: PaletteItem[] }[] = [
+      { name: 'Composite', items: items.filter(i => ['sequence', 'selector', 'parallel'].includes(i.type)) },
+      { name: 'Decorator', items: items.filter(i => ['inverter', 'repeater', 'cooldown'].includes(i.type)) },
+      { name: 'Actions', items: items.filter(i => i.type === 'action') },
+      { name: 'Conditions', items: items.filter(i => i.type === 'condition') }
+    ]
+    return groups.filter(g => g.items.length > 0)
+  }, [items])
 
   return (
-    <div style={{ width: '220px', backgroundColor: '#1a1a2e', padding: '1rem', overflowY: 'auto' }}>
-      {categories.map(({ name: category, nodes }) => (
-        <div key={category} style={{ marginBottom: '0.75rem' }}>
-          <div style={{ fontWeight: 600, fontSize: '0.75rem', color: '#888', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            {category}
-          </div>
-          <div style={{ marginTop: '0.5rem' }}>
-            {nodes.map(nodeType => (
-              <button
-                key={nodeType}
-                style={{
-                  padding: '0.5rem 0.75rem',
-                  borderRadius: '0.375rem',
-                  border: '1px solid #444',
-                  backgroundColor: '#2d2d44',
-                  color: '#ccc',
-                  cursor: 'grab',
-                  width: '100%',
-                  textAlign: 'left',
-                  marginBottom: '0.25rem'
-                }}
-                draggable
-              >
-                {nodeType}
-              </button>
-            ))}
-          </div>
+    <div className={styles.palette}>
+      {grouped.map(({ name: category, items: groupItems }) => (
+        <div key={category} className={styles.paletteCategory}>
+          <div className={styles.paletteCategoryTitle}>{category}</div>
+          {groupItems.map(item => (
+            <button
+              key={item.label}
+              className={styles.paletteNode}
+              draggable
+              onDragStart={(e) => {
+                e.dataTransfer.setData('application/json', JSON.stringify(item))
+                e.dataTransfer.effectAllowed = 'copy'
+              }}
+            >
+              <div>{item.label}</div>
+              <div style={{ fontSize: '0.6875rem', opacity: 0.6, marginTop: '2px' }}>{item.description}</div>
+            </button>
+          ))}
         </div>
       ))}
     </div>
@@ -86,9 +121,9 @@ const BTEditionNodeEditor = ({
   const renderNodeContent = () => {
     const common = (label: string) => (
       <>
-        <span style={{ fontWeight: 600 }}>{label}:</span>
-        <span style={{ opacity: 0.7 }}>{node.type}</span>
-        {node.args && <span style={{ color: '#fbbf24' }}> (args)</span>}
+        <span className={styles.nodeLabel + ' ' + styles.nodeLabelStrong}>{label}:</span>
+        <span className={styles.nodeLabel + ' ' + styles.nodeLabelDim}>{node.type}</span>
+        {node.args && <span className={styles.nodeLabel + ' ' + styles.nodeLabelArgs}> (args)</span>}
       </>
     )
 
@@ -109,10 +144,10 @@ const BTEditionNodeEditor = ({
         return common('Cooldown')
       case 'condition':
         return (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <div className={styles.nodeLabel}>
             {common('Condition')}
             <button
-              style={{ padding: '0.5rem 0.75rem', backgroundColor: 'rgba(255,255,255,0.1)', color: '#fff', border: 'none', borderRadius: '0.25rem', cursor: 'pointer' }}
+              className={styles.nodeActionBtn + ' ' + styles.nodeActionBtnEdit}
               onClick={() => setEditMode(true)}
             >
               Edit
@@ -121,11 +156,11 @@ const BTEditionNodeEditor = ({
         )
       case 'action':
         return (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <div className={styles.nodeLabel}>
             {common('Action')}
-            <span style={{ color: '#93c5fd' }}>{node.name || ''}</span>
+            <span className={styles.nodeLabelAction}>{node.name || ''}</span>
             <button
-              style={{ padding: '0.5rem 0.75rem', backgroundColor: 'rgba(255,255,255,0.1)', color: '#fff', border: 'none', borderRadius: '0.25rem', cursor: 'pointer' }}
+              className={styles.nodeActionBtn + ' ' + styles.nodeActionBtnEdit}
               onClick={() => setEditMode(true)}
             >
               Edit
@@ -142,23 +177,23 @@ const BTEditionNodeEditor = ({
   if (editMode) {
     if (node.type === 'condition' || node.type === 'action') {
       return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.75rem', padding: '0.75rem', backgroundColor: '#1a1a2e', borderRadius: '0.375rem' }}>
+        <div className={styles.editMode}>
           <input
-            style={{ padding: '0.5rem', border: '1px solid #444', borderRadius: '0.25rem', backgroundColor: '#0f0f1a', color: '#fff', width: '100%', fontSize: '0.875rem' }}
+            className={styles.editInput}
             placeholder={node.type === 'condition' ? 'conditionName(args)' : 'name'}
             value={editValue}
             onChange={e => setEditValue(e.target.value)}
             autoFocus
           />
-          <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <div className={styles.editActions}>
             <button
-              style={{ padding: '0.5rem 1rem', backgroundColor: '#22c55e', color: '#fff', border: 'none', borderRadius: '0.25rem', cursor: 'pointer', fontWeight: 500 }}
+              className={styles.editBtn + ' ' + styles.editBtnSave}
               onClick={handleEditValueChange}
             >
               OK
             </button>
             <button
-              style={{ padding: '0.5rem 1rem', backgroundColor: '#666', color: '#fff', border: 'none', borderRadius: '0.25rem', cursor: 'pointer', fontWeight: 500 }}
+              className={styles.editBtn + ' ' + styles.editBtnCancel}
               onClick={() => setEditMode(false)}
             >
               Cancel
@@ -169,22 +204,22 @@ const BTEditionNodeEditor = ({
     }
 
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.75rem', padding: '0.75rem', backgroundColor: '#1a1a2e', borderRadius: '0.375rem' }}>
+      <div className={styles.editMode}>
         <textarea
-          style={{ width: '100%', height: '120px', padding: '0.75rem', border: '1px solid #444', borderRadius: '0.375rem', backgroundColor: '#0f0f1a', color: '#fff', fontSize: '0.75rem', fontFamily: 'monospace', resize: 'vertical' }}
+          className={styles.editTextarea}
           value={argsText}
           onChange={e => setArgsText(e.target.value)}
           placeholder='{"example": "args"}'
         />
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
+        <div className={styles.editActions}>
           <button
-            style={{ padding: '0.5rem 1rem', backgroundColor: '#22c55e', color: '#fff', border: 'none', borderRadius: '0.25rem', cursor: 'pointer', fontWeight: 500 }}
+            className={styles.editBtn + ' ' + styles.editBtnSave}
             onClick={handleEditValueChange}
           >
             Save
           </button>
           <button
-            style={{ padding: '0.5rem 1rem', backgroundColor: '#666', color: '#fff', border: 'none', borderRadius: '0.25rem', cursor: 'pointer', fontWeight: 500 }}
+            className={styles.editBtn + ' ' + styles.editBtnCancel}
             onClick={() => setEditMode(false)}
           >
             Cancel
@@ -195,26 +230,26 @@ const BTEditionNodeEditor = ({
   }
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem', backgroundColor: '#2d2d44', borderRadius: '0.375rem' }}>
+    <div className={`${styles.nodeEditor} ${node.children !== undefined && node.children.length === 0 ? '' : ''}`}>
       {renderNodeContent()}
-      <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+      <div className={styles.nodeActions}>
         {node.children !== undefined && node.children.length === 0 && (
           <button
-            style={{ padding: '0.375rem 0.75rem', backgroundColor: '#22c55e', color: '#fff', border: 'none', borderRadius: '0.25rem', cursor: 'pointer', fontSize: '0.875rem' }}
+            className={styles.nodeActionBtn + ' ' + styles.nodeActionBtnAdd}
             onClick={onAddChild}
           >
             + Add child
           </button>
         )}
         <button
-          style={{ padding: '0.375rem 0.75rem', backgroundColor: 'rgba(255,255,255,0.1)', color: '#fff', border: 'none', borderRadius: '0.25rem', cursor: 'pointer', fontSize: '0.875rem' }}
+          className={styles.nodeActionBtn + ' ' + styles.nodeActionBtnEdit}
           onClick={() => setEditMode(true)}
         >
           {node.args ? 'Edit Args' : 'Set Args'}
         </button>
         {node.type !== 'root' && (
           <button
-            style={{ padding: '0.25rem 0.5rem', backgroundColor: 'rgba(239,68,68,0.8)', color: '#fff', border: 'none', borderRadius: '0.25rem', cursor: 'pointer', fontSize: '0.875rem', fontWeight: 600, lineHeight: 1 }}
+            className={styles.nodeActionBtn + ' ' + styles.nodeActionBtnDelete}
             onClick={onDelete}
           >
             ×
@@ -326,18 +361,18 @@ export default function BTGraphEditor({
   }
 
   return (
-    <div style={{ minHeight: 'calc(100vh - 80px)', display: 'flex', flexDirection: 'column' }}>
-      <div style={{ padding: '1.5rem', backgroundColor: '#0f0f1a', borderBottom: '1px solid #2a2a3a' }}>
-        <h2 style={{ fontSize: '1.5rem', fontWeight: 700, margin: '0 0 1rem 0' }}>Behavior Tree Editor</h2>
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+    <div className={styles.container}>
+      <div className={styles.toolbar}>
+        <h2 className={styles.toolbarTitle}>Behavior Tree Editor</h2>
+        <div className={styles.toolbarActions}>
           <button
-            style={{ padding: '0.75rem 1.5rem', backgroundColor: '#8b5cf6', color: '#fff', border: 'none', borderRadius: '0.375rem', fontWeight: 600, fontSize: '0.875rem', cursor: 'pointer' }}
+            className={styles.toolbarBtn + ' ' + styles.toolbarBtnSave}
             onClick={saveToStorage}
           >
             Save
           </button>
           <button
-            style={{ padding: '0.75rem 1.5rem', backgroundColor: '#666', color: '#fff', border: 'none', borderRadius: '0.375rem', fontWeight: 600, fontSize: '0.875rem', cursor: 'pointer' }}
+            className={styles.toolbarBtn + ' ' + styles.toolbarBtnClear}
             onClick={clearEditor}
           >
             Clear
@@ -345,10 +380,10 @@ export default function BTGraphEditor({
         </div>
       </div>
 
-      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+      <div className={styles.container}>
         <NodePalette />
 
-        <div style={{ flex: 1, padding: '1rem', overflow: 'auto', backgroundColor: '#0a0a0f' }}>
+        <div className={styles.editorArea}>
           {root ? (
             <div style={{ maxWidth: '800px', margin: '0 auto' }}>
               <BTEditionNodeEditor
@@ -368,7 +403,7 @@ export default function BTGraphEditor({
               {root && countChildren(root) === 0 && (
                 <div style={{ marginTop: '1rem' }}>
                   <button
-                    style={{ padding: '0.75rem 1.5rem', backgroundColor: '#22c55e', color: '#fff', border: 'none', borderRadius: '0.375rem', fontSize: '0.875rem', fontWeight: 500, cursor: 'pointer' }}
+                    className={styles.addRootBtn}
                     onClick={() => {
                       const newNode: BTEditionNode = { type: 'sequence', id: `node_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`, children: [] }
                       onChange({ ...root, id: 'root', children: [newNode] })
@@ -391,7 +426,7 @@ export default function BTGraphEditor({
               />
             </div>
           ) : (
-            <div style={{ textAlign: 'center', padding: '3rem', color: '#888' }}>
+            <div className={styles.emptyState}>
               <p>🎯 Start by dragging nodes from the palette on the left.</p>
             </div>
           )}
@@ -423,8 +458,11 @@ const BTTreeRecursive = ({
   const handleDelete = () => { if (node.type !== 'root') onDelete(node.id) }
   const handleUpdateArgs = (updated: BTEditionNode) => onUpdateArgs(node.id, updated)
 
+  const bgStyle = isSelected ? { background: 'var(--bg-elevated)' } : {}
+  const borderStyle = isSelected ? { border: '2px solid var(--accent)' } : {}
+
   return (
-    <div style={{ marginBottom: '0.5rem', backgroundColor: isSelected ? '#3a3a5a' : '#2d2d44', border: isSelected ? '2px solid #3b82f6' : '1px solid #444', borderRadius: '0.375rem' }}>
+    <div className={styles.treeNode} style={{ ...bgStyle, ...borderStyle, borderRadius: '0.375rem', marginBottom: '0.5rem', padding: '0.5rem', background: bgStyle.background || 'var(--bg-surface)', border: borderStyle.border || '1px solid var(--border)' }}>
       <BTEditionNodeEditor node={node} onUpdate={handleUpdateArgs} onDelete={handleDelete} onAddChild={() => handleAddChild('sequence')} />
 
       {node.children !== undefined && node.children.length > 0 && (
@@ -445,13 +483,13 @@ const BTTreeRecursive = ({
       )}
 
       {node.children !== undefined && node.children.length === 0 && node.type !== 'root' && (
-        <div style={{ padding: '0.75rem', backgroundColor: 'rgba(0,0,0,0.2)', borderRadius: '0.25rem', marginTop: '0.5rem' }}>
-          <span style={{ color: '#888', fontSize: '0.875rem' }}>No children. Add:</span>
-          <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
-            <button style={{ padding: '0.375rem 0.75rem', backgroundColor: '#22c55e', color: '#fff', border: 'none', borderRadius: '0.25rem', fontSize: '0.8rem', cursor: 'pointer' }} onClick={() => handleAddChild('sequence')}>Sequence</button>
-            <button style={{ padding: '0.375rem 0.75rem', backgroundColor: '#8b5cf6', color: '#fff', border: 'none', borderRadius: '0.25rem', fontSize: '0.8rem', cursor: 'pointer' }} onClick={() => handleAddChild('selector')}>Selector</button>
-            <button style={{ padding: '0.375rem 0.75rem', backgroundColor: '#f59e0b', color: '#fff', border: 'none', borderRadius: '0.25rem', fontSize: '0.8rem', cursor: 'pointer' }} onClick={() => handleAddChild('action')}>Action</button>
-            <button style={{ padding: '0.375rem 0.75rem', backgroundColor: '#10b981', color: '#fff', border: 'none', borderRadius: '0.25rem', fontSize: '0.8rem', cursor: 'pointer' }} onClick={() => handleAddChild('condition')}>Condition</button>
+        <div className={styles.emptyChildren}>
+          <span className={styles.emptyChildrenText}>No children. Add:</span>
+          <div className={styles.emptyChildrenActions}>
+            <button className={styles.emptyChildBtn + ' ' + styles.emptyChildBtnSequence} onClick={() => handleAddChild('sequence')}>Sequence</button>
+            <button className={styles.emptyChildBtn + ' ' + styles.emptyChildBtnSelector} onClick={() => handleAddChild('selector')}>Selector</button>
+            <button className={styles.emptyChildBtn + ' ' + styles.emptyChildBtnAction} onClick={() => handleAddChild('action')}>Action</button>
+            <button className={styles.emptyChildBtn + ' ' + styles.emptyChildBtnCondition} onClick={() => handleAddChild('condition')}>Condition</button>
           </div>
         </div>
       )}
