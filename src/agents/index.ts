@@ -139,6 +139,11 @@ registerAgent(hedgehog, 'hedgehog')
 registerAgent(flamingo, 'flamingo')
 registerAgent(octopus, 'octopus')
 registerAgent(tapir, 'tapir')
+registerAgent(lion, 'lion')
+registerAgent(cicada, 'cicada')
+registerAgent(seahorse, 'seahorse')
+registerAgent(gecko, 'gecko')
+registerAgent(mandrill, 'mandrill')
 
 const agentList: Array<{ character: Character }> = [
   loyalDog, curiousCat, guardDino, danceBot, zenTurtle,
@@ -151,7 +156,8 @@ const agentList: Array<{ character: Character }> = [
   owl, cobra, shark, hummingbird, scorpion,
   peacock, firefly, elephant, phoenix, penguin,
   crab, chameleon, jaguar, dolphin, mantis,
-  bee, hedgehog, flamingo, octopus, tapir
+  bee, hedgehog, flamingo, octopus, tapir,
+  lion, cicada, seahorse, gecko, mandrill
 ]
 
 // ─── Public API ──────────────────────────────────────────────
