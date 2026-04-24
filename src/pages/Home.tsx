@@ -153,7 +153,7 @@ export function HomePage() {
             {t('home.agents_subtitle')}
           </p>
           <div className={styles.featuredGrid}>
-            {characters.slice(0, 8).map((char, i) => (
+            {characters.slice(0, 12).map((char, i) => (
               <motion.div
                 key={char.id}
                 initial={{ opacity: 0, y: 16 }}
@@ -162,7 +162,7 @@ export function HomePage() {
                 transition={{ duration: 0.35, delay: i * 0.05 }}
               >
                 <HoverBeam size="sm" colorVariant="colorful" strength={0.55}>
-                  <Link to={`/agent/${char.id}`} className={styles.featuredCard}>
+                  <Link to={`/agent/${char.id}`} className={styles.featuredCard} data-category={char.category}>
                     <span className={styles.featuredEmoji}>{char.emoji}</span>
                     <div>
                       <span className={styles.featuredName}>{char.name}</span>

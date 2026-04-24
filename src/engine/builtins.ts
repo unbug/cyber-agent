@@ -219,6 +219,70 @@ registerAction('idle', (): NodeStatus => {
   return 'success'
 })
 
+registerAction('stayStill', (bb, _adapter, args): NodeStatus => {
+  const duration = (args?.duration as number) ?? 1000
+  const tickIntervalMs = (bb as any).tickIntervalMs ?? 50
+  const elapsed = bb.tick * tickIntervalMs
+  if (elapsed >= duration) {
+    delete (bb as any)._stayStillStart
+    return 'success'
+  }
+  if (!(bb as any)._stayStillStart) (bb as any)._stayStillStart = elapsed
+  return 'running'
+})
+
+registerAction('erraticMove', (bb, _adapter, args): NodeStatus => {
+  const speed = (args?.speed as number) ?? (bb.speed as number) ?? 2
+  const jitter = (args?.jitter as number) ?? 0.3
+  const target = args?.target as string | undefined
+
+  let dx: number, dy: number
+  if (target === 'pointer') {
+    dx = bb.pointerX - bb.x
+    dy = bb.pointerY - bb.y
+  } else {
+    // Erratic random target
+    const margin = 30
+    const tx = margin + Math.random() * (bb.canvasWidth - margin * 2)
+    const ty = margin + Math.random() * (bb.canvasHeight - margin * 2)
+    dx = tx - bb.x + (Math.random() - 0.5) * jitter * 100
+    dy = ty - bb.y + (Math.random() - 0.5) * jitter * 100
+  }
+
+  const dist = Math.sqrt(dx * dx + dy * dy)
+  if (dist < speed) {
+    bb.x += (dx / dist) * speed + (Math.random() - 0.5) * jitter * 20
+    bb.y += (dy / dist) * speed + (Math.random() - 0.5) * jitter * 20
+    return 'success'
+  }
+  bb.x += (dx / dist) * speed
+  bb.y += (dy / dist) * speed
+  bb.rotation = Math.atan2(dy, dx) * (180 / Math.PI)
+  return 'running'
+})
+
+registerAction('moveAwayFromPointer', (bb, _adapter, args): NodeStatus => {
+  const speed = (args?.speed as number) ?? bb.speed
+  const dx = bb.x - bb.pointerX
+  const dy = bb.y - bb.pointerY
+  const dist = Math.sqrt(dx * dx + dy * dy)
+  if (dist < speed) return 'success'
+  bb.x += (dx / dist) * speed
+  bb.y += (dy / dist) * speed
+  bb.rotation = Math.atan2(dy, dx) * (180 / Math.PI)
+  return 'running'
+})
+
+registerAction('pauseRandomly', (bb, _adapter, args): NodeStatus => {
+  const minMs = (args?.minMs as number) ?? 1000
+  const maxMs = (args?.maxMs as number) ?? 3000
+  const pauseEnd = (bb as any)._pauseEnd as number | undefined
+  if (!pauseEnd) {
+    (bb as any)._pauseEnd = Date.now() + minMs + Math.random() * (maxMs - minMs)
+  }
+  return Date.now() >= ((bb as any)._pauseEnd as number) ? 'success' : 'running'
+})
+
 // ═══════════════════════════════════════════════════════════════
 // Robotics-specific Actions (heartbeat, balance, terrain adaptation)
 // ═══════════════════════════════════════════════════════════

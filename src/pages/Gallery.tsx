@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Search, ArrowRight, FileCode, Plus } from 'lucide-react'
+import { Search, ArrowRight, FileCode, Plus, Shuffle } from 'lucide-react'
 import { HoverBeam } from '@/components/HoverBeam'
 import { characters, type Character } from '@/agents'
 import { useI18n } from '@/i18n'
@@ -47,6 +47,11 @@ const EMOJI_MAP: Record<string, string> = {
   'elephant': '🐘',
   'phoenix': '🔥',
   'penguin': '🐧',
+  'bee': '🐝',
+  'hedgehog': '🦔',
+  'flamingo': '🦩',
+  'octopus': '🐙',
+  'tapir': '🦓',
 }
 
 const CATEGORIES = [
@@ -60,16 +65,29 @@ const CATEGORIES = [
 export function GalleryPage() {
   const [filter, setFilter] = useState<string>('all')
   const [search, setSearch] = useState('')
+  const [shuffled, setShuffled] = useState(false)
   const { t } = useI18n()
 
-  const filtered = characters.filter((c) => {
-    const matchCategory = filter === 'all' || c.category === filter
-    const matchSearch =
-      !search ||
-      c.name.toLowerCase().includes(search.toLowerCase()) ||
-      c.tags.some((t) => t.includes(search.toLowerCase()))
-    return matchCategory && matchSearch
-  })
+  const toggleShuffle = () => {
+    setShuffled((s) => !s)
+  }
+
+  const getFiltered = () => {
+    let list = characters.filter((c) => {
+      const matchCategory = filter === 'all' || c.category === filter
+      const matchSearch =
+        !search ||
+        c.name.toLowerCase().includes(search.toLowerCase()) ||
+        c.tags.some((t) => t.includes(search.toLowerCase()))
+      return matchCategory && matchSearch
+    })
+    if (shuffled) {
+      list = [...list].sort(() => Math.random() - 0.5)
+    }
+    return list
+  }
+
+  const filtered = getFiltered()
 
   return (
     <div className={styles.page}>
@@ -122,6 +140,19 @@ export function GalleryPage() {
                 </button>
               </HoverBeam>
             ))}
+            <HoverBeam
+              size="line"
+              colorVariant={shuffled ? 'sunset' : 'mono'}
+              strength={shuffled ? 0.75 : 0.35}
+            >
+              <button
+                onClick={toggleShuffle}
+                className={`${styles.filterBtn} ${shuffled ? styles.filterActive : ''}`}
+                title="Shuffle characters"
+              >
+                <Shuffle size={14} />
+              </button>
+            </HoverBeam>
           </div>
         </div>
 
@@ -156,7 +187,7 @@ function CharacterCard({ character }: { character: Character }) {
       <div className={styles.cardRow}>
         <div className={styles.cardMain}>
           <HoverBeam size="md" colorVariant="colorful" strength={0.62}>
-            <Link to={`/agent/${character.id}`} className={styles.card}>
+            <Link to={`/agent/${character.id}`} className={styles.card} data-category={character.category}>
               <div className={styles.cardEmoji}>{EMOJI_MAP[character.id] || character.emoji}</div>
               <div className={styles.cardBody}>
                 <div className={styles.cardHeader}>
