@@ -1,7 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { I18nProvider, useI18n } from '../i18n';
 import { HomePage as Home } from '../pages/Home';
 
 // Mock useI18n to return the key itself for test assertions

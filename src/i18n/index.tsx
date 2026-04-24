@@ -28,12 +28,7 @@ const I18nContext = createContext<I18nContextValue>({
 })
 
 export function I18nProvider({ children }: { children: React.ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>(() => {
-    // Auto-detect from browser
-    const browserLang = navigator.language?.toLowerCase() ?? ''
-    if (browserLang.startsWith('zh')) return 'zh'
-    return 'en'
-  })
+  const [locale, setLocaleState] = useState<Locale>('en') // default to English
 
   const setLocale = useCallback((l: Locale) => {
     setLocaleState(l)
