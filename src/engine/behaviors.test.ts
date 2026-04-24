@@ -48,14 +48,19 @@ describe('Character behaviors', () => {
       'wolf',
       'butterfly',
       'koala',
+      'crab',
+      'chameleon',
+      'jaguar',
+      'dolphin',
+      'mantis',
     ]
     for (const id of ids) {
       expect(getBehavior(id)).toBeDefined()
     }
   })
 
-  it('getAllBehaviors returns all 40', () => {
-    expect(getAllBehaviors()).toHaveLength(40)
+  it('getAllBehaviors returns all 45', () => {
+    expect(getAllBehaviors()).toHaveLength(45)
   })
 
   it('each behavior tree can hydrate and tick without crashing', () => {
