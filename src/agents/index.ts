@@ -72,6 +72,12 @@ import * as cicada from './cicada'
 import * as seahorse from './seahorse'
 import * as gecko from './gecko'
 import * as mandrill from './mandrill'
+// New agents
+import * as spider from './spider'
+import * as whale from './whale'
+import * as rhino from './rhino'
+import * as heron from './heron'
+import * as otter from './otter'
 
 // ─── Registry ────────────────────────────────────────────────
 
@@ -144,6 +150,11 @@ registerAgent(cicada, 'cicada')
 registerAgent(seahorse, 'seahorse')
 registerAgent(gecko, 'gecko')
 registerAgent(mandrill, 'mandrill')
+registerAgent(spider, 'spider')
+registerAgent(whale, 'whale')
+registerAgent(rhino, 'rhino')
+registerAgent(heron, 'heron')
+registerAgent(otter, 'otter')
 
 const agentList: Array<{ character: Character }> = [
   loyalDog, curiousCat, guardDino, danceBot, zenTurtle,
@@ -157,7 +168,8 @@ const agentList: Array<{ character: Character }> = [
   peacock, firefly, elephant, phoenix, penguin,
   crab, chameleon, jaguar, dolphin, mantis,
   bee, hedgehog, flamingo, octopus, tapir,
-  lion, cicada, seahorse, gecko, mandrill
+  lion, cicada, seahorse, gecko, mandrill,
+  spider, whale, rhino, heron, otter
 ]
 
 // ─── Public API ──────────────────────────────────────────────

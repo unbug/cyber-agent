@@ -52,6 +52,21 @@ const EMOJI_MAP: Record<string, string> = {
   'flamingo': '🦩',
   'octopus': '🐙',
   'tapir': '🦓',
+  'crab': '🦀',
+  'chameleon': '🦎',
+  'jaguar': '🐆',
+  'dolphin': '🐬',
+  'mantis': '🦗',
+  'cicada': '🪲',
+  'gecko': '🦎',
+  'lion': '🦁',
+  'mandrill': '🐵',
+  'seahorse': '🐴',
+  'spider': '🕷️',
+  'whale': '🐋',
+  'rhino': '🦏',
+  'heron': '🦢',
+  'otter': '🦦',
 }
 
 const CATEGORIES = [
