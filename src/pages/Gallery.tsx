@@ -1,11 +1,18 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Search, ArrowRight, FileCode, Plus, Shuffle } from 'lucide-react'
+import { Search, ArrowRight, FileCode, Plus, Shuffle, Dices } from 'lucide-react'
 import { HoverBeam } from '@/components/HoverBeam'
 import { characters, type Character } from '@/agents'
 import { useI18n } from '@/i18n'
 import styles from './Gallery.module.css'
+
+const DIFFICULTIES = [
+  { key: 'all', labelKey: 'gallery.difficulty_all' },
+  { key: 'easy', labelKey: 'gallery.difficulty_easy' },
+  { key: 'medium', labelKey: 'gallery.difficulty_medium' },
+  { key: 'hard', labelKey: 'gallery.difficulty_hard' },
+] as const
 
 const EMOJI_MAP: Record<string, string> = {
   'loyal-dog': '🐕',
@@ -87,6 +94,7 @@ const CATEGORIES = [
 
 export function GalleryPage() {
   const [filter, setFilter] = useState<string>('all')
+  const [difficulty, setDifficulty] = useState<string>('all')
   const [search, setSearch] = useState('')
   const [shuffled, setShuffled] = useState(false)
   const { t } = useI18n()
@@ -95,14 +103,23 @@ export function GalleryPage() {
     setShuffled((s) => !s)
   }
 
+  const handleRandom = useCallback(() => {
+    const list = getFiltered()
+    if (list.length > 0) {
+      const picked = list[Math.floor(Math.random() * list.length)]!
+      window.location.href = `/agent/${picked.id}`
+    }
+  }, [filter, difficulty, search, shuffled])
+
   const getFiltered = () => {
     let list = characters.filter((c) => {
       const matchCategory = filter === 'all' || c.category === filter
+      const matchDifficulty = difficulty === 'all' || c.difficulty === difficulty
       const matchSearch =
         !search ||
         c.name.toLowerCase().includes(search.toLowerCase()) ||
         c.tags.some((t) => t.includes(search.toLowerCase()))
-      return matchCategory && matchSearch
+      return matchCategory && matchDifficulty && matchSearch
     })
     if (shuffled) {
       list = [...list].sort(() => Math.random() - 0.5)
@@ -163,6 +180,25 @@ export function GalleryPage() {
                 </button>
               </HoverBeam>
             ))}
+          </div>
+          <div className={styles.filters}>
+            {DIFFICULTIES.map(({ key, labelKey }) => (
+              <HoverBeam
+                key={key}
+                size="line"
+                colorVariant={difficulty === key ? 'sunset' : 'mono'}
+                strength={difficulty === key ? 0.75 : 0.35}
+              >
+                <button
+                  onClick={() => setDifficulty(key)}
+                  className={`${styles.filterBtn} ${difficulty === key ? styles.filterActive : ''}`}
+                >
+                  {t(labelKey)}
+                </button>
+              </HoverBeam>
+            ))}
+          </div>
+          <div className={styles.randomSection}>
             <HoverBeam
               size="line"
               colorVariant={shuffled ? 'sunset' : 'mono'}
@@ -174,6 +210,15 @@ export function GalleryPage() {
                 title="Shuffle characters"
               >
                 <Shuffle size={14} />
+              </button>
+            </HoverBeam>
+            <HoverBeam size="line" colorVariant="mono" strength={0.35}>
+              <button
+                onClick={handleRandom}
+                className={styles.filterBtn}
+                title="Random character"
+              >
+                <Dices size={14} />
               </button>
             </HoverBeam>
           </div>

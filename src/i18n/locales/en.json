@@ -42,7 +42,11 @@
     "guards": "Guards",
     "performers": "Performers",
     "explorers": "Explorers",
-    "create_new": "Create New"
+    "create_new": "Create New",
+    "difficulty_all": "All Levels",
+    "difficulty_easy": "Easy",
+    "difficulty_medium": "Medium",
+    "difficulty_hard": "Hard"
   },
   "agent": {
     "back": "Back to Gallery",

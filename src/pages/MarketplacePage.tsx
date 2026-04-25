@@ -8,6 +8,13 @@ import { downloadCharacter } from '@/utils/downloadCharacter'
 import { useI18n } from '@/i18n'
 import styles from './MarketplacePage.module.css'
 
+const DIFFICULTIES = [
+  { key: 'all', label: 'All Levels' },
+  { key: 'easy', label: 'Easy' },
+  { key: 'medium', label: 'Medium' },
+  { key: 'hard', label: 'Hard' },
+] as const
+
 const EMOJI_MAP: Record<string, string> = {
   'loyal-dog': '🐕',
   'curious-cat': '🐈',
@@ -101,6 +108,7 @@ const SORT_OPTIONS = [
 
 export function MarketplacePage() {
   const [filter, setFilter] = useState<string>('all')
+  const [difficulty, setDifficulty] = useState<string>('all')
   const [search, setSearch] = useState('')
   const [sortBy, setSortBy] = useState<string>('default')
   const { t } = useI18n()
@@ -108,11 +116,12 @@ export function MarketplacePage() {
   const filtered = useMemo(() => {
     let list = characters.filter((c) => {
       const matchCategory = filter === 'all' || c.category === filter
+      const matchDifficulty = difficulty === 'all' || c.difficulty === difficulty
       const matchSearch =
         !search ||
         c.name.toLowerCase().includes(search.toLowerCase()) ||
         c.tags.some((tag) => tag.toLowerCase().includes(search.toLowerCase()))
-      return matchCategory && matchSearch
+      return matchCategory && matchDifficulty && matchSearch
     })
 
     if (sortBy === 'name') {
@@ -122,7 +131,7 @@ export function MarketplacePage() {
     }
 
     return list
-  }, [filter, search, sortBy])
+  }, [filter, difficulty, search, sortBy])
 
   const handleDownload = (character: (typeof characters)[0]) => {
     downloadCharacter(character)
@@ -185,6 +194,24 @@ export function MarketplacePage() {
                 <button
                   onClick={() => setFilter(key)}
                   className={`${styles.filterBtn} ${filter === key ? styles.filterActive : ''}`}
+                >
+                  {label}
+                </button>
+              </HoverBeam>
+            ))}
+          </div>
+
+          <div className={styles.filters}>
+            {DIFFICULTIES.map(({ key, label }) => (
+              <HoverBeam
+                key={key}
+                size="line"
+                colorVariant={difficulty === key ? 'sunset' : 'mono'}
+                strength={difficulty === key ? 0.75 : 0.35}
+              >
+                <button
+                  onClick={() => setDifficulty(key)}
+                  className={`${styles.filterBtn} ${difficulty === key ? styles.filterActive : ''}`}
                 >
                   {label}
                 </button>

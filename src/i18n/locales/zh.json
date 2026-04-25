@@ -42,7 +42,11 @@
     "guards": "守卫",
     "performers": "表演者",
     "explorers": "探险者",
-    "create_new": "创建新角色"
+    "create_new": "创建新角色",
+    "difficulty_all": "所有难度",
+    "difficulty_easy": "简单",
+    "difficulty_medium": "中等",
+    "difficulty_hard": "困难"
   },
   "agent": {
     "back": "返回角色库",
