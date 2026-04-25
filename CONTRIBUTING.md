@@ -208,6 +208,88 @@ const runner = createCanvasRunner(behavior, canvasElement)
 runner.start()
 ```
 
+## 🐛 Debug Invariants
+
+Every change to CyberAgent **must** expose a debug surface. This is non-negotiable.
+
+### Rule 1: Trace Events
+
+If your code touches the behavior tree engine, robot adapters, or character logic, add tracer events:
+
+```typescript
+import { emitTickStart, emitNodeEnter, emitActionDispatch } from './engine/tracer'
+
+// At tick start
+emitTickStart(performance.now())
+
+// When entering a BT node
+emitNodeEnter('nodeId', 'nodeType', performance.now())
+
+// When dispatching an action
+emitActionDispatch('chargeAt', performance.now())
+
+// When writing to the blackboard
+// (bb.set already emits bb.set events — verify coverage)
+
+// When the adapter sends/receives data
+// (emitAdapterTx / emitAdapterRx already wired)
+```
+
+The tracer collects the last **1 000 events** per session in a ring buffer, persisted to IndexedDB. Events are visible in the `/debug` page.
+
+### Rule 2: Debugger Visibility
+
+New features should add at least one of:
+
+- **Tracer events** — structured log entries (tick.start, node.enter, action.dispatch, adapter.tx/rx, bb.set, error)
+- **`/debug` panel** — a visual widget showing live state (blackboard diffs, tick rate, timeline)
+- **Replay support** — the ability to record and replay a session (`.cybertrace` format)
+
+### Rule 3: No Silent Failures
+
+Never swallow errors. If an operation can fail, emit an `error` tracer event and surface it in `/debug`:
+
+```typescript
+try {
+  await adapter.sendCommand(cmd)
+} catch (err) {
+  emitError('adapter.sendCommand', err, performance.now())
+  throw err
+}
+```
+
+## 🤖 Embodiment Invariants
+
+Every feature must have a **real-hardware path**. Sim-only work must be clearly marked.
+
+### Rule 1: HIL Evidence for Hardware Changes
+
+If your PR touches robot adapters, motor control, sensor reading, or any hardware-adjacent code, you **must** include Hardware-in-Loop (HIL) evidence:
+
+1. Create or update `docs/hil/<adapter>/` with:
+   - A test report (pass/fail for each test case)
+   - Screenshots or logs showing real hardware interaction
+   - Connection instructions for reproducible testing
+2. The HIL test must run against the **actual adapter code** (not mocks)
+3. Document which robot model was used and firmware version
+
+### Rule 2: Sim-Only Behind `experimental/`
+
+If a feature cannot be tested on real hardware yet:
+
+- Place it under `src/experimental/` or gate behind an `experimental/` flag
+- Add a `// TODO: HIL evidence required` comment
+- Document the expected real-hardware path in the PR
+
+### Rule 3: Safety First
+
+When working with real robots:
+
+- Always test with `emergencyStop()` accessible
+- Verify motor limits and speed clamping
+- Never deploy untested motor commands to a connected robot
+- Use the HIL emulator (`tests/hil-emulator/`) for CI validation
+
 ## 📝 Code Style
 
 - TypeScript strict mode
@@ -217,6 +299,8 @@ runner.start()
 - PascalCase for components/classes
 - camelCase for functions/variables
 - Descriptive names — no abbreviations
+- **Every change must have a debug surface** (see Debug Invariants)
+- **Every hardware change must have HIL evidence** (see Embodiment Invariants)
 
 ## 🔄 PR Process
 

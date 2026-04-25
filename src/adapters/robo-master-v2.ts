@@ -189,20 +189,29 @@ export class RoboMasterAdapterV2 implements RobotAdapter {
     const adapter = new RoboMasterAdapterV2(config);
     return adapter.heartbeat.connect().then(() => adapter);
   }
+
+  /** For testing only — creates an adapter without connecting */
+  static _forTest(config: RoboMasterAdapterV2Config): RoboMasterAdapterV2 {
+    return new RoboMasterAdapterV2(config);
+  }
   
   /**
    * Optimized tick: processes highest priority command first
    */
   async tick(): Promise<void> {
-    // Emergency stop ALWAYS processes first
+    // Emergency stop ALWAYS processes first — send directly, not via sendCommand
     if (this.commandQueue.hasEmergency()) {
       const emergencyEntry = this.commandQueue.dequeue();
       if (emergencyEntry) {
-        await this.sendCommand(emergencyEntry.command);
+        const socket = this.heartbeat.getWebSocket();
+        if (socket && socket.readyState === WebSocket.OPEN) {
+          socket.send(JSON.stringify(emergencyEntry.command));
+        }
+        emitAdapterTx('emergency_stop', performance.now());
         return;
       }
     }
-    
+
     // Process next highest priority command
     const nextEntry = this.commandQueue.dequeue();
     if (nextEntry) {
