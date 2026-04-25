@@ -70,6 +70,11 @@ const EMOJI_MAP: Record<string, string> = {
   'crane': '🦢',
   'gorilla': '🦍',
   'manta': '🪼',
+  'eagle': '🦅',
+  'sloth': '🦥',
+  'narwhal': '🦄',
+  'cricket': '🦗',
+  'bat': '🦇',
 }
 
 const CATEGORIES = [

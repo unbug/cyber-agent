@@ -82,6 +82,12 @@ import * as otter from './otter'
 import * as crane from './crane'
 import * as gorilla from './gorilla'
 import * as manta from './manta'
+// New agents
+import * as eagle from './eagle'
+import * as sloth from './sloth'
+import * as narwhal from './narwhal'
+import * as cricket from './cricket'
+import * as bat from './bat'
 
 // ─── Registry ────────────────────────────────────────────────
 
@@ -162,6 +168,11 @@ registerAgent(otter, 'otter')
 registerAgent(crane, 'crane')
 registerAgent(gorilla, 'gorilla')
 registerAgent(manta, 'manta')
+registerAgent(eagle, 'eagle')
+registerAgent(sloth, 'sloth')
+registerAgent(narwhal, 'narwhal')
+registerAgent(cricket, 'cricket')
+registerAgent(bat, 'bat')
 
 const agentList: Array<{ character: Character }> = [
   loyalDog, curiousCat, guardDino, danceBot, zenTurtle,
@@ -177,7 +188,7 @@ const agentList: Array<{ character: Character }> = [
   bee, hedgehog, flamingo, octopus, tapir,
   lion, cicada, seahorse, gecko, mandrill,
   spider, whale, rhino, heron, otter,
-  crane, gorilla, manta
+  crane, gorilla, manta, eagle, sloth, narwhal, cricket, bat
 ]
 
 // ─── Public API ──────────────────────────────────────────────
