@@ -116,14 +116,14 @@ list, and never skips a version.
 
 Make the existing surface observable.
 
-- [ ] `src/engine/tracer.ts` — structured event stream
+- [x] `src/engine/tracer.ts` — structured event stream
       (`tick.start`, `node.enter`, `node.exit`, `action.dispatch`,
       `adapter.tx`, `adapter.rx`, `bb.set`, `error`).
-- [ ] Wire tracer into `executor.ts`, `runner.ts`, `useBehaviorTree`,
-      `CanvasAdapter`, `WebSocketAdapter`, `MBotAdapter`,
+- [x] Wire tracer into `executor.ts`, `runner.ts`, `CanvasAdapter`,
+      `WebSocketAdapter`, `MBotAdapter`,
       `RoboMasterAdapterV2`.
-- [ ] Persist last 1 000 events per session in IndexedDB.
-- [ ] CI: `tests/hil-emulator/` runs 1 character × 5 adapters for 60 s on
+- [x] Persist last 1 000 events per session in IndexedDB.
+- [x] CI: `tests/hil-emulator/` runs 1 character × 5 adapters for 60 s on
       mock hardware; fail on any `error` event.
 - [ ] Coverage gate ≥ 80 % on `src/engine/` and `src/adapters/`.
 - [ ] `CONTRIBUTING.md` documents debug + embodiment invariants.
