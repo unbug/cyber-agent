@@ -76,6 +76,30 @@ registerCondition('anomalyDetected', (_bb, _args) => false)
 registerCondition('positioningComplete', (_bb, _args) => Math.random() > 0.7)
 
 // ═══════════════════════════════════════════════════════════════
+//  Additional Conditions (character-specific aliases)
+// ═══════════════════════════════════════════════════════════════
+
+registerCondition('excitementHigh', (bb, args) => {
+  const threshold = (args?.threshold as number) ?? 0.5
+  return bb.excitement > threshold
+})
+
+registerCondition('isNear', (bb, args) => {
+  const targetX = (args?.x as number) ?? bb.pointerX ?? bb.x
+  const targetY = (args?.y as number) ?? bb.pointerY ?? bb.y
+  const distance = (args?.distance as number) ?? 60
+  const dx = targetX - bb.x
+  const dy = targetY - bb.y
+  return Math.sqrt(dx * dx + dy * dy) < distance
+})
+
+registerCondition('pauseRandomly', (bb) => {
+  const pauseEnd = (bb as any)._pauseEnd as number | undefined
+  if (!pauseEnd) return false
+  return Date.now() >= pauseEnd
+})
+
+// ═══════════════════════════════════════════════════════════════
 //  ACTIONS — Movement
 // ═══════════════════════════════════════════════════════════════
 
