@@ -68,6 +68,9 @@ const EMOJI_MAP: Record<string, string> = {
   'rhino': '🦏',
   'heron': '🦢',
   'otter': '🦦',
+  'crane': '🦢',
+  'gorilla': '🦍',
+  'manta': '🪼',
 }
 
 const CATEGORY_LABELS: Record<string, string> = {
