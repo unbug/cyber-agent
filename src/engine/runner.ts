@@ -16,6 +16,7 @@ import type {
 } from './types'
 import { createBlackboard } from './types'
 import { hydrate, tick, resetTree } from './executor'
+import { emitTickStart, emitBbSet } from './tracer'
 
 // Ensure all builtins are registered
 import './builtins'
@@ -146,6 +147,10 @@ export class BehaviorTreeRunner {
 
   private doTick() {
     const now = performance.now()
+
+    // Emit tick.start
+    emitTickStart(now)
+
     this.bb.deltaMs = now - this.lastTickTime
     this.bb.totalMs += this.bb.deltaMs
     this.bb.tick++
@@ -153,6 +158,12 @@ export class BehaviorTreeRunner {
 
     // Execute behavior tree
     tick(this.root, this.bb, this.adapter)
+
+    // Emit blackboard snapshots for key fields
+    const bbFields = ['x', 'y', 'rotation', 'speed', 'emotion', 'energy', 'excitement'] as const
+    for (const field of bbFields) {
+      emitBbSet(field, this.bb[field], now)
+    }
 
     // TPS counter
     this._tpsCounter++

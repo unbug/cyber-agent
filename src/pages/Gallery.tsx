@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Search, ArrowRight, FileCode, Plus, Shuffle, Dices } from 'lucide-react'
 import { HoverBeam } from '@/components/HoverBeam'
+import { CharacterDetailModal } from '@/components/CharacterDetailModal'
 import { characters, type Character } from '@/agents'
 import { useI18n } from '@/i18n'
 import styles from './Gallery.module.css'
@@ -82,6 +83,7 @@ const EMOJI_MAP: Record<string, string> = {
   'narwhal': '🦄',
   'cricket': '🦗',
   'bat': '🦇',
+  'night-watch': '🦉',
 }
 
 const CATEGORIES = [
@@ -97,7 +99,16 @@ export function GalleryPage() {
   const [difficulty, setDifficulty] = useState<string>('all')
   const [search, setSearch] = useState('')
   const [shuffled, setShuffled] = useState(false)
+  const [selectedChar, setSelectedChar] = useState<Character | null>(null)
   const { t } = useI18n()
+
+  const openDetail = useCallback((char: Character) => {
+    setSelectedChar(char)
+  }, [])
+
+  const closeDetail = useCallback(() => {
+    setSelectedChar(null)
+  }, [])
 
   const toggleShuffle = () => {
     setShuffled((s) => !s)
@@ -230,7 +241,7 @@ export function GalleryPage() {
           layout
         >
           {filtered.map((char) => (
-            <CharacterCard key={char.id} character={char} />
+            <CharacterCard key={char.id} character={char} onSelect={openDetail} />
           ))}
           {filtered.length === 0 && (
             <div className={styles.empty}>
@@ -239,11 +250,16 @@ export function GalleryPage() {
           )}
         </motion.div>
       </div>
+
+      {/* Detail Modal */}
+      <CharacterDetailModal character={selectedChar} onClose={closeDetail} />
     </div>
   )
 }
 
-function CharacterCard({ character }: { character: Character }) {
+function CharacterCard({ character, onSelect }: { character: Character; onSelect?: (char: Character) => void }) {
+  const handleClick = () => onSelect?.(character)
+
   return (
     <motion.div
       layout
@@ -253,7 +269,7 @@ function CharacterCard({ character }: { character: Character }) {
       transition={{ duration: 0.25 }}
     >
       <div className={styles.cardRow}>
-        <div className={styles.cardMain}>
+        <div className={styles.cardMain} onClick={handleClick}>
           <HoverBeam size="md" colorVariant="colorful" strength={0.62}>
             <Link to={`/agent/${character.id}`} className={styles.card} data-category={character.category}>
               <div className={styles.cardEmoji}>{EMOJI_MAP[character.id] || character.emoji}</div>

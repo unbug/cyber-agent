@@ -31,6 +31,10 @@ export {
 export { BehaviorTreeRunner } from './runner'
 export type { RunnerState, RunnerSnapshot } from './runner'
 
+// Tracer
+export { tracer } from './tracer'
+export type { TracerEvent, TracerEventType } from './tracer'
+
 // Canvas adapter
 export { CanvasAdapter } from './canvas-adapter'
 

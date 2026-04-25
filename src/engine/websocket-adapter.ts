@@ -14,6 +14,7 @@
  */
 
 import type { Blackboard, RobotAdapter, AdapterCommand } from './types'
+import { emitAdapterTx, emitAdapterRx } from './tracer'
 
 export interface WebSocketAdapterConfig {
   url: string
@@ -150,6 +151,7 @@ export class WebSocketAdapter implements RobotAdapter {
   }
   
   sendCommand(command: AdapterCommand): void {
+    emitAdapterTx(command.type, performance.now())
     if (this.ws?.readyState === WebSocket.OPEN) {
       try {
         const payload = JSON.stringify(command)
@@ -186,7 +188,8 @@ export class WebSocketAdapter implements RobotAdapter {
   private handleMessage(event: MessageEvent) {
     try {
       const data = JSON.parse(event.data)
-      
+      emitAdapterRx({ type: data.type, raw: true }, performance.now())
+
       switch (data.type) {
         case 'heartbeat_ack':
           // Heartbeat acknowledged

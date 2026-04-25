@@ -14,6 +14,7 @@ import type {
   ActionFn,
   ConditionFn,
 } from './types'
+import { emitTickStart, emitNodeEnter, emitNodeExit, emitActionDispatch } from './tracer'
 
 // ─── Built-in Action & Condition Registries ───────────────────
 
@@ -70,6 +71,26 @@ export function tick(
   bb: Blackboard,
   adapter: RobotAdapter,
 ): NodeStatus {
+  const t = performance.now()
+  emitTickStart(t)
+
+  const { def } = node
+  const label = def.name ?? def.type
+  emitNodeEnter(label, t)
+
+  const result = dispatchNode(node, bb, adapter)
+
+  emitNodeExit(label, result, performance.now())
+  return result
+}
+
+// ─── Internal dispatch (avoids double-emission for composites) ─────
+
+function dispatchNode(
+  node: RuntimeNode,
+  bb: Blackboard,
+  adapter: RobotAdapter,
+): NodeStatus {
   const { def } = node
 
   switch (def.type) {
@@ -100,14 +121,18 @@ export function tick(
 // Runs children left→right. Fails on first failure. Succeeds when all succeed.
 
 function tickSequence(node: RuntimeNode, bb: Blackboard, adapter: RobotAdapter): NodeStatus {
+  const t = performance.now()
+  emitNodeEnter('sequence', t)
   for (const child of node.children) {
     const result = tick(child, bb, adapter)
     if (result === 'running' || result === 'failure') {
       node.status = result
+      emitNodeExit('sequence', result, performance.now())
       return result
     }
   }
   node.status = 'success'
+  emitNodeExit('sequence', 'success', performance.now())
   return 'success'
 }
 
@@ -115,14 +140,18 @@ function tickSequence(node: RuntimeNode, bb: Blackboard, adapter: RobotAdapter):
 // Runs children left→right. Succeeds on first success. Fails when all fail.
 
 function tickSelector(node: RuntimeNode, bb: Blackboard, adapter: RobotAdapter): NodeStatus {
+  const t = performance.now()
+  emitNodeEnter('selector', t)
   for (const child of node.children) {
     const result = tick(child, bb, adapter)
     if (result === 'running' || result === 'success') {
       node.status = result
+      emitNodeExit('selector', result, performance.now())
       return result
     }
   }
   node.status = 'failure'
+  emitNodeExit('selector', 'failure', performance.now())
   return 'failure'
 }
 
@@ -130,6 +159,8 @@ function tickSelector(node: RuntimeNode, bb: Blackboard, adapter: RobotAdapter):
 // Ticks ALL children every frame. Succeeds when threshold met.
 
 function tickParallel(node: RuntimeNode, bb: Blackboard, adapter: RobotAdapter): NodeStatus {
+  const t = performance.now()
+  emitNodeEnter('parallel', t)
   const threshold = (node.def as { successThreshold?: number }).successThreshold ?? node.children.length
   let successes = 0
   let failures = 0
@@ -142,40 +173,50 @@ function tickParallel(node: RuntimeNode, bb: Blackboard, adapter: RobotAdapter):
 
   if (successes >= threshold) {
     node.status = 'success'
+    emitNodeExit('parallel', 'success', performance.now())
     return 'success'
   }
   if (failures > node.children.length - threshold) {
     node.status = 'failure'
+    emitNodeExit('parallel', 'failure', performance.now())
     return 'failure'
   }
   node.status = 'running'
+  emitNodeExit('parallel', 'running', performance.now())
   return 'running'
 }
 
 // ─── Decorator: Inverter ──────────────────────────────────────
 
 function tickInverter(node: RuntimeNode, bb: Blackboard, adapter: RobotAdapter): NodeStatus {
+  const t = performance.now()
+  emitNodeEnter('inverter', t)
   const result = tick(node.children[0]!, bb, adapter)
-  if (result === 'success') { node.status = 'failure'; return 'failure' }
-  if (result === 'failure') { node.status = 'success'; return 'success' }
+  if (result === 'success') { node.status = 'failure'; emitNodeExit('inverter', 'failure', performance.now()); return 'failure' }
+  if (result === 'failure') { node.status = 'success'; emitNodeExit('inverter', 'success', performance.now()); return 'success' }
   node.status = 'running'
+  emitNodeExit('inverter', 'running', performance.now())
   return 'running'
 }
 
 // ─── Decorator: Repeater ──────────────────────────────────────
 
 function tickRepeater(node: RuntimeNode, bb: Blackboard, adapter: RobotAdapter): NodeStatus {
+  const t = performance.now()
+  emitNodeEnter('repeater', t)
   const count = (node.def as { count: number }).count
   const current = (node.state.iteration as number) ?? 0
 
   if (count !== -1 && current >= count) {
     node.status = 'success'
+    emitNodeExit('repeater', 'success', performance.now())
     return 'success'
   }
 
   const result = tick(node.children[0]!, bb, adapter)
   if (result === 'running') {
     node.status = 'running'
+    emitNodeExit('repeater', 'running', performance.now())
     return 'running'
   }
 
@@ -185,21 +226,26 @@ function tickRepeater(node: RuntimeNode, bb: Blackboard, adapter: RobotAdapter):
 
   if (count !== -1 && current + 1 >= count) {
     node.status = 'success'
+    emitNodeExit('repeater', 'success', performance.now())
     return 'success'
   }
   node.status = 'running'
+  emitNodeExit('repeater', 'running', performance.now())
   return 'running'
 }
 
 // ─── Decorator: Cooldown ──────────────────────────────────────
 
 function tickCooldown(node: RuntimeNode, bb: Blackboard, adapter: RobotAdapter): NodeStatus {
+  const t = performance.now()
+  emitNodeEnter('cooldown', t)
   const durationMs = (node.def as { durationMs: number }).durationMs
   const lastRun = (node.state.lastRunAt as number) ?? 0
   const now = bb.totalMs
 
   if (now - lastRun < durationMs) {
     node.status = 'failure'
+    emitNodeExit('cooldown', 'failure', performance.now())
     return 'failure'
   }
 
@@ -208,6 +254,7 @@ function tickCooldown(node: RuntimeNode, bb: Blackboard, adapter: RobotAdapter):
     node.state.lastRunAt = now
   }
   node.status = result
+  emitNodeExit('cooldown', result, performance.now())
   return result
 }
 
@@ -230,6 +277,8 @@ function tickCondition(node: RuntimeNode, bb: Blackboard): NodeStatus {
 
 function tickAction(node: RuntimeNode, bb: Blackboard, adapter: RobotAdapter): NodeStatus {
   const def = node.def as { action: string; args?: Record<string, unknown> }
+  const t = performance.now()
+  emitActionDispatch(def.action, t)
   const fn = actionRegistry.get(def.action)
   if (!fn) {
     console.warn(`[BT] Unknown action: ${def.action}`)

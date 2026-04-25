@@ -7,6 +7,7 @@
  */
 
 import type { Blackboard, RobotAdapter, AdapterCommand } from './types'
+import { emitAdapterTx } from './tracer'
 
 const EMOTION_COLORS: Record<string, string> = {
   idle: '#6366f1',
@@ -97,7 +98,7 @@ export class CanvasAdapter implements RobotAdapter {
   }
 
   sendCommand(command: AdapterCommand) {
-    // Canvas adapter logs commands for debugging
+    emitAdapterTx(command.type, performance.now())
     console.debug('[CanvasAdapter] command:', command.type, command.payload)
   }
 

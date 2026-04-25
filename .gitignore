@@ -18,3 +18,4 @@ coverage/
 *.tsbuildinfo
 next-env.d.ts
 .vite/
+HEARTBEAT.md

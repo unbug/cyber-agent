@@ -3,6 +3,7 @@
  */
 
 import type { RobotAdapter, Blackboard, AdapterCommand } from '../engine/types';
+import { emitAdapterTx } from '../engine/tracer';
 
 class I2CProtocol {
   static DEVICE_MOTOR = 0x08;
@@ -79,6 +80,7 @@ export class MBotAdapter implements RobotAdapter {
   }
 
   sendCommand(command: AdapterCommand): void {
+    emitAdapterTx(command.type, performance.now());
     const packet = this.serializeCommand(command);
     console.log('Send:', packet);
   }

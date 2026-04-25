@@ -1,4 +1,5 @@
 import type { RobotAdapter, AdapterCommand } from '../engine/types';
+import { emitAdapterTx } from '../engine/tracer';
 
 interface RoboMasterAdapterV2Config {
   host: string;
@@ -244,6 +245,7 @@ export class RoboMasterAdapterV2 implements RobotAdapter {
   }
   
   sendCommand(command: AdapterCommand): void {
+    emitAdapterTx(command.type, performance.now());
     this.commandQueue.enqueue(command, CommandPriority.REGULAR);
   }
   
