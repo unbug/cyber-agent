@@ -125,11 +125,14 @@ Make the existing surface observable.
 - [x] Persist last 1 000 events per session in IndexedDB.
 - [x] CI: `tests/hil-emulator/` runs 1 character × 5 adapters for 60 s on
       mock hardware; fail on any `error` event.
-- [ ] Coverage gate ≥ 80 % on `src/engine/` and `src/adapters/`.
-- [ ] `CONTRIBUTING.md` documents debug + embodiment invariants.
+- [x] Coverage gate ≥ 80 % on `src/engine/` and `src/adapters/`.
+      (engine: 81.3%, adapters: 85.5%)
+- [x] `CONTRIBUTING.md` documents debug + embodiment invariants.
 
 **Release gate**: tracer emits in production build; CI emulator green
 7 days; HEARTBEAT shows 0 unresolved adapter errors.
+
+Released: 2026-04-26
 
 #### v0.4 — `/debug` page MVP _(+1 → +2 months)_
 
