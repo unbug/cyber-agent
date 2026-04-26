@@ -30,7 +30,7 @@ describe('Home page', () => {
   it('renders feature cards', () => {
     renderWithRouter(<Home />);
     expect(screen.getByText('home.agents_title')).toBeInTheDocument();
-    expect(screen.getByText('feature_agents_title')).toBeInTheDocument();
+    expect(screen.getByText('home.feature_agents_title')).toBeInTheDocument();
   });
 
   it('renders CTA link to gallery', () => {
