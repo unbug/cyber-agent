@@ -2,8 +2,17 @@
 
 .container {
   display: flex;
+  flex-direction: column;
   height: 100%;
   min-height: calc(100vh - 80px);
+}
+
+/* ─── Editor Body (palette + editor side by side) ─── */
+
+.editorBody {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
 }
 
 /* ─── Node Palette ─── */

@@ -22,6 +22,8 @@ export function App() {
         <Route path="/challenge" element={<ChallengePage />} />
         <Route path="/marketplace" element={<MarketplacePage />} />
         <Route path="/agent/:id/editor" element={<CharacterEditor />} />
+        <Route path="/editor/new" element={<CharacterEditor />} />
+        <Route path="/editor/create" element={<CharacterEditor />} />
         <Route path="/editor" element={<BTGraphEditorPage />} />
       </Route>
     </Routes>

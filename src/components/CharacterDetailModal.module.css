@@ -196,7 +196,8 @@
   border-color: rgba(255, 255, 255, 0.15);
 }
 
-.actionBtn.primary {
+.actionBtn.primary,
+.primary {
   background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(244, 63, 94, 0.2));
   border-color: rgba(239, 68, 68, 0.3);
   color: #fca5a5;

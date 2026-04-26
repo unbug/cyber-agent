@@ -123,7 +123,7 @@ export function CharacterDetailModal({ character, onClose }: CharacterDetailModa
             {/* Quick Actions */}
             <div className={styles.actions}>
               <HoverBeam size="line" colorVariant="sunset" strength={0.65}>
-                <Link to={`/agent/${character.id}`} className={`${styles.actionBtn} primary`}>
+                <Link to={`/agent/${character.id}`} className={`${styles.actionBtn} ${styles.primary}`}>
                   <Heart size={16} />
                   <span>{t('detail.view_agent')}</span>
                   <ArrowRight size={14} />

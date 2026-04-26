@@ -121,9 +121,9 @@ const BTEditionNodeEditor = ({
   const renderNodeContent = () => {
     const common = (label: string) => (
       <>
-        <span className={styles.nodeLabel + ' ' + styles.nodeLabelStrong}>{label}:</span>
-        <span className={styles.nodeLabel + ' ' + styles.nodeLabelDim}>{node.type}</span>
-        {node.args && <span className={styles.nodeLabel + ' ' + styles.nodeLabelArgs}> (args)</span>}
+        <span className={`${styles.nodeLabel} ${styles['nodeLabel--strong']}`}>{label}:</span>
+        <span className={`${styles.nodeLabel} ${styles['nodeLabel--dim']}`}>{node.type}</span>
+        {node.args && <span className={`${styles.nodeLabel} ${styles['nodeLabel--args']}`}> (args)</span>}
       </>
     )
 
@@ -147,7 +147,7 @@ const BTEditionNodeEditor = ({
           <div className={styles.nodeLabel}>
             {common('Condition')}
             <button
-              className={styles.nodeActionBtn + ' ' + styles.nodeActionBtnEdit}
+              className={`${styles.nodeActionBtn} ${styles['nodeActionBtn--edit']}`}
               onClick={() => setEditMode(true)}
             >
               Edit
@@ -158,9 +158,9 @@ const BTEditionNodeEditor = ({
         return (
           <div className={styles.nodeLabel}>
             {common('Action')}
-            <span className={styles.nodeLabelAction}>{node.name || ''}</span>
+            <span className={styles['nodeLabel--action']}>{node.name || ''}</span>
             <button
-              className={styles.nodeActionBtn + ' ' + styles.nodeActionBtnEdit}
+              className={`${styles.nodeActionBtn} ${styles['nodeActionBtn--edit']}`}
               onClick={() => setEditMode(true)}
             >
               Edit
@@ -187,13 +187,13 @@ const BTEditionNodeEditor = ({
           />
           <div className={styles.editActions}>
             <button
-              className={styles.editBtn + ' ' + styles.editBtnSave}
+              className={`${styles.editBtn} ${styles['editBtn--save']}`}
               onClick={handleEditValueChange}
             >
               OK
             </button>
             <button
-              className={styles.editBtn + ' ' + styles.editBtnCancel}
+              className={`${styles.editBtn} ${styles['editBtn--cancel']}`}
               onClick={() => setEditMode(false)}
             >
               Cancel
@@ -213,13 +213,13 @@ const BTEditionNodeEditor = ({
         />
         <div className={styles.editActions}>
           <button
-            className={styles.editBtn + ' ' + styles.editBtnSave}
+            className={`${styles.editBtn} ${styles['editBtn--save']}`}
             onClick={handleEditValueChange}
           >
-            Save
+            OK
           </button>
           <button
-            className={styles.editBtn + ' ' + styles.editBtnCancel}
+            className={`${styles.editBtn} ${styles['editBtn--cancel']}`}
             onClick={() => setEditMode(false)}
           >
             Cancel
@@ -234,22 +234,21 @@ const BTEditionNodeEditor = ({
       {renderNodeContent()}
       <div className={styles.nodeActions}>
         {node.children !== undefined && node.children.length === 0 && (
-          <button
-            className={styles.nodeActionBtn + ' ' + styles.nodeActionBtnAdd}
+          <button className={`${styles.nodeActionBtn} ${styles['nodeActionBtn--add']}`}
             onClick={onAddChild}
           >
             + Add child
           </button>
         )}
         <button
-          className={styles.nodeActionBtn + ' ' + styles.nodeActionBtnEdit}
+          className={`${styles.nodeActionBtn} ${styles['nodeActionBtn--edit']}`}
           onClick={() => setEditMode(true)}
         >
           {node.args ? 'Edit Args' : 'Set Args'}
         </button>
         {node.type !== 'root' && (
           <button
-            className={styles.nodeActionBtn + ' ' + styles.nodeActionBtnDelete}
+            className={`${styles.nodeActionBtn} ${styles['nodeActionBtn--delete']}`}
             onClick={onDelete}
           >
             ×
@@ -366,13 +365,13 @@ export default function BTGraphEditor({
         <h2 className={styles.toolbarTitle}>Behavior Tree Editor</h2>
         <div className={styles.toolbarActions}>
           <button
-            className={styles.toolbarBtn + ' ' + styles.toolbarBtnSave}
+            className={`${styles.toolbarBtn} ${styles['toolbarBtn--save']}`}
             onClick={saveToStorage}
           >
             Save
           </button>
           <button
-            className={styles.toolbarBtn + ' ' + styles.toolbarBtnClear}
+            className={`${styles.toolbarBtn} ${styles['toolbarBtn--clear']}`}
             onClick={clearEditor}
           >
             Clear
@@ -380,7 +379,7 @@ export default function BTGraphEditor({
         </div>
       </div>
 
-      <div className={styles.container}>
+      <div className={styles.editorBody}>
         <NodePalette />
 
         <div className={styles.editorArea}>
@@ -486,10 +485,10 @@ const BTTreeRecursive = ({
         <div className={styles.emptyChildren}>
           <span className={styles.emptyChildrenText}>No children. Add:</span>
           <div className={styles.emptyChildrenActions}>
-            <button className={styles.emptyChildBtn + ' ' + styles.emptyChildBtnSequence} onClick={() => handleAddChild('sequence')}>Sequence</button>
-            <button className={styles.emptyChildBtn + ' ' + styles.emptyChildBtnSelector} onClick={() => handleAddChild('selector')}>Selector</button>
-            <button className={styles.emptyChildBtn + ' ' + styles.emptyChildBtnAction} onClick={() => handleAddChild('action')}>Action</button>
-            <button className={styles.emptyChildBtn + ' ' + styles.emptyChildBtnCondition} onClick={() => handleAddChild('condition')}>Condition</button>
+            <button className={`${styles.emptyChildBtn} ${styles['emptyChildBtn--sequence']}`} onClick={() => handleAddChild('sequence')}>Sequence</button>
+            <button className={`${styles.emptyChildBtn} ${styles['emptyChildBtn--selector']}`} onClick={() => handleAddChild('selector')}>Selector</button>
+            <button className={`${styles.emptyChildBtn} ${styles['emptyChildBtn--action']}`} onClick={() => handleAddChild('action')}>Action</button>
+            <button className={`${styles.emptyChildBtn} ${styles['emptyChildBtn--condition']}`} onClick={() => handleAddChild('condition')}>Condition</button>
           </div>
         </div>
       )}

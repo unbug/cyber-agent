@@ -14,6 +14,7 @@ import { characters, getBehavior, saveCharacterAsJSON, getAllBehaviors } from '@
 import type { BTEditionNode } from '@/agents'
 import type { BehaviorNodeDef } from '@/engine/types'
 import BTGraphEditor from './BTGraphEditor'
+import styles from './CharacterEditor.module.css'
 
 // ─── Default tree for new characters ──────────────────────────
 
@@ -58,7 +59,7 @@ const CATEGORIES = ['companion', 'guard', 'performer', 'explorer'] as const
 
 export default function CharacterEditor() {
   const navigate = useNavigate()
-  const { agentId } = useParams<{ agentId: string }>()
+  const { id: agentId } = useParams<{ id: string }>()
 
   // Mode: 'existing' (editing a character) | 'create' (making a new one)
   const [mode, setMode] = useState<'existing' | 'create'>('existing')
@@ -202,32 +203,32 @@ export default function CharacterEditor() {
   const displayEmoji = emoji || '🤖'
 
   return (
-    <div className="editor-page">
+    <div className={styles['editor-page']}>
       {/* Top bar */}
-      <header className="editor-header">
-        <div className="editor-header-left">
-          <Link to="/gallery" className="editor-back-btn">
+      <header className={styles['editor-header']}>
+        <div className={styles['editor-header-left']}>
+          <Link to="/gallery" className={styles['editor-back-btn']}>
             ← Back to Gallery
           </Link>
-          <div className="editor-title">
-            <span className="editor-emoji">{displayEmoji}</span>
+          <div className={styles['editor-title']}>
+            <span className={styles['editor-emoji']}>{displayEmoji}</span>
             <h1>
               {isNew ? 'Create Character' : 'Character Editor'}
             </h1>
           </div>
           {!isNew && (
-            <button onClick={handleCreateNew} className="editor-new-btn">
+            <button onClick={handleCreateNew} className={styles['editor-new-btn']}>
               + New
             </button>
           )}
         </div>
 
-        <div className="editor-header-right">
+        <div className={styles['editor-header-right']}>
           {!isNew && (
             <select
               value={category}
               onChange={e => setCategory(e.target.value)}
-              className="editor-select"
+              className={styles['editor-select']}
             >
               {CATEGORIES.map(c => (
                 <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>
@@ -235,11 +236,11 @@ export default function CharacterEditor() {
             </select>
           )}
 
-          <button onClick={() => setShowImportDialog(true)} className="editor-btn editor-btn--import">
+          <button onClick={() => setShowImportDialog(true)} className={`${styles['editor-btn']} ${styles['editor-btn--import']}`}>
             📂 Import
           </button>
 
-          <button onClick={handleExportAll} className="editor-btn editor-btn--export">
+          <button onClick={handleExportAll} className={`${styles['editor-btn']} ${styles['editor-btn--export']}`}>
             💾 Export All
           </button>
         </div>
@@ -247,64 +248,64 @@ export default function CharacterEditor() {
 
       {/* Notification */}
       {notification && (
-        <div className="editor-notification">
+        <div className={styles['editor-notification']}>
           {notification}
         </div>
       )}
 
       {/* Two-panel layout */}
-      <div className="editor-body">
+      <div className={styles['editor-body']}>
         {/* LEFT: Character metadata */}
-        <aside className="editor-sidebar">
-          <h2 className="editor-sidebar-title">Character Info</h2>
+        <aside className={styles['editor-sidebar']}>
+          <h2 className={styles['editor-sidebar-title']}>Character Info</h2>
 
-          <div className="editor-field">
+          <div className={styles['editor-field']}>
             <label>Emoji</label>
             <input
               value={emoji}
               onChange={e => setEmoji(e.target.value)}
-              className="editor-input editor-input--emoji"
+              className={`${styles['editor-input']} ${styles['editor-input--emoji']}`}
               placeholder="🤖"
             />
           </div>
 
-          <div className="editor-field">
+          <div className={styles['editor-field']}>
             <label>Name</label>
             <input
               value={name}
               onChange={e => setName(e.target.value)}
-              className="editor-input"
+              className={styles['editor-input']}
               placeholder="Character name"
             />
           </div>
 
-          <div className="editor-field">
+          <div className={styles['editor-field']}>
             <label>Description</label>
             <textarea
               value={description}
               onChange={e => setDescription(e.target.value)}
-              className="editor-textarea"
+              className={styles['editor-textarea']}
               placeholder="What does this character do?"
               rows={4}
             />
           </div>
 
-          <div className="editor-field">
+          <div className={styles['editor-field']}>
             <label>Tags</label>
             <input
               value={tags.join(', ')}
               onChange={e => setTags(e.target.value.split(',').map(t => t.trim()).filter(Boolean))}
-              className="editor-input"
+              className={styles['editor-input']}
               placeholder="tag1, tag2, tag3"
             />
           </div>
 
-          <div className="editor-field">
+          <div className={styles['editor-field']}>
             <label>Difficulty</label>
             <select
               value={difficulty}
               onChange={e => setDifficulty(e.target.value as 'easy' | 'medium' | 'hard')}
-              className="editor-select"
+              className={styles['editor-select']}
             >
               <option value="easy">Easy ★</option>
               <option value="medium">Medium ★★</option>
@@ -313,21 +314,21 @@ export default function CharacterEditor() {
           </div>
 
           {/* Summary */}
-          <div className="editor-summary">
+          <div className={styles['editor-summary']}>
             <h3>Summary</h3>
-            <div className="editor-summary-row">
+            <div className={styles['editor-summary-row']}>
               <span>📦 ID:</span>
               <code>{name.toLowerCase().replace(/\s+/g, '-') || 'new-character'}</code>
             </div>
-            <div className="editor-summary-row">
+            <div className={styles['editor-summary-row']}>
               <span>🏷️ Category:</span>
               <code>{category}</code>
             </div>
-            <div className="editor-summary-row">
+            <div className={styles['editor-summary-row']}>
               <span>📊 Difficulty:</span>
               <code>{difficulty}</code>
             </div>
-            <div className="editor-summary-row">
+            <div className={styles['editor-summary-row']}>
               <span>🌳 BT Nodes:</span>
               <code>{countTreeNodes(btRoot)}</code>
             </div>
@@ -335,12 +336,12 @@ export default function CharacterEditor() {
         </aside>
 
         {/* RIGHT: Behavior Tree Editor */}
-        <main className="editor-main">
-          <h2 className="editor-main-title">
+        <main className={styles['editor-main']}>
+          <h2 className={styles['editor-main-title']}>
             Behavior Tree — {displayName}
           </h2>
 
-          <div className="editor-editor-wrapper">
+          <div className={styles['editor-editor-wrapper']}>
             <BTGraphEditor
               root={btRoot}
               onChange={setBtRoot}
@@ -349,8 +350,8 @@ export default function CharacterEditor() {
           </div>
 
           {/* Quick actions */}
-          <div className="editor-actions">
-            <button onClick={handleExportBT} disabled={!btRoot} className="editor-btn editor-btn--secondary">
+          <div className={styles['editor-actions']}>
+            <button onClick={handleExportBT} disabled={!btRoot} className={`${styles['editor-btn']} ${styles['editor-btn--secondary']}`}>
               📄 Export BT as JSON
             </button>
             <button
@@ -360,19 +361,19 @@ export default function CharacterEditor() {
                 }
               }}
               disabled={!btRoot}
-              className="editor-btn editor-btn--secondary"
+              className={`${styles['editor-btn']} ${styles['editor-btn--secondary']}`}
             >
               📋 Copy to Clipboard
             </button>
-            <Link to="/docs" className="editor-btn editor-btn--outline">
+            <Link to="/docs" className={`${styles['editor-btn']} ${styles['editor-btn--outline']}`}>
               📖 Docs
             </Link>
           </div>
 
           {/* Reference: all characters */}
-          <div className="editor-reference">
+          <div className={styles['editor-reference']}>
             <h3>Reference — All Characters</h3>
-            <div className="editor-ref-grid">
+            <div className={styles['editor-ref-grid']}>
               {getAllBehaviors().map((b, i) => {
                 const ch = characters.find(c => c.id === b.characterId)
                 return (
@@ -392,7 +393,7 @@ export default function CharacterEditor() {
                         setBtRoot(convertToEdition(behavior.tree))
                       }
                     }}
-                    className="editor-ref-btn"
+                    className={styles['editor-ref-btn']}
                   >
                     {ch?.emoji ?? '🤖'} {b.characterId}
                   </button>
@@ -405,21 +406,21 @@ export default function CharacterEditor() {
 
       {/* Import JSON modal */}
       {showImportDialog && (
-        <div className="editor-modal-overlay" onClick={() => setShowImportDialog(false)}>
-          <div className="editor-modal" onClick={e => e.stopPropagation()}>
+        <div className={styles['editor-modal-overlay']} onClick={() => setShowImportDialog(false)}>
+          <div className={styles['editor-modal']} onClick={e => e.stopPropagation()}>
             <h2>Import Behavior Tree JSON</h2>
             <textarea
               value={importedJson}
               onChange={e => setImportedJson(e.target.value)}
               placeholder='{"type":"selector","children":[...]}'
-              className="editor-modal-textarea"
+              className={styles['editor-modal-textarea']}
               rows={8}
             />
-            <div className="editor-modal-actions">
-              <button onClick={() => setShowImportDialog(false)} className="editor-btn editor-btn--outline">
+            <div className={styles['editor-modal-actions']}>
+              <button onClick={() => setShowImportDialog(false)} className={`${styles['editor-btn']} ${styles['editor-btn--outline']}`}>
                 Cancel
               </button>
-              <button onClick={handleImportJson} className="editor-btn editor-btn--export">
+              <button onClick={handleImportJson} className={`${styles['editor-btn']} ${styles['editor-btn--export']}`}>
                 Import
               </button>
             </div>
