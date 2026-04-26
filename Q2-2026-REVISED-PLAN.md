@@ -274,7 +274,38 @@ Deliverables:
 **Q3 里程碑**:
 - ✅ 情感系统公开白皮书
 - ✅ 仿真精度 90%+
+- ✅ **Multi-Agent Playground 阶段 A+B+C 全量上线**（详见 [MULTI-AGENT-PLAYGROUND-PLAN.md](MULTI-AGENT-PLAYGROUND-PLAN.md)）
 - ✅ **社区计划正式启动**
+
+---
+
+## 第五条产品形态：Multi-Agent Playground
+
+> **不是第五壁垒，而是把前四个壁垒"产品化"的旗舰场景**。详细任务拆解见
+> [MULTI-AGENT-PLAYGROUND-PLAN.md](MULTI-AGENT-PLAYGROUND-PLAN.md)。
+
+**做什么**：让用户在浏览器里把任意多个 cyber-agent 角色拖到一个共享场景（操场 / 公园 / 校园 / 游乐场），看他们彼此感知、互动；同时把这一切 1:1 投射到由 cyber-agent 驱动的物理玩具机器人上。
+
+**竞品对照**：
+- AI Town（a16z, 9.8k★）：纯 LLM 小镇，无物理映射
+- Smallville / Generative Agents（21.2k★）：研究项目，每步 10 秒粒度
+- NVIDIA Isaac Sim Mega：工业级，对玩具市场过重
+- → cyber-agent 的差异化：**唯一打通"浏览器多 agent 模拟 ↔ 多台物理机器人广播"** 的开源项目
+
+**与四大壁垒的耦合**：
+
+| 壁垒 | Playground 中的体现 |
+| --- | --- |
+| ① 适配器广度 | `MultiBroadcastAdapter` 复用所有单机适配器；每多 1 个机型 = 多 1 种 playground 玩法 |
+| ② VAL 情感深度 | 邻居观察是 valence/arousal 最强输入；playground 是 VAL 的最佳验证场 |
+| ③ Sim→Physical 90% | 多机时基同步是 transfer 项目的加压测试 |
+| ④ 实时性能 | 50+ agent 同 tick 是浏览器侧的另一条性能曲线 |
+
+**时间线**：
+- Q2 W7-W8：阶段 A MVP（与 sim→physical 并行，内部 staging）
+- Q3 W9-W10：阶段 B 场景库 / Recorder / Replay
+- Q3 W11-W12：阶段 C 物理桥接 + ≥2 台 RoboMaster 实机互动
+- Q3 W13+：阶段 D Playground Editor / 剧本 YAML / Marketplace 联动
 
 ---
 

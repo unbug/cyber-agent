@@ -269,15 +269,30 @@ unchanged on a real RoboMaster; published bench numbers hold.
 
 #### v2.1 — Multi-agent stage _(+18 → +21 months)_
 
+> Detailed plan + competitive research (AI Town / Smallville / Isaac Sim
+> Mega) in [MULTI-AGENT-PLAYGROUND-PLAN.md](MULTI-AGENT-PLAYGROUND-PLAN.md).
+> An MVP is being prototyped during Q2 W7-W8 as an experimental flag —
+> see [TODO-Q2-2026.md](TODO-Q2-2026.md).
+
 - [ ] Shared blackboard / pub-sub bus over WebSocket (host elects).
 - [ ] Social BT primitives: `BroadcastEmotion`, `Negotiate`, `Mirror`,
-      `RoleSwap`.
+      `RoleSwap`, `findNearestAgent`, `greet`, `follow`, `flee`,
+      `emitSignal` / `onSignal`.
+- [ ] `World` + `SpatialIndex` + `MultiExecutor` (deterministic, seeded
+      RNG, 100% replay parity).
+- [ ] Scene library: playground / park / campus / schoolyard with POIs
+      (slide, swing, sandbox, classroom door, …); Tiled importer.
+- [ ] `/playground` page: drag agents from Gallery into a scene, freeze /
+      replay / share-link a session.
 - [ ] N-track timeline + agent diff in `/debug`.
+- [ ] `MultiBroadcastAdapter` — fan-out commands to N physical robots
+      with NTP-style time sync (≤5 ms drift) and global e-stop.
 - [ ] Two-robot demo (cat × dog) with believable interaction shipped.
 - [ ] 3+ robots, 30-minute soak, no cross-talk drops.
 
 **Release gate**: 3-robot soak test green; one community-recorded
-multi-agent trace replayable.
+multi-agent trace replayable; ≥2 RoboMaster S1 follow a browser-authored
+playground session with <10 cm / <100 ms sim→physical error.
 
 #### v2.2 — VLA / policy slot-in _(+21 → +24 months)_
 
