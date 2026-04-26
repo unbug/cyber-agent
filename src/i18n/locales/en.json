@@ -4,7 +4,8 @@
     "gallery": "Gallery",
     "docs": "Docs",
     "challenge": "Challenge",
-    "marketplace": "Marketplace"
+    "marketplace": "Marketplace",
+    "debug": "Debugger"
   },
   "home": {
     "hero_title": "Bring Your Characters to Life",

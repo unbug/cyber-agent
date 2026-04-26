@@ -6,6 +6,7 @@ import { AgentPage } from './pages/Agent'
 import { DocsPage } from './pages/Docs'
 import { ChallengePage } from './pages/ChallengePage'
 import { MarketplacePage } from './pages/MarketplacePage'
+import { DebugPage } from './pages/DebugPage'
 import CharacterEditor from './pages/CharacterEditor'
 import BTGraphEditor from './pages/BTGraphEditor'
 import { useState } from 'react'
@@ -21,6 +22,7 @@ export function App() {
         <Route path="/docs" element={<DocsPage />} />
         <Route path="/challenge" element={<ChallengePage />} />
         <Route path="/marketplace" element={<MarketplacePage />} />
+        <Route path="/debug" element={<DebugPage />} />
         <Route path="/agent/:id/editor" element={<CharacterEditor />} />
         <Route path="/editor/new" element={<CharacterEditor />} />
         <Route path="/editor/create" element={<CharacterEditor />} />

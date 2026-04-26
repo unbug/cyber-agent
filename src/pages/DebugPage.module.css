@@ -1,0 +1,489 @@
+/* DebugPage — Real-time debugger for CyberAgent BT engine */
+
+/* ─── Page Layout ─────────────────────────────────────────────── */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: var(--space-3);
+}
+
+/* ─── Stats Bar ───────────────────────────────────────────────── */
+
+.statsBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.statsGroup {
+  display: flex;
+  gap: var(--space-6);
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.statLabel {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.statValue {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.statWarning {
+  color: #ef4444;
+}
+
+.statsActions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.btn {
+  padding: var(--space-1) var(--space-3);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.btn:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-hover);
+}
+
+.btnDanger {
+  color: #ef4444;
+}
+
+.btnDanger:hover {
+  background: #ef444411;
+  border-color: #ef444444;
+}
+
+/* ─── Error Log ───────────────────────────────────────────────── */
+
+.errorLog {
+  background: #ef444408;
+  border: 1px solid #ef444422;
+  border-radius: var(--radius-lg);
+  padding: var(--space-3) var(--space-4);
+}
+
+.errorLogHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-2);
+}
+
+.errorLogTitle {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #ef4444;
+}
+
+.errorCount {
+  font-size: 0.75rem;
+  color: #ef4444;
+  background: #ef444422;
+  padding: 2px 8px;
+  border-radius: 99px;
+}
+
+.errorList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.errorItem {
+  display: flex;
+  gap: var(--space-3);
+  font-size: 0.75rem;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+}
+
+.errorTime {
+  color: var(--text-tertiary);
+  min-width: 60px;
+}
+
+.errorMsg {
+  color: #ef4444;
+}
+
+.errorToggle {
+  padding: var(--space-1) var(--space-3);
+  font-size: 0.75rem;
+  color: #ef4444;
+  background: #ef444411;
+  border: 1px solid #ef444422;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+/* ─── Split View ──────────────────────────────────────────────── */
+
+.splitView {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--space-3);
+  flex: 1;
+  min-height: 0;
+}
+
+@media (max-width: 1200px) {
+  .splitView {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .splitView {
+    grid-template-columns: 1fr;
+  }
+
+  .statsGroup {
+    gap: var(--space-4);
+  }
+}
+
+/* ─── Panel ───────────────────────────────────────────────────── */
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.panelHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-elevated);
+}
+
+.panelIcon {
+  font-size: 1rem;
+}
+
+.panelTitle {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.panelBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-3);
+  min-height: 0;
+}
+
+/* ─── BT Tree ─────────────────────────────────────────────────── */
+
+.treeNode {
+  margin-bottom: var(--space-1);
+}
+
+.nodeHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid transparent;
+  font-size: 0.8rem;
+  transition: background 0.1s;
+}
+
+.nodeHeader:hover {
+  background: var(--bg-hover);
+}
+
+.nodeActive {
+  border-left-width: 3px;
+}
+
+.nodeIcon {
+  font-size: 0.9rem;
+  width: 1.2em;
+  text-align: center;
+  opacity: 0.7;
+}
+
+.nodeName {
+  font-weight: 600;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.75rem;
+}
+
+.nodeStatus {
+  margin-left: auto;
+  font-size: 0.9rem;
+}
+
+.treeChildren {
+  margin-left: var(--space-4);
+  border-left: 1px solid var(--border);
+  padding-left: var(--space-2);
+}
+
+.breadcrumbSection {
+  margin-top: var(--space-4);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border);
+}
+
+.breadcrumbLabel {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ─── Breadcrumb ──────────────────────────────────────────────── */
+
+.breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin-top: var(--space-2);
+  font-size: 0.7rem;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+}
+
+.breadcrumbItem {
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-elevated);
+  transition: background 0.1s;
+}
+
+.breadcrumbHovered {
+  background: var(--bg-hover);
+}
+
+/* ─── Actuator Timeline ───────────────────────────────────────── */
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.timelineItem {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.timelineHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.timelineLabel {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.timelineCount {
+  font-size: 0.65rem;
+  color: var(--text-tertiary);
+  background: var(--bg-elevated);
+  padding: 2px 8px;
+  border-radius: 99px;
+}
+
+.timelineEvents {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.timelineEvent {
+  display: flex;
+  gap: var(--space-2);
+  font-size: 0.7rem;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  padding: 2px 4px;
+  border-radius: var(--radius-sm);
+}
+
+.timelineEvent:hover {
+  background: var(--bg-hover);
+}
+
+.timelineTime {
+  color: var(--text-tertiary);
+  min-width: 55px;
+}
+
+.timelineType {
+  font-weight: 700;
+  min-width: 24px;
+}
+
+.timelineType[data-type="tx"] {
+  color: #3b82f6;
+}
+
+.timelineType[data-type="rx"] {
+  color: #22c55e;
+}
+
+.timelineMsg {
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ─── Blackboard ──────────────────────────────────────────────── */
+
+.blackboard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.blackboardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.blackboardTitle {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.blackboardCount {
+  font-size: 0.65rem;
+  color: var(--text-tertiary);
+}
+
+.blackboardFields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.blackboardField {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--bg-elevated);
+  border: 1px solid transparent;
+  transition: border-color 0.2s;
+}
+
+.fieldChanged {
+  border-color: #eab30844;
+  background: #eab30808;
+}
+
+.fieldHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-1);
+}
+
+.fieldName {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-family: 'SF Mono', 'Fira Code', monospace;
+}
+
+.fieldChangedBadge {
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: #eab308;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.fieldValue {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  word-break: break-all;
+}
+
+.fieldDiff {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-1);
+  padding-top: var(--space-1);
+  border-top: 1px solid var(--border);
+  font-size: 0.65rem;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+}
+
+.fieldOld {
+  color: #ef4444;
+  text-decoration: line-through;
+}
+
+.fieldArrow {
+  color: var(--text-tertiary);
+}
+
+.fieldNew {
+  color: #22c55e;
+}
+
+/* ─── Empty State ─────────────────────────────────────────────── */
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-10);
+  color: var(--text-tertiary);
+  font-size: 0.875rem;
+  text-align: center;
+  gap: var(--space-3);
+}
+
+.emptyIcon {
+  font-size: 2.5rem;
+  opacity: 0.5;
+}

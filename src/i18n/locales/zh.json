@@ -4,7 +4,8 @@
     "gallery": "角色库",
     "docs": "文档",
     "challenge": "挑战",
-    "marketplace": "角色市场"
+    "marketplace": "角色市场",
+    "debug": "调试器"
   },
   "home": {
     "hero_title": "让你的角色活起来",
