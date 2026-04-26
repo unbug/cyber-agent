@@ -6,7 +6,7 @@
  * (emotion glow, trail, bounce) make it feel alive.
  */
 
-import type { Blackboard, RobotAdapter, AdapterCommand } from './types'
+import type { Blackboard, RobotAdapter, AdapterCommand, RobotCapabilities } from './types'
 import { emitAdapterTx } from './tracer'
 
 const EMOTION_COLORS: Record<string, string> = {
@@ -171,5 +171,20 @@ export class CanvasAdapter implements RobotAdapter {
     ctx.fillStyle = 'rgba(255,255,255,0.4)'
     ctx.textAlign = 'right'
     ctx.fillText('ENERGY', x - 4, y + barH)
+  }
+
+  // ── Capabilities ─────────────────────────────────────────────
+
+  capabilities(): RobotCapabilities {
+    return {
+      movement: true,
+      rotation: true,
+      speed: true,
+      led: false,
+      sound: false,
+      gesture: false,
+      maxSpeed: 100,
+      maxRotationSpeed: 180,
+    }
   }
 }

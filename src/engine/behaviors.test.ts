@@ -13,6 +13,16 @@ const mockAdapter: RobotAdapter = {
   update: () => {},
   destroy: () => {},
   sendCommand: () => {},
+  capabilities: () => ({
+    movement: true,
+    rotation: true,
+    speed: true,
+    led: true,
+    sound: true,
+    gesture: true,
+    maxSpeed: 200,
+    maxRotationSpeed: 360,
+  }),
 }
 
 describe('Character behaviors', () => {

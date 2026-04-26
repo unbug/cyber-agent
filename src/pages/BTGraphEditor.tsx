@@ -1,6 +1,8 @@
 import { useEffect, useState, useMemo } from 'react'
 import type { BTEditionNode } from '../engine/types'
 import { getActionRegistry, getConditionRegistry } from '../engine/executor'
+import type { RobotCapabilities } from '../engine/types'
+import { isNodeCompatible } from '../engine/types'
 import styles from './BTGraphEditor.module.css'
 
 interface PaletteItem {
@@ -15,7 +17,11 @@ const typeLabel: Record<string, string> = {
   action: 'Action', condition: 'Condition'
 }
 
-const NodePalette = () => {
+const NodePalette = ({
+  capabilities = null,
+}: {
+  capabilities?: RobotCapabilities | null
+}) => {
   const [items, setItems] = useState<PaletteItem[]>([])
 
   useEffect(() => {
@@ -31,16 +37,17 @@ const NodePalette = () => {
     for (const t of ['inverter', 'repeater', 'cooldown'] as const) {
       results.push({ label: typeLabel[t]!, type: t, description: t })
     }
-    // Actions
+    // Actions — filter by adapter capabilities
     for (const [name] of actionMap) {
-      results.push({ label: name, type: 'action', description: 'Built-in action' })
+      const compatible = capabilities == null || isNodeCompatible('action', capabilities)
+      results.push({ label: name, type: 'action', description: compatible ? 'Built-in action' : 'Not supported by this adapter' })
     }
-    // Conditions
+    // Conditions — always compatible
     for (const [name] of conditionMap) {
       results.push({ label: name, type: 'condition', description: 'Built-in condition' })
     }
     setItems(results)
-  }, [])
+  }, [capabilities])
 
   const grouped = useMemo(() => {
     const groups: { name: string; items: PaletteItem[] }[] = [
@@ -263,10 +270,13 @@ export default function BTGraphEditor({
   root,
   onChange,
   onSave,
+  capabilities = null,
 }: {
   root: BTEditionNode | null
   onChange: (newRoot: BTEditionNode | null) => void
   onSave: (bt: BTEditionNode | null) => void
+  /** Adapter capabilities for palette filtering. null = default (all nodes enabled). */
+  capabilities?: RobotCapabilities | null
 }) {
   const [selectedId, setSelectedId] = useState<string | null>(null)
 
@@ -380,7 +390,7 @@ export default function BTGraphEditor({
       </div>
 
       <div className={styles.editorBody}>
-        <NodePalette />
+        <NodePalette capabilities={capabilities} />
 
         <div className={styles.editorArea}>
           {root ? (

@@ -165,6 +165,42 @@ export type ConditionFn = (
   args?: Record<string, unknown>,
 ) => boolean
 
+// ─── Robot Capabilities ───────────────────────────────────────
+
+/**
+ * Describes what a RobotAdapter can do. Used by the BTGraphEditor
+ * to grey out incompatible node types in the palette.
+ */
+export interface RobotCapabilities {
+  /** Can move the robot forward / backward */
+  movement: boolean
+  /** Can rotate the robot in place */
+  rotation: boolean
+  /** Can set speed (0-1 range) */
+  speed: boolean
+  /** Can control LEDs */
+  led: boolean
+  /** Can play sounds / beeps */
+  sound: boolean
+  /** Can perform complex gestures (dance, wave, etc.) */
+  gesture: boolean
+  /** Maximum speed (pixels/sec or equivalent) */
+  maxSpeed: number
+  /** Maximum rotation speed (degrees/sec) */
+  maxRotationSpeed: number
+}
+
+export const DEFAULT_CAPABILITIES: RobotCapabilities = {
+  movement: true,
+  rotation: true,
+  speed: true,
+  led: false,
+  sound: false,
+  gesture: false,
+  maxSpeed: 100,
+  maxRotationSpeed: 180,
+}
+
 // ─── Robot Adapter (hardware abstraction) ───────────────────────
 
 /**
@@ -198,6 +234,9 @@ export interface RobotAdapter {
 
   /** Send a specific command (motor, LED, sound, etc.) */
   sendCommand(command: AdapterCommand): void
+
+  /** Report what this adapter can do (for editor capability discovery) */
+  capabilities(): RobotCapabilities
 }
 
 export interface AdapterCommand {
@@ -254,6 +293,40 @@ export interface BTEditionNode {
   count?: number
   child?: BTEditionNode
   successThreshold?: number
+}
+
+// ─── BT Node compatibility helpers ─────────────────────────────
+
+/**
+ * Check if a BT node type requires capabilities the adapter lacks.
+ * Returns true if the node IS compatible (adapter supports what it needs).
+ */
+export function isNodeCompatible(
+  nodeType: string,
+  caps: RobotCapabilities,
+): boolean {
+  switch (nodeType) {
+    case 'sequence':
+    case 'selector':
+    case 'parallel':
+    case 'inverter':
+    case 'repeater':
+    case 'cooldown':
+    case 'root':
+      // Composite / decorator nodes work with any adapter
+      return true
+    case 'condition':
+      // Conditions are pure blackboard checks — always compatible
+      return true
+    case 'wait':
+      // Wait is a local timer — always compatible
+      return true
+    case 'action':
+      // Actions need at least one output capability
+      return caps.movement || caps.led || caps.sound || caps.gesture
+    default:
+      return true
+  }
 }
 
 // ─── Built-in actions/conditions ─────────────────────────────────

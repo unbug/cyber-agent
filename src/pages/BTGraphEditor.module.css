@@ -63,6 +63,15 @@
   cursor: grabbing;
 }
 
+/* ─── Disabled palette node (adapter doesn't support this type) ─── */
+
+.paletteNodeDisabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+  user-select: none;
+}
+
 /* ─── Toolbar ─── */
 
 .toolbar {

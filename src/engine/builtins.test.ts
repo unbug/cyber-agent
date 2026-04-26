@@ -22,6 +22,16 @@ function mockAdapter(): RobotAdapter {
     update: vi.fn(),
     destroy: vi.fn(),
     sendCommand: vi.fn(),
+    capabilities: () => ({
+      movement: true,
+      rotation: true,
+      speed: true,
+      led: false,
+      sound: false,
+      gesture: false,
+      maxSpeed: 100,
+      maxRotationSpeed: 180,
+    }),
   }
 }
 

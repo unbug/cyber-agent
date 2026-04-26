@@ -13,7 +13,7 @@
  *   agent.start(wsAdapter)
  */
 
-import type { Blackboard, RobotAdapter, AdapterCommand } from './types'
+import type { Blackboard, RobotAdapter, AdapterCommand, RobotCapabilities } from './types'
 import { emitAdapterTx, emitAdapterRx } from './tracer'
 
 export interface WebSocketAdapterConfig {
@@ -272,6 +272,23 @@ export class WebSocketAdapter implements RobotAdapter {
    */
   custom(commandType: string, payload: Record<string, unknown>): void {
     this.sendCommand({ type: commandType, payload })
+  }
+
+  // ── Capabilities ─────────────────────────────────────────────
+
+  capabilities(): RobotCapabilities {
+    // WebSocketAdapter is a generic passthrough — assumes the downstream
+    // robot supports everything (the actual robot defines real limits)
+    return {
+      movement: true,
+      rotation: true,
+      speed: true,
+      led: true,
+      sound: true,
+      gesture: true,
+      maxSpeed: 200,
+      maxRotationSpeed: 360,
+    }
   }
 }
 

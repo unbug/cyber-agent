@@ -12,7 +12,7 @@
  *   - type: 'stop', payload: {}
  */
 
-import type { Blackboard, RobotAdapter, AdapterCommand } from './types'
+import type { Blackboard, RobotAdapter, AdapterCommand, RobotCapabilities } from './types'
 
 export interface RoboMasterConfig {
   host?: string
@@ -198,6 +198,22 @@ export class RoboMasterMotionAdapter implements RobotAdapter {
    */
   getLastMotionCommand() {
     return this.lastMotionCommand
+  }
+
+  // ── Capabilities ─────────────────────────────────────────────
+
+  capabilities(): RobotCapabilities {
+    // RoboMaster Motion Adapter: wraps the RoboMaster SDK
+    return {
+      movement: true,
+      rotation: true,
+      speed: true,
+      led: true,
+      sound: true,
+      gesture: true,
+      maxSpeed: 400,
+      maxRotationSpeed: 360,
+    }
   }
 }
 

@@ -346,6 +346,7 @@ export default function CharacterEditor() {
               root={btRoot}
               onChange={setBtRoot}
               onSave={setBtRoot}
+              capabilities={null}
             />
           </div>
 

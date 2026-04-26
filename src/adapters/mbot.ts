@@ -2,7 +2,7 @@
  * mBot Adapter Implementation — EduRobot Platform
  */
 
-import type { RobotAdapter, Blackboard, AdapterCommand } from '../engine/types';
+import type { RobotAdapter, Blackboard, AdapterCommand, RobotCapabilities } from '../engine/types';
 import { emitAdapterTx } from '../engine/tracer';
 
 class I2CProtocol {
@@ -98,4 +98,20 @@ export class MBotAdapter implements RobotAdapter {
   }
 
   getUltrasonicDistance(): number { return this.sensorSystem.readUltrasonic(); }
+
+  // ── Capabilities ─────────────────────────────────────────────
+
+  capabilities(): RobotCapabilities {
+    // mBot EduRobot: differential drive, 16-LED matrix, buzzer
+    return {
+      movement: true,
+      rotation: true,
+      speed: true,
+      led: true,
+      sound: true,
+      gesture: false,
+      maxSpeed: 100,
+      maxRotationSpeed: 180,
+    }
+  }
 }

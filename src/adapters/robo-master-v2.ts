@@ -1,4 +1,4 @@
-import type { RobotAdapter, AdapterCommand } from '../engine/types';
+import type { RobotAdapter, AdapterCommand, RobotCapabilities } from '../engine/types';
 import { emitAdapterTx } from '../engine/tracer';
 
 interface RoboMasterAdapterV2Config {
@@ -274,6 +274,22 @@ export class RoboMasterAdapterV2 implements RobotAdapter {
       { type: 'emergency_stop', payload: {} },
       CommandPriority.EMERGENCY_STOP
     );
+  }
+
+  // ── Capabilities ─────────────────────────────────────────────
+
+  capabilities(): RobotCapabilities {
+    // RoboMaster S1/EP: full mobility, LED armor, speaker, gimbal
+    return {
+      movement: true,
+      rotation: true,
+      speed: true,
+      led: true,
+      sound: true,
+      gesture: true,
+      maxSpeed: 400,
+      maxRotationSpeed: 360,
+    }
   }
 }
 
