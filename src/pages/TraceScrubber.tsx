@@ -101,9 +101,11 @@ async function loadTraceFile(file: File): Promise<{ header: ParsedTrace['header'
 interface TraceScrubberProps {
   liveEvents: TracerEvent[]
   liveBlackboard: Record<string, unknown> | null
+  /** Load a trace from parent (for pulled traces) */
+  traceData?: { header: Record<string, unknown>; events: TracerEvent[] }
 }
 
-export function TraceScrubber({ liveEvents: _liveEvents, liveBlackboard }: TraceScrubberProps) {
+export function TraceScrubber({ liveEvents: _liveEvents, liveBlackboard, traceData }: TraceScrubberProps) {
   const [state, setState] = useState<ScrubberState>({
     events: [],
     currentIndex: -1,
@@ -118,6 +120,23 @@ export function TraceScrubber({ liveEvents: _liveEvents, liveBlackboard }: Trace
   })
 
   const playRef = useRef<number | null>(null)
+
+  // Load trace when traceData prop changes
+  useEffect(() => {
+    if (!traceData) return
+    setState({
+      events: traceData.events,
+      currentIndex: -1,
+      isScrubbing: false,
+      speed: 1,
+      isPlaying: false,
+      currentBlackboard: null,
+      currentActiveNodes: new Set<string>(),
+      meta: (traceData.header.meta ?? {}) as Record<string, unknown>,
+      status: 'ready',
+      errorMsg: '',
+    })
+  }, [traceData])
 
   const handleUpload = useCallback(async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]

@@ -9,11 +9,12 @@
  */
 
 import { useMemo, useCallback, useState } from 'react'
-import { tracer, type TracerEvent } from '@/engine/tracer'
+import { tracer, type TracerEvent, type TracerEventType } from '@/engine/tracer'
 import { useDebug, diffBlackboards, type BbDiff } from '@/hooks/useDebug'
 import type { RuntimeNode } from '@/engine/types'
 import { TraceScrubber } from './TraceScrubber'
 import { BreakpointPanel } from '@/components/BreakpointPanel'
+import { TracePullerPanel } from '@/components/TracePullerPanel'
 import styles from './DebugPage.module.css'
 
 // ─── BT Tree Renderer ─────────────────────────────────────────
@@ -320,6 +321,9 @@ export function DebugPage() {
   const debug = useDebug()
   const [hoveredNode, setHoveredNode] = useState<string | null>(null)
   const [showErrors, setShowErrors] = useState(false)
+  const [scrubberTraceData, setScrubberTraceData] = useState<
+    { header: Record<string, unknown>; events: TracerEvent[] } | undefined
+  >()
 
   // Collect active nodes from tree
   const activeNodes = useMemo(() => {
@@ -405,12 +409,27 @@ export function DebugPage() {
       <TraceScrubber
         liveEvents={debug.breadcrumb}
         liveBlackboard={debug.blackboard}
+        traceData={scrubberTraceData}
       />
 
       {/* Breakpoint Panel */}
       <BreakpointPanel
         onTriggered={() => {
           /* breakpoint triggered — banner shown in panel */
+        }}
+      />
+
+      {/* Trace Puller — real device WebSocket */}
+      <TracePullerPanel
+        onLoadScrubber={(data) => {
+          // Convert pulled trace data to TracerEvent[] for scrubber
+          const events: TracerEvent[] = (data.events as { t: number; type: string; label: string; payload: unknown }[]).map(e => ({
+            t: e.t,
+            type: e.type as TracerEventType,
+            label: e.label,
+            payload: e.payload as Record<string, unknown> | undefined,
+          }))
+          setScrubberTraceData({ header: data.header, events })
         }}
       />
 
