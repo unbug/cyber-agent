@@ -151,14 +151,14 @@ locally with no hardware, using only the live `/debug` view.
 
 #### v0.5 — Time-travel & `.cybertrace` _(+2 → +3 months)_
 
-- [ ] `.cybertrace` format spec (`sdk/src/trace/schema.ts`) — gzipped
+- [x] `.cybertrace` format spec (`sdk/src/trace/schema.ts`) — gzipped
       JSONL, versioned, with migration registry.
-- [ ] `/debug` scrubber: rewind / step / fast-forward an in-memory
+- [x] `/debug` scrubber: rewind / step / fast-forward an in-memory
       session OR an uploaded trace.
 - [ ] Breakpoints by BT node, blackboard predicate, or adapter event.
-- [ ] CLI: `cyber-agent record <adapter>` / `cyber-agent replay <file>`.
+- [x] CLI: `cyber-agent record <adapter>` / `cyber-agent replay <file>`.
 - [ ] Pull a trace off a real device over WebSocket.
-- [ ] `npx @cyber-agent/sdk trace lint` validates schema.
+- [x] `npx @cyber-agent/sdk trace lint` validates schema.
 
 **Release gate**: a third party shares a `.cybertrace` from a real robot;
 maintainer single-steps through it locally to root-cause a bug.
