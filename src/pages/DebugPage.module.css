@@ -607,3 +607,285 @@
   border-radius: var(--radius-sm);
   color: var(--text-secondary);
 }
+
+/* ─── Breakpoint Panel ──────────────────────────────────────── */
+
+.bpPanel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.bpForm {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.bpKindSelect {
+  padding: var(--space-1) var(--space-2);
+  font-size: 0.8rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.bpPatternInput {
+  flex: 1;
+  min-width: 120px;
+  padding: var(--space-1) var(--space-2);
+  font-size: 0.8rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: 'SF Mono', 'Fira Code', monospace;
+}
+
+.bpPatternInput::placeholder {
+  color: var(--text-tertiary);
+}
+
+.bpPhaseSelect {
+  padding: var(--space-1) var(--space-2);
+  font-size: 0.75rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.bpValueInput {
+  width: 100px;
+  padding: var(--space-1) var(--space-2);
+  font-size: 0.8rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: 'SF Mono', 'Fira Code', monospace;
+}
+
+.bpAddBtn {
+  padding: var(--space-1) var(--space-3);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #22c55e;
+  background: #22c55e11;
+  border: 1px solid #22c55e33;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.bpAddBtn:hover {
+  background: #22c55e22;
+  border-color: #22c55e66;
+}
+
+.bpList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding-top: var(--space-1);
+  border-top: 1px solid var(--border);
+}
+
+.bpListHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.bpListTitle {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.bpListActions {
+  display: flex;
+  gap: var(--space-1);
+}
+
+.bpSmallBtn {
+  padding: 2px 6px;
+  font-size: 0.75rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.bpSmallBtn:hover {
+  background: var(--bg-hover);
+}
+
+.bpSmallBtnDanger {
+  padding: 2px 6px;
+  font-size: 0.75rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: #ef4444;
+  cursor: pointer;
+}
+
+.bpSmallBtnDanger:hover {
+  background: #ef444411;
+  border-color: #ef444444;
+}
+
+.bpItems {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.bpItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  font-size: 0.75rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: 'SF Mono', 'Fira Code', monospace;
+}
+
+.bpDisabled {
+  opacity: 0.5;
+}
+
+.bpIcon {
+  font-size: 0.9rem;
+}
+
+.bpKind {
+  font-weight: 700;
+  color: var(--text-tertiary);
+  font-size: 0.6rem;
+  text-transform: uppercase;
+}
+
+.bpPattern {
+  flex: 1;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bpHitCount {
+  font-size: 0.65rem;
+  color: var(--text-tertiary);
+  min-width: 40px;
+  text-align: right;
+}
+
+.bpToggleBtn {
+  padding: 2px 6px;
+  font-size: 0.8rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.bpEnabled {
+  color: #eab308;
+}
+
+.bpDisabledBtn {
+  color: #6b7280;
+}
+
+.bpDeleteBtn {
+  padding: 2px 6px;
+  font-size: 0.7rem;
+  background: transparent;
+  border: none;
+  color: var(--text-tertiary);
+  cursor: pointer;
+}
+
+.bpDeleteBtn:hover {
+  color: #ef4444;
+}
+
+.bpBanner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: #eab30811;
+  border: 1px solid #eab30844;
+  border-radius: var(--radius-sm);
+}
+
+.bpBannerIcon {
+  font-size: 1.2rem;
+}
+
+.bpBannerContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.bpBannerTitle {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #eab308;
+}
+
+.bpBannerDetail {
+  font-size: 0.65rem;
+  color: var(--text-tertiary);
+  font-family: 'SF Mono', 'Fira Code', monospace;
+}
+
+.bpPausedBanner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: #ef444411;
+  border: 1px solid #ef444444;
+  border-radius: var(--radius-sm);
+  color: #ef4444;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.bpPausedIcon {
+  font-size: 1.2rem;
+}
+
+.bpResumeBtn {
+  padding: var(--space-1) var(--space-3);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #22c55e;
+  background: #22c55e11;
+  border: 1px solid #22c55e33;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.bpResumeBtn:hover {
+  background: #22c55e22;
+  border-color: #22c55e66;
+}

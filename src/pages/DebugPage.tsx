@@ -13,6 +13,7 @@ import { tracer, type TracerEvent } from '@/engine/tracer'
 import { useDebug, diffBlackboards, type BbDiff } from '@/hooks/useDebug'
 import type { RuntimeNode } from '@/engine/types'
 import { TraceScrubber } from './TraceScrubber'
+import { BreakpointPanel } from '@/components/BreakpointPanel'
 import styles from './DebugPage.module.css'
 
 // ─── BT Tree Renderer ─────────────────────────────────────────
@@ -404,6 +405,13 @@ export function DebugPage() {
       <TraceScrubber
         liveEvents={debug.breadcrumb}
         liveBlackboard={debug.blackboard}
+      />
+
+      {/* Breakpoint Panel */}
+      <BreakpointPanel
+        onTriggered={() => {
+          /* breakpoint triggered — banner shown in panel */
+        }}
       />
 
       {/* Main split view */}

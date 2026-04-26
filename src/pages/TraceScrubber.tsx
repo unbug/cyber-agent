@@ -56,7 +56,7 @@ function getActiveNodes(events: TracerEvent[], upToIndex: number): Set<string> {
 
 // ─── Upload Handler ──────────────────────────────────────────────
 
-async function loadTraceFile(file: File): Promise<ParsedTrace> {
+async function loadTraceFile(file: File): Promise<{ header: ParsedTrace['header']; events: TracerEvent[] }> {
   let content: string
 
   if (file.name.endsWith('.gz')) {

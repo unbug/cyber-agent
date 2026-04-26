@@ -18,6 +18,8 @@
  * to IndexedDB on demand.
  */
 
+import { checkBreakpoints } from './breakpoints'
+
 // ─── Event Types ──────────────────────────────────────────────────
 
 export type TracerEventType =
@@ -29,6 +31,10 @@ export type TracerEventType =
   | 'adapter.tx'
   | 'adapter.rx'
   | 'error'
+  | 'breakpoint.triggered'
+
+// Re-export breakpoint types for consumers
+export type { Breakpoint, BreakpointKind } from './breakpoints'
 
 export interface TracerEvent {
   /** Monotonic timestamp in ms (performance.now()) */
@@ -103,9 +109,31 @@ class Tracer {
     return this._enabled
   }
 
-  /** Fire an event */
+  /** Fire an event — checks breakpoints before emitting */
   emit(event: TracerEvent) {
     if (!this.enabled) return
+
+    // Check breakpoints
+    const trigger = checkBreakpoints(event)
+    if (trigger) {
+      // Emit a breakpoint.triggered event to notify listeners
+      const bpEvent: TracerEvent = {
+        t: event.t,
+        type: 'breakpoint.triggered',
+        label: trigger.name,
+        payload: {
+          breakpointId: trigger.id,
+          kind: trigger.kind,
+          hitCount: trigger.hitCount,
+        },
+      }
+      this.ring.push(bpEvent)
+      for (const fn of this.listeners) {
+        try { fn(bpEvent) } catch { /* don't break listeners */ }
+      }
+      return
+    }
+
     this.ring.push(event)
     for (const fn of this.listeners) {
       try { fn(event) } catch { /* don't break listeners */ }
