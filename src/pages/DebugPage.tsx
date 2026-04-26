@@ -12,6 +12,7 @@ import { useMemo, useCallback, useState } from 'react'
 import { tracer, type TracerEvent } from '@/engine/tracer'
 import { useDebug, diffBlackboards, type BbDiff } from '@/hooks/useDebug'
 import type { RuntimeNode } from '@/engine/types'
+import { TraceScrubber } from './TraceScrubber'
 import styles from './DebugPage.module.css'
 
 // ─── BT Tree Renderer ─────────────────────────────────────────
@@ -398,6 +399,12 @@ export function DebugPage() {
           ⚠ {debug.errors.length} error{debug.errors.length > 1 ? 's' : ''}
         </button>
       )}
+
+      {/* Trace Scrubber */}
+      <TraceScrubber
+        liveEvents={debug.breadcrumb}
+        liveBlackboard={debug.blackboard}
+      />
 
       {/* Main split view */}
       <div className={styles.splitView}>

@@ -142,7 +142,7 @@ A debugger you can hand to a contributor.
       50-node breadcrumb) ｜ actuator timeline ｜ blackboard inspector.
 - [ ] Live tick-rate / latency widgets.
 - [ ] Diff highlighting on every blackboard write.
-- [ ] Capability discovery — read `adapter.capabilities()` and grey out
+- [x] Capability discovery — read `adapter.capabilities()` and grey out
       incompatible BT nodes in the editor.
 - [ ] One end-to-end demo video: bug → fix → re-run on real RoboMaster.
 

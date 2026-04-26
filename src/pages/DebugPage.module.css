@@ -487,3 +487,123 @@
   font-size: 2.5rem;
   opacity: 0.5;
 }
+
+/* ─── Trace Scrubber ──────────────────────────────────────────── */
+
+.scrubber {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.scrubberBar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.btnActive {
+  border-color: #3b82f6;
+  background: #3b82f611;
+}
+
+.scrubberSpeed {
+  padding: var(--space-1) var(--space-2);
+  font-size: 0.75rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.scrubberSlider {
+  flex: 1;
+  min-width: 120px;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--border);
+  border-radius: 2px;
+  outline: none;
+}
+
+.scrubberSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #3b82f6;
+  cursor: pointer;
+}
+
+.scrubberLabel {
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  white-space: nowrap;
+}
+
+.scrubberPreview {
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.scrubberPreviewTitle {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-1);
+}
+
+.scrubberPreviewFields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.scrubberField {
+  display: flex;
+  gap: var(--space-2);
+  font-size: 0.7rem;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+}
+
+.scrubberFieldName {
+  color: var(--text-primary);
+  font-weight: 600;
+  min-width: 80px;
+}
+
+.scrubberFieldValue {
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.scrubberNodes {
+  display: flex;
+  gap: var(--space-1);
+  flex-wrap: wrap;
+}
+
+.scrubberNodeTag {
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+}
