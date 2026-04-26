@@ -1,446 +1,264 @@
-/* ─── BTGraphEditor Styles ─── */
+/* ─── Container ──────────────────────────────────────────────── */
 
 .container {
   display: flex;
-  flex-direction: column;
   height: 100%;
-  min-height: calc(100vh - 80px);
-}
-
-/* ─── Editor Body (palette + editor side by side) ─── */
-
-.editorBody {
-  display: flex;
   flex: 1;
   overflow: hidden;
+  background: var(--bg-base);
+  min-height: 0;
 }
 
-/* ─── Node Palette ─── */
+/* ─── Palette ─────────────────────────────────────────────────── */
 
 .palette {
-  width: 220px;
-  background: var(--bg-base);
-  border-right: 1px solid var(--border);
-  padding: 1rem;
-  overflow-y: auto;
+  width: 192px;
+  min-width: 192px;
   flex-shrink: 0;
-}
-
-.paletteCategory {
-  margin-bottom: 0.75rem;
-}
-
-.paletteCategoryTitle {
-  font-weight: 600;
-  font-size: 0.7rem;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 0.5rem;
-}
-
-.paletteNode {
-  padding: 0.5rem 0.75rem;
-  border-radius: 0.375rem;
-  border: 1px solid var(--border);
   background: var(--bg-surface);
-  color: var(--text-secondary);
-  cursor: grab;
-  width: 100%;
-  text-align: left;
-  margin-bottom: 0.25rem;
-  font-size: 0.8125rem;
-  transition: all 0.15s;
-}
-
-.paletteNode:hover {
-  border-color: var(--accent);
-  color: var(--text-primary);
-  background: var(--bg-elevated);
-}
-
-.paletteNode:active {
-  cursor: grabbing;
-}
-
-/* ─── Disabled palette node (adapter doesn't support this type) ─── */
-
-.paletteNodeDisabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-  pointer-events: none;
-  user-select: none;
-}
-
-/* ─── Toolbar ─── */
-
-.toolbar {
-  padding: 1rem 1.5rem;
-  background: var(--bg-base);
-  border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  padding: var(--space-4);
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: var(--space-4);
 }
 
-.toolbarTitle {
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin: 0;
-  color: var(--text-primary);
-}
-
-.toolbarActions {
-  display: flex;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-}
-
-.toolbarBtn {
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 0.375rem;
-  font-weight: 600;
-  font-size: 0.8125rem;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-
-.toolbarBtn--save {
-  background: var(--accent);
-  color: white;
-}
-
-.toolbarBtn--save:hover {
-  background: var(--accent-hover);
-  box-shadow: var(--shadow-glow);
-}
-
-.toolbarBtn--clear {
-  background: var(--bg-elevated);
-  color: var(--text-secondary);
-  border: 1px solid var(--border);
-}
-
-.toolbarBtn--clear:hover {
-  border-color: var(--border-hover);
-  color: var(--text-primary);
-}
-
-/* ─── Editor Area ─── */
-
-.editorArea {
-  flex: 1;
-  padding: 1rem;
-  overflow: auto;
-  background: var(--bg-base);
-}
-
-.emptyState {
-  text-align: center;
-  padding: 3rem;
+.paletteHint {
+  font-size: 0.6875rem;
   color: var(--text-muted);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--border);
 }
 
-/* ─── Node Editor ─── */
-
-.nodeEditor {
+.paletteSection {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.paletteSectionTitle {
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding-bottom: var(--space-1);
+}
+
+.paletteItem {
+  display: flex;
   align-items: center;
-  padding: 0.75rem;
-  background: var(--bg-surface);
+  gap: var(--space-2);
+  padding: var(--space-2);
+  border-radius: var(--radius-sm);
   border: 1px solid var(--border);
-  border-radius: 0.375rem;
-  margin-bottom: 0.5rem;
-}
-
-.nodeEditor--selected {
-  border-color: var(--accent);
   background: var(--bg-elevated);
+  cursor: pointer;
+  transition: all 0.12s;
+  text-align: left;
+  width: 100%;
 }
 
-.nodeLabel {
-  display: flex;
+.paletteItem:hover {
+  border-color: var(--accent);
+  background: var(--accent-muted);
+}
+
+.paletteItemLabel {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
+.paletteItem:hover .paletteItemLabel {
+  color: var(--text-primary);
+}
+
+/* ─── Type Badges ─────────────────────────────────────────────── */
+
+.badge {
+  display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: center;
+  padding: 0 var(--space-1);
+  border-radius: 4px;
+  font-size: 0.5625rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  min-width: 30px;
+  height: 16px;
+  flex-shrink: 0;
+  font-family: var(--font-mono);
 }
 
-.nodeLabel--strong {
-  font-weight: 600;
+.badge--success {
+  background: rgba(34, 197, 94, 0.12);
+  color: var(--success);
 }
 
-.nodeLabel--dim {
-  opacity: 0.7;
+.badge--accent {
+  background: var(--accent-muted);
+  color: var(--accent-hover);
 }
 
-.nodeLabel--args {
+.badge--warning {
+  background: rgba(245, 158, 11, 0.12);
   color: var(--warning);
 }
 
-.nodeLabel--action {
-  color: var(--accent);
+.badge--muted {
+  background: var(--bg-hover);
+  color: var(--text-muted);
 }
 
-.nodeActions {
+/* ─── Tree Area ───────────────────────────────────────────────── */
+
+.treeArea {
+  flex: 1;
+  overflow: auto;
+  padding: var(--space-5);
+}
+
+.empty {
+  flex: 1;
   display: flex;
-  gap: 0.375rem;
   align-items: center;
-}
-
-.nodeActionBtn {
-  padding: 0.375rem 0.75rem;
-  border-radius: 0.25rem;
-  border: none;
-  cursor: pointer;
-  font-size: 0.8125rem;
-  transition: all 0.15s;
-}
-
-.nodeActionBtn--edit {
-  background: var(--bg-elevated);
-  color: var(--text-secondary);
-  border: 1px solid var(--border);
-}
-
-.nodeActionBtn--edit:hover {
-  border-color: var(--accent);
-  color: var(--text-primary);
-}
-
-.nodeActionBtn--add {
-  background: var(--success);
-  color: white;
-}
-
-.nodeActionBtn--add:hover {
-  background: #16a34a;
-}
-
-.nodeActionBtn--delete {
-  background: rgba(239, 68, 68, 0.8);
-  color: white;
-  font-weight: 600;
-  padding: 0.25rem 0.5rem;
+  justify-content: center;
+  color: var(--text-muted);
   font-size: 0.875rem;
-  line-height: 1;
+  text-align: center;
+  padding: var(--space-8);
+  line-height: 1.8;
 }
 
-.nodeActionBtn--delete:hover {
-  background: #dc2626;
-}
+/* ─── Tree Node ───────────────────────────────────────────────── */
 
-/* ─── Edit Mode ─── */
-
-.editMode {
+.treeNodeWrap {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  margin-top: 0.75rem;
-  padding: 0.75rem;
-  background: var(--bg-base);
-  border-radius: 0.375rem;
 }
-
-.editInput {
-  padding: 0.5rem;
-  border: 1px solid var(--border);
-  border-radius: 0.25rem;
-  background: var(--bg-elevated);
-  color: var(--text-primary);
-  width: 100%;
-  font-size: 0.875rem;
-  font-family: var(--font-mono);
-}
-
-.editInput::placeholder {
-  color: var(--text-muted);
-}
-
-.editTextarea {
-  width: 100%;
-  height: 120px;
-  padding: 0.75rem;
-  border: 1px solid var(--border);
-  border-radius: 0.375rem;
-  background: var(--bg-elevated);
-  color: var(--text-primary);
-  font-size: 0.75rem;
-  font-family: var(--font-mono);
-  resize: vertical;
-}
-
-.editTextarea::placeholder {
-  color: var(--text-muted);
-}
-
-.editActions {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.editBtn {
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 0.25rem;
-  cursor: pointer;
-  font-weight: 500;
-  font-size: 0.8125rem;
-  transition: all 0.15s;
-}
-
-.editBtn--save {
-  background: var(--success);
-  color: white;
-}
-
-.editBtn--save:hover {
-  background: #16a34a;
-}
-
-.editBtn--cancel {
-  background: var(--bg-elevated);
-  color: var(--text-secondary);
-  border: 1px solid var(--border);
-}
-
-.editBtn--cancel:hover {
-  border-color: var(--border-hover);
-  color: var(--text-primary);
-}
-
-/* ─── Empty Children ─── */
-
-.emptyChildren {
-  padding: 0.75rem;
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 0.25rem;
-  margin-top: 0.5rem;
-}
-
-.emptyChildrenText {
-  color: var(--text-muted);
-  font-size: 0.8125rem;
-}
-
-.emptyChildrenActions {
-  display: flex;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.emptyChildBtn {
-  padding: 0.375rem 0.75rem;
-  border: none;
-  border-radius: 0.25rem;
-  font-size: 0.8rem;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.15s;
-}
-
-.emptyChildBtn--sequence {
-  background: var(--success);
-  color: white;
-}
-
-.emptyChildBtn--selector {
-  background: var(--accent);
-  color: white;
-}
-
-.emptyChildBtn--parallel {
-  background: var(--warning);
-  color: #1a1a2e;
-}
-
-.emptyChildBtn--action {
-  background: var(--accent-light);
-  color: white;
-}
-
-.emptyChildBtn--condition {
-  background: var(--success-light);
-  color: #1a1a2e;
-}
-
-.emptyChildBtn--decorator {
-  background: var(--text-muted);
-  color: white;
-}
-
-.emptyChildBtn:hover {
-  opacity: 0.85;
-}
-
-/* ─── Add Root Button ─── */
-
-.addRootBtn {
-  padding: 0.75rem 1.5rem;
-  background: var(--success);
-  color: white;
-  border: none;
-  border-radius: 0.375rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  margin-top: 1rem;
-  transition: all 0.15s;
-}
-
-.addRootBtn:hover {
-  background: #16a34a;
-}
-
-/* ─── Tree Node Wrapper ─── */
 
 .treeNode {
-  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  cursor: pointer;
+  transition: all 0.12s;
+  gap: var(--space-2);
+  min-height: 36px;
+  user-select: none;
 }
 
-/* ─── Node Type Badges ─── */
-
-.badge {
-  display: inline-block;
-  padding: 1px 6px;
-  border-radius: 0.25rem;
-  font-size: 0.6875rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
+.treeNode:hover {
+  border-color: var(--border-hover);
+  background: var(--bg-elevated);
 }
 
-.badge--composite {
-  background: rgba(139, 92, 246, 0.15);
-  color: #a78bfa;
+.treeNode--selected {
+  border-color: var(--accent);
+  background: var(--accent-muted);
 }
 
-.badge--decorator {
-  background: rgba(245, 158, 11, 0.15);
-  color: #fbbf24;
+.nodeLeft {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  flex: 1;
 }
 
-.badge--leaf {
-  background: rgba(16, 185, 129, 0.15);
-  color: #34d399;
+.nodeRight {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  flex-shrink: 0;
 }
 
-/* ─── Responsive ─── */
-
-@media (max-width: 768px) {
-  .container {
-    flex-direction: column;
-  }
-
-  .palette {
-    width: 100%;
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-    max-height: 200px;
-  }
-
-  .editorArea {
-    padding: 0.75rem;
-  }
+.nodeType {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
 }
+
+.nodeValue {
+  font-size: 0.8125rem;
+  color: var(--accent-hover);
+  font-family: var(--font-mono);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 1px var(--space-1);
+  border-radius: 3px;
+  transition: background 0.12s;
+}
+
+.nodeValue:hover {
+  background: var(--bg-hover);
+}
+
+.inlineInput {
+  font-size: 0.8125rem;
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+  background: var(--bg-elevated);
+  border: 1px solid var(--accent);
+  border-radius: 3px;
+  padding: 1px var(--space-2);
+  outline: none;
+  min-width: 80px;
+  flex: 1;
+}
+
+.nodeBtn {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.875rem;
+  line-height: 1;
+  transition: all 0.12s;
+  padding: 0;
+}
+
+.nodeBtn:hover {
+  border-color: var(--accent);
+  color: var(--accent-hover);
+  background: var(--accent-muted);
+}
+
+.nodeBtn--delete:hover {
+  border-color: var(--error);
+  color: var(--error);
+  background: rgba(239, 68, 68, 0.08);
+}
+
+/* ─── Children ────────────────────────────────────────────────── */
+
+.children {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-top: 2px;
+}
+
+.childrenIndent {
+  margin-left: var(--space-5);
+  padding-left: var(--space-3);
+  border-left: 1px solid var(--border);
+  padding-bottom: 2px;
+}
+
+
