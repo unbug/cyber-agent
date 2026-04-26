@@ -271,7 +271,7 @@ function CharacterCard({ character, onSelect }: { character: Character; onSelect
       <div className={styles.cardRow}>
         <div className={styles.cardMain} onClick={handleClick}>
           <HoverBeam size="md" colorVariant="colorful" strength={0.62}>
-            <Link to={`/agent/${character.id}`} className={styles.card} data-category={character.category}>
+            <div className={styles.card} data-category={character.category}>
               <div className={styles.cardEmoji}>{EMOJI_MAP[character.id] || character.emoji}</div>
               <div className={styles.cardBody}>
                 <div className={styles.cardHeader}>
@@ -290,7 +290,7 @@ function CharacterCard({ character, onSelect }: { character: Character; onSelect
                   <ArrowRight size={16} className={styles.cardArrow} />
                 </div>
               </div>
-            </Link>
+            </div>
           </HoverBeam>
         </div>
         <HoverBeam size="sm" colorVariant="sunset" strength={0.8}>

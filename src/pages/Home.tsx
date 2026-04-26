@@ -9,23 +9,23 @@ import styles from './Home.module.css'
 const FEATURES = [
   {
     icon: Bot,
-    labelKey: 'feature_agents_title',
-    descKey: 'feature_agents_desc',
+    labelKey: 'home.feature_agents_title',
+    descKey: 'home.feature_agents_desc',
   },
   {
     icon: Cpu,
-    labelKey: 'feature_robot_title',
-    descKey: 'feature_robot_desc',
+    labelKey: 'home.feature_robot_title',
+    descKey: 'home.feature_robot_desc',
   },
   {
     icon: Wifi,
-    labelKey: 'feature_evolve_title',
-    descKey: 'feature_evolve_desc',
+    labelKey: 'home.feature_evolve_title',
+    descKey: 'home.feature_evolve_desc',
   },
   {
     icon: Sparkles,
     labelKey: 'nav.docs',
-    descKey: 'feature_evolve_desc',
+    descKey: 'home.feature_evolve_desc',
   },
 ]
 
