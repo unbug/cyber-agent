@@ -18,7 +18,10 @@
     "noUncheckedIndexedAccess": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "@cyber-agent/sdk": ["sdk/src/index.ts"],
+      "@cyber-agent/sdk/*": ["sdk/src/*.ts"],
+      "@cyber-agent/sdk/trace": ["sdk/src/trace/schema.ts"]
     }
   },
   "include": ["src", "vite-env.d.ts"]
