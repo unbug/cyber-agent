@@ -116,56 +116,101 @@
 .sectionBody code {
   font-family: var(--font-mono);
   font-size: 0.8125rem;
-  padding: 1px 5px;
+  padding: 1px 6px;
   border-radius: var(--radius-sm);
   background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
 }
 
-.sectionBody pre {
-  margin: var(--space-3) 0;
-  padding: var(--space-4);
-  border-radius: var(--radius-md);
-  background: var(--bg-elevated);
-  overflow-x: auto;
-}
-
-.sectionBody pre code {
+/* Code block */
+.sectionBody pre[data-code] {
+  position: relative;
+  margin: var(--space-4) 0;
   padding: 0;
+  border-radius: var(--radius-md);
+  background: #0d0d10;
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.sectionBody pre[data-code] span[data-lang] {
+  display: block;
+  padding: var(--space-2) var(--space-4);
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  text-transform: lowercase;
+}
+
+.sectionBody pre[data-code] code {
+  display: block;
+  padding: var(--space-4) var(--space-5);
   background: none;
+  border: none;
+  font-family: var(--font-mono);
   font-size: 0.8125rem;
-  line-height: 1.6;
+  line-height: 1.7;
+  color: #d4d4d8;
+  white-space: pre;
+  overflow-x: auto;
 }
 
 .sectionBody ul,
 .sectionBody ol {
-  padding-left: var(--space-4);
-  margin: var(--space-2) 0;
+  padding-left: var(--space-5);
+  margin: var(--space-3) 0;
 }
 
 .sectionBody li {
-  margin-bottom: var(--space-1);
+  margin-bottom: var(--space-2);
 }
 
+/* Tables */
 .sectionBody table {
   width: 100%;
   border-collapse: collapse;
-  margin: var(--space-3) 0;
+  margin: var(--space-4) 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.sectionBody thead {
+  background: var(--bg-elevated);
+}
+
+.sectionBody th {
+  padding: var(--space-2) var(--space-3);
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border);
 }
 
 .sectionBody td {
   padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
   font-size: 0.8125rem;
+  color: var(--text-secondary);
 }
 
-.sectionBody tr:first-child td {
-  font-weight: 600;
-  color: var(--text-primary);
-  background: var(--bg-elevated);
+.sectionBody tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.sectionBody tbody tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
 }
 
 .sectionBody p {
-  margin-bottom: var(--space-2);
+  margin-bottom: var(--space-3);
 }
 
 @media (max-width: 768px) {

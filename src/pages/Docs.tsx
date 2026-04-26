@@ -289,23 +289,64 @@ npm run dev
   return contents[id] || '';
 }
 
-/** Minimal markdown → HTML (good enough for docs) */
+/** Markdown → HTML renderer */
 function renderMarkdown(md: string): string {
-  return md
+  // ── 1. Extract fenced code blocks first (protect inner content) ──
+  const blocks: string[] = [];
+  let out = md.replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang: string, code: string) => {
+    const escaped = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const badge = lang ? `<span data-lang="${lang}">${lang}</span>` : '';
+    blocks.push(`<pre data-code>${badge}<code>${escaped}</code></pre>`);
+    return `\x00BLOCK${blocks.length - 1}\x00`;
+  });
+
+  // ── 2. Headings ──
+  out = out
     .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-    .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+    .replace(/^## (.+)$/gm, '<h2>$1</h2>');
+
+  // ── 3. Bold + inline code ──
+  out = out
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/`([^`]+)`/g, '<code>$1</code>')
-    .replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code class="lang-$1">$2</code></pre>')
-    .replace(/^\|(.+)\|$/gm, (_, row) => {
-      const cells = row.split('|').map((c: string) => c.trim());
-      return '<tr>' + cells.map((c: string) => `<td>${c}</td>`).join('') + '</tr>';
+    .replace(/`([^`\n]+)`/g, '<code>$1</code>');
+
+  // ── 4. Tables (skip separator rows like |---|---| ) ──
+  out = out.replace(/^\|(.+)\|$/gm, (_line, row: string) => {
+    if (/^[\s\-:|]+$/.test(row)) return '';           // separator → blank line
+    const cells = row.split('|').map((c: string) => c.trim()).filter(Boolean);
+    return '<tr>' + cells.map((c: string) => `<td>${c}</td>`).join('') + '</tr>';
+  });
+  // Wrap consecutive rows; first row → <th>
+  out = out.replace(/((?:<tr>[\s\S]*?<\/tr>\n?)+)/g, (match) => {
+    const rows = match.match(/<tr>[\s\S]*?<\/tr>/g) ?? [];
+    if (!rows.length) return match;
+    const thead = rows[0]!.replace(/<td>/g, '<th>').replace(/<\/td>/g, '</th>');
+    const tbody = rows.slice(1).join('');
+    return `<table><thead>${thead}</thead>${tbody ? `<tbody>${tbody}</tbody>` : ''}</table>`;
+  });
+
+  // ── 5. Lists ──
+  out = out
+    .replace(/^[-*] (.+)$/gm, '<li>$1</li>')
+    .replace(/^\d+\. (.+)$/gm, '<li>$1</li>');
+  out = out.replace(/((?:<li>[\s\S]*?<\/li>\n?)+)/g, '<ul>$&</ul>');
+
+  // ── 6. Paragraphs (skip block-level / placeholder lines) ──
+  out = out
+    .split(/\n{2,}/)
+    .map((block) => {
+      const t = block.trim();
+      if (!t) return '';
+      if (/^(<[huptlo]|<table|\x00BLOCK)/.test(t)) return t;
+      return `<p>${t.replace(/\n/g, '<br />')}</p>`;
     })
-    .replace(/(<tr>.*<\/tr>\n?)+/g, '<table>$&</table>')
-    .replace(/^- (.+)$/gm, '<li>$1</li>')
-    .replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>')
-    .replace(/^(\d+)\. (.+)$/gm, '<li>$2</li>')
-    .replace(/\n\n/g, '</p><p>')
-    .replace(/^(?!<[huptlo])(.+)$/gm, '<p>$1</p>');
+    .join('\n');
+
+  // ── 7. Restore code blocks (handle both raw and <p>-wrapped) ──
+  blocks.forEach((html, i) => {
+    out = out.replace(new RegExp(`<p>\\x00BLOCK${i}\\x00</p>`, 'g'), html);
+    out = out.replace(new RegExp(`\\x00BLOCK${i}\\x00`, 'g'), html);
+  });
+
+  return out;
 }
