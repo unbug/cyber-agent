@@ -27,10 +27,11 @@ describe('Home page', () => {
     expect(screen.getByText('home.hero_title')).toBeInTheDocument();
   });
 
-  it('renders feature cards', () => {
+  it('renders architecture section', () => {
     renderWithRouter(<Home />);
-    expect(screen.getByText('home.agents_title')).toBeInTheDocument();
-    expect(screen.getByText('home.feature_agents_title')).toBeInTheDocument();
+    expect(screen.getByText('home.arch_char_title')).toBeInTheDocument();
+    expect(screen.getByText('home.arch_bt_title')).toBeInTheDocument();
+    expect(screen.getByText('home.arch_robot_title')).toBeInTheDocument();
   });
 
   it('renders CTA link to gallery', () => {
