@@ -105,9 +105,13 @@ export function HomePage() {
         <div className={styles.tickerFadeR} />
       </div>
 
-      {/* ── Architecture: Character → BT → Robot ─────── */}
+      {/* ── How It Works: Character → BT → Robot ─────── */}
       <section className={styles.arch}>
         <div className="container">
+          <div className={styles.archHeader}>
+            <p className={styles.archLabel}>{t('home.how_it_works_title')}</p>
+            <h2 className={styles.archSectionTitle}>{t('home.arch_how_title')}</h2>
+          </div>
           <div className={styles.archFlow}>
             <motion.div
               className={styles.archBlock}
@@ -116,9 +120,19 @@ export function HomePage() {
               viewport={{ once: true }}
               transition={{ duration: 0.4 }}
             >
+              <div className={styles.stepBadge}>01</div>
               <div className={styles.archEmoji}>🎭</div>
               <h3 className={styles.archTitle}>{t('home.arch_char_title')}</h3>
               <p className={styles.archDesc}>{t('home.arch_char_desc')}</p>
+              <div className={styles.stepPreview}>
+                <div className={styles.charChip}>
+                  <span className={styles.charChipEmoji}>🦁</span>
+                  <div>
+                    <span className={styles.charChipName}>Lion</span>
+                    <span className={styles.charChipTags}>Aggressive · Territorial · Brave</span>
+                  </div>
+                </div>
+              </div>
             </motion.div>
 
             <div className={styles.archArrow} aria-hidden>→</div>
@@ -130,9 +144,13 @@ export function HomePage() {
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: 0.1 }}
             >
+              <div className={styles.stepBadge}>02</div>
               <div className={styles.archEmoji}>🌳</div>
               <h3 className={styles.archTitle}>{t('home.arch_bt_title')}</h3>
               <p className={styles.archDesc}>{t('home.arch_bt_desc')}</p>
+              <div className={styles.stepPreview}>
+                <pre className={styles.miniCode}>{`sel(root)\n  seq → cond(near)\n       → act(sprint)\n  act(patrol)`}</pre>
+              </div>
             </motion.div>
 
             <div className={styles.archArrow} aria-hidden>→</div>
@@ -144,10 +162,24 @@ export function HomePage() {
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: 0.2 }}
             >
+              <div className={styles.stepBadge}>03</div>
               <div className={styles.archEmoji}>🤖</div>
               <h3 className={styles.archTitle}>{t('home.arch_robot_title')}</h3>
               <p className={styles.archDesc}>{t('home.arch_robot_desc')}</p>
+              <div className={styles.stepPreview}>
+                <div className={styles.robotLive}>
+                  <span className={styles.liveTag}>LIVE</span>
+                  <span className={styles.robotName}>RoboMaster EP</span>
+                  <span className={styles.robotAction}>→ chasing pointer</span>
+                </div>
+              </div>
             </motion.div>
+          </div>
+          <div className={styles.howResultWrap}>
+            <div className={styles.howResult}>
+              <span>✦</span>
+              <span>{t('home.how_result')}</span>
+            </div>
           </div>
         </div>
       </section>

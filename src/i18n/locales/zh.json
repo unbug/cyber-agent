@@ -37,6 +37,7 @@
     "stat_bt": "行为树驱动",
     "arch_char_title": "选择角色",
     "arch_char_desc": "从 70+ 个独特的 AI 角色中选择，每个角色都有独特的情绪、反应和运动风格。",
+    "arch_how_title": "角色驱动机器人",
     "arch_bt_title": "行为树",
     "arch_bt_desc": "每个角色由可组合的行为树定义，使用 seq、sel、cond 和 act 节点。",
     "arch_robot_title": "真实机器人",
@@ -44,7 +45,8 @@
     "code_title": "创建你的角色",
     "code_desc": "用一棵行为树定义角色的全部个性，使用可视化编辑器或直接编写 DSL。",
     "open_editor": "打开编辑器",
-    "read_docs": "阅读文档"
+    "read_docs": "阅读文档",
+    "how_result": "无需硬件编程，只需定义角色个性。"
   },
   "gallery": {
     "title": "角色图鉴",

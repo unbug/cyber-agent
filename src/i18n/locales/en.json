@@ -37,6 +37,7 @@
     "stat_bt": "Behavior Tree",
     "arch_char_title": "Character",
     "arch_char_desc": "Pick from 70+ unique agent personalities, each with distinct emotions, reactions, and movement styles.",
+    "arch_how_title": "Character Powers the Robot",
     "arch_bt_title": "Behavior Tree",
     "arch_bt_desc": "Each character is defined by a composable behavior tree using seq, sel, cond, and act nodes.",
     "arch_robot_title": "Real Robot",
@@ -44,7 +45,8 @@
     "code_title": "Write Your Own Character",
     "code_desc": "Define a character's entire personality in a single behavior tree. Use the visual editor or write the DSL directly.",
     "open_editor": "Open Editor",
-    "read_docs": "Read Docs"
+    "read_docs": "Read Docs",
+    "how_result": "No hardware coding. Just define the personality."
   },
   "gallery": {
     "title": "Agent Gallery",
