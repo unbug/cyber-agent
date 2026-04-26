@@ -11,18 +11,15 @@ export function LanguageToggle() {
   if (supportedLocales.length <= 1) return null
 
   const next = locale === 'en' ? 'zh' : 'en'
-  const label = next === 'en' ? 'EN' : '中文'
 
   return (
     <button
       className={styles.toggle}
       onClick={() => setLocale(next)}
-      title={`Switch to ${next === 'en' ? 'English' : 'Chinese'}`}
+      title={`Switch to ${next === 'en' ? 'English' : '中文'}`}
       aria-label={`Switch language to ${next === 'en' ? 'English' : 'Chinese'}`}
     >
-      <span className={styles.current}>{locale === 'en' ? 'EN' : '中文'}</span>
-      <span className={styles.arrow}>→</span>
-      <span className={styles.next}>{label}</span>
+      {locale === 'en' ? 'EN' : '中'}
     </button>
   )
 }

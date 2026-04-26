@@ -8,8 +8,8 @@
     "debug": "Debugger"
   },
   "home": {
-    "hero_title": "Bring Your Characters to Life",
-    "hero_subtitle": "CyberAgent creates thousands of virtual AI agents that inhabit and animate physical robots and toys in the real world.",
+    "hero_title": "AI Characters for Physical Robots",
+    "hero_subtitle": "CyberAgent is an open-source library of 70+ AI agent personalities. Each character runs a behavior tree that drives a real robot — RoboMaster, mBot, and more.",
     "hero_cta": "Explore Gallery",
     "features_title": "Why CyberAgent?",
     "feature_agents_title": "Virtual Agent Ecosystem",
@@ -31,7 +31,20 @@
     "step_3_desc": "The robot comes alive as your chosen character at home.",
     "cta_title": "Ready to Get Started?",
     "cta_desc": "Explore our agent gallery and find your perfect companion.",
-    "cta_button": "Browse Agents"
+    "cta_button": "Browse Agents",
+    "stat_agents": "Characters",
+    "stat_adapters": "Robot Adapters",
+    "stat_bt": "Behavior Tree",
+    "arch_char_title": "Character",
+    "arch_char_desc": "Pick from 70+ unique agent personalities, each with distinct emotions, reactions, and movement styles.",
+    "arch_bt_title": "Behavior Tree",
+    "arch_bt_desc": "Each character is defined by a composable behavior tree using seq, sel, cond, and act nodes.",
+    "arch_robot_title": "Real Robot",
+    "arch_robot_desc": "Connect to RoboMaster EP, mBot, or any supported platform and watch the character come alive.",
+    "code_title": "Write Your Own Character",
+    "code_desc": "Define a character's entire personality in a single behavior tree. Use the visual editor or write the DSL directly.",
+    "open_editor": "Open Editor",
+    "read_docs": "Read Docs"
   },
   "gallery": {
     "title": "Agent Gallery",

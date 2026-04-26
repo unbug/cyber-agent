@@ -8,8 +8,8 @@
     "debug": "调试器"
   },
   "home": {
-    "hero_title": "让你的角色活起来",
-    "hero_subtitle": "CyberAgent 创造数千个虚拟 AI 角色，让它们 inhabit 并驱动现实世界中的机器人和玩具。",
+    "hero_title": "为真实机器人打造的 AI 角色",
+    "hero_subtitle": "CyberAgent 是一个开源库，包含 70+ 个 AI 角色个性。每个角色通过行为树驱动真实机器人 — RoboMaster、mBot 等。",
     "hero_cta": "浏览角色库",
     "features_title": "为什么选择 CyberAgent？",
     "feature_agents_title": "虚拟角色生态",
@@ -31,7 +31,20 @@
     "step_3_desc": "机器人以你选择的角色在家活起来。",
     "cta_title": "准备好开始了吗？",
     "cta_desc": "浏览我们的角色画廊，找到你的完美伙伴。",
-    "cta_button": "浏览角色"
+    "cta_button": "浏览角色",
+    "stat_agents": "角色数量",
+    "stat_adapters": "机器人适配器",
+    "stat_bt": "行为树驱动",
+    "arch_char_title": "选择角色",
+    "arch_char_desc": "从 70+ 个独特的 AI 角色中选择，每个角色都有独特的情绪、反应和运动风格。",
+    "arch_bt_title": "行为树",
+    "arch_bt_desc": "每个角色由可组合的行为树定义，使用 seq、sel、cond 和 act 节点。",
+    "arch_robot_title": "真实机器人",
+    "arch_robot_desc": "连接到 RoboMaster EP、mBot 或任何支持的平台，让角色真实运动起来。",
+    "code_title": "创建你的角色",
+    "code_desc": "用一棵行为树定义角色的全部个性，使用可视化编辑器或直接编写 DSL。",
+    "open_editor": "打开编辑器",
+    "read_docs": "阅读文档"
   },
   "gallery": {
     "title": "角色画廊",
