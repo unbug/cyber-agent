@@ -155,7 +155,7 @@ locally with no hardware, using only the live `/debug` view.
       JSONL, versioned, with migration registry.
 - [x] `/debug` scrubber: rewind / step / fast-forward an in-memory
       session OR an uploaded trace.
-- [ ] Breakpoints by BT node, blackboard predicate, or adapter event.
+- [x] Breakpoints by BT node, blackboard predicate, or adapter event.
 - [x] CLI: `cyber-agent record <adapter>` / `cyber-agent replay <file>`.
 - [ ] Pull a trace off a real device over WebSocket.
 - [x] `npx @cyber-agent/sdk trace lint` validates schema.
