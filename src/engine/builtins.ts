@@ -100,6 +100,16 @@ registerCondition('pauseRandomly', (bb) => {
 })
 
 // ═══════════════════════════════════════════════════════════════
+//  Safety conditions (v0.6)
+// ═══════════════════════════════════════════════════════════════
+
+/** Returns true when the safety supervisor has NOT triggered an e-stop. */
+registerCondition('safetyOk', (bb) => !bb.eStopActive)
+
+/** Returns true when the safety supervisor reports degraded state. */
+registerCondition('safetyDegraded', (bb) => bb.safetyState === 'degraded')
+
+// ═══════════════════════════════════════════════════════════════
 //  ACTIONS — Movement
 // ═══════════════════════════════════════════════════════════════
 

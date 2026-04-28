@@ -46,3 +46,7 @@ export { RoboMasterMotionAdapter, createRoboMasterAdapter, createRoboMasterWebSo
 
 // Character behaviors (re-exported from agents module)
 export { getBehavior, getAllBehaviors } from '../agents'
+
+// Safety Supervisor
+export { SafetySupervisor } from './safety-supervisor'
+export type { SafetyEvent, SafetyState, SafetyPolicy, SafetyOptions } from './safety-supervisor'

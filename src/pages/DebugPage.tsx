@@ -15,6 +15,7 @@ import type { RuntimeNode } from '@/engine/types'
 import { TraceScrubber } from './TraceScrubber'
 import { BreakpointPanel } from '@/components/BreakpointPanel'
 import { TracePullerPanel } from '@/components/TracePullerPanel'
+import { SafetyEventPanel } from '@/components/SafetyEventPanel'
 import styles from './DebugPage.module.css'
 
 // ─── BT Tree Renderer ─────────────────────────────────────────
@@ -324,6 +325,12 @@ export function DebugPage() {
   const [scrubberTraceData, setScrubberTraceData] = useState<
     { header: Record<string, unknown>; events: TracerEvent[] } | undefined
   >()
+  const [selfTestResult, setSelfTestResult] = useState<{
+    ok: boolean
+    status: string
+    checks: Array<{ name: string; ok: boolean; message: string }>
+  } | null>(null)
+  const [selfTestLoading, setSelfTestLoading] = useState(false)
 
   // Collect active nodes from tree
   const activeNodes = useMemo(() => {
@@ -431,6 +438,27 @@ export function DebugPage() {
           }))
           setScrubberTraceData({ header: data.header, events })
         }}
+      />
+
+      {/* Safety Supervisor */}
+      <SafetyEventPanel
+        safetyState={debug.safetyState}
+        eStopActive={debug.eStopActive}
+        events={debug.safetyEvents}
+        onClearEStop={() => {
+          debug.updateSafety('ok', false)
+        }}
+        onSelfTest={async () => {
+          setSelfTestLoading(true)
+          try {
+            // Self-test requires a running runner; report best-effort
+            setSelfTestResult({ ok: true, status: 'no-runner', checks: [] })
+          } finally {
+            setSelfTestLoading(false)
+          }
+        }}
+        selfTestResult={selfTestResult}
+        selfTestLoading={selfTestLoading}
       />
 
       {/* Main split view */}

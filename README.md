@@ -141,7 +141,7 @@ A debugger you can hand to a contributor.
 - [ ] `/debug` page split-view: BT graph (current node highlighted, last
       50-node breadcrumb) ｜ actuator timeline ｜ blackboard inspector.
 - [ ] Live tick-rate / latency widgets.
-- [ ] Diff highlighting on every blackboard write.
+- [x] Diff highlighting on every blackboard write (`src/hooks/useDebug.ts` → `diffBlackboards`).
 - [x] Capability discovery — read `adapter.capabilities()` and grey out
       incompatible BT nodes in the editor.
 - [ ] One end-to-end demo video: bug → fix → re-run on real RoboMaster.
@@ -165,14 +165,16 @@ maintainer single-steps through it locally to root-cause a bug.
 
 #### v0.6 — Adapter contract v2 _(+3 → +4 months)_
 
-- [ ] `sdk/src/adapter/contract.ts` v2:
+- [x] `sdk/src/adapter/contract.ts` v2:
+      `connect / disconnect / sendCommand / onTelemetry / capabilities() /
+      selfTest()` returning a structured report.:
       `connect / disconnect / sendCommand / onTelemetry / capabilities() /
       selfTest()` returning a structured report.
-- [ ] Hardware-in-Loop (HIL) checklist a contributor can run with a $50
-      mBot to certify a new adapter.
+- [x] Hardware-in-Loop (HIL) checklist a contributor can run with a $50
+      mBot to certify a new adapter (`docs/hil/mbot/CHECKLIST.md`).
 - [ ] Migrate existing 5 adapters to v2; deprecate v1 with a 1-version
       grace.
-- [ ] Safety supervisor node: kill switch on >200 ms heartbeat loss,
+- [x] Safety supervisor node: kill switch on >200 ms heartbeat loss,
       watt-dog on motor stall.
 
 **Release gate**: 5 in-house adapters certified; one community-contributed

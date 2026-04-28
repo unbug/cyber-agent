@@ -40,6 +40,10 @@ export interface Blackboard {
   deltaMs: number
   totalMs: number
 
+  // Safety supervisor state (set by runner each tick)
+  eStopActive?: boolean
+  safetyState?: 'ok' | 'degraded' | 'e_stopped'
+
   // Custom flags (extensible by character behaviors)
   [key: string]: unknown
 }

@@ -8,11 +8,13 @@
  * - Blackboard diff (current vs previous snapshot)
  * - Adapter tx/rx timeline
  * - Tick rate / latency stats
+ * - Safety supervisor events
  */
 
 import { useRef, useState, useCallback, useEffect } from 'react'
 import { tracer, type TracerEvent } from '@/engine/tracer'
 import type { RuntimeNode, Blackboard } from '@/engine/types'
+import type { SafetyEvent, SafetyState } from '@/engine/safety-supervisor'
 
 // ─── Internal state ─────────────────────────────────────────────
 
@@ -35,6 +37,12 @@ interface DebugState {
   totalEvents: number
   /** Is the BT currently running */
   isRunning: boolean
+  /** Safety supervisor state */
+  safetyState: SafetyState | null
+  /** E-stop active flag */
+  eStopActive: boolean
+  /** Safety events */
+  safetyEvents: SafetyEvent[]
 }
 
 const MAX_BREADCRUMB = 50
@@ -48,6 +56,10 @@ export function useDebug(): DebugState & {
   updateTree: (tree: RuntimeNode) => void
   /** Reset all state */
   reset: () => void
+  /** Update safety state */
+  updateSafety: (state: SafetyState, eStop: boolean) => void
+  /** Add safety event */
+  addSafetyEvent: (event: SafetyEvent) => void
   /** Computed tick rate (fps) */
   tickRate: number
   /** Computed avg latency (ms) */
@@ -63,6 +75,9 @@ export function useDebug(): DebugState & {
     errors: [],
     totalEvents: 0,
     isRunning: false,
+    safetyState: null,
+    eStopActive: false,
+    safetyEvents: [],
   })
 
   const stateRef = useRef(state)
@@ -91,7 +106,18 @@ export function useDebug(): DebugState & {
       errors: [],
       totalEvents: 0,
       isRunning: false,
+      safetyState: null,
+      eStopActive: false,
+      safetyEvents: [],
     })
+  }, [])
+
+  const updateSafety = useCallback((safetyState: SafetyState, eStop: boolean) => {
+    setState(prev => ({ ...prev, safetyState, eStopActive: eStop }))
+  }, [])
+
+  const addSafetyEvent = useCallback((event: SafetyEvent) => {
+    setState(prev => ({ ...prev, safetyEvents: [...prev.safetyEvents, event] }))
   }, [])
 
   // Tracer subscription
@@ -145,10 +171,14 @@ export function useDebug(): DebugState & {
     captureBlackboard,
     updateTree,
     reset,
+    updateSafety,
+    addSafetyEvent,
   } as DebugState & {
     captureBlackboard: (bb: Blackboard) => void
     updateTree: (tree: RuntimeNode) => void
     reset: () => void
+    updateSafety: (state: SafetyState, eStop: boolean) => void
+    addSafetyEvent: (event: SafetyEvent) => void
     tickRate: number
     avgLatency: number
   }

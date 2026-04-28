@@ -681,4 +681,38 @@ describe('Conditions — Extended', () => {
     const bb = makeBb({ x: 200, y: 150 })
     expect(tick(root, bb, mockAdapter())).toBe('success')
   })
+
+  // ── Safety conditions (v0.6) ─────────────────────────────
+
+  it('safetyOk returns true when no e-stop', () => {
+    const def: BehaviorNodeDef = { type: 'condition', check: 'safetyOk' }
+    const root = hydrate(def)
+    const bb = makeBb() as Blackboard & { eStopActive?: boolean }
+    bb.eStopActive = false
+    expect(tick(root, bb, mockAdapter())).toBe('success')
+  })
+
+  it('safetyOk returns false when e-stop active', () => {
+    const def: BehaviorNodeDef = { type: 'condition', check: 'safetyOk' }
+    const root = hydrate(def)
+    const bb = makeBb() as Blackboard & { eStopActive?: boolean }
+    bb.eStopActive = true
+    expect(tick(root, bb, mockAdapter())).toBe('failure')
+  })
+
+  it('safetyDegraded returns true when degraded', () => {
+    const def: BehaviorNodeDef = { type: 'condition', check: 'safetyDegraded' }
+    const root = hydrate(def)
+    const bb = makeBb() as Blackboard & { safetyState?: string }
+    bb.safetyState = 'degraded'
+    expect(tick(root, bb, mockAdapter())).toBe('success')
+  })
+
+  it('safetyDegraded returns false when ok', () => {
+    const def: BehaviorNodeDef = { type: 'condition', check: 'safetyDegraded' }
+    const root = hydrate(def)
+    const bb = makeBb() as Blackboard & { safetyState?: string }
+    bb.safetyState = 'ok'
+    expect(tick(root, bb, mockAdapter())).toBe('failure')
+  })
 })

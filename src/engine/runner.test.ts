@@ -55,27 +55,27 @@ describe('BehaviorTreeRunner', () => {
 
   it('starts in stopped state', () => {
     const behavior = getBehavior('fox')!
-    const runner = new BehaviorTreeRunner(behavior, adapter)
+    const runner = new BehaviorTreeRunner(behavior, adapter, {})
     expect(runner.state).toBe('stopped')
   })
 
   it('transitions to running on start', () => {
     const behavior = getBehavior('fox')!
-    const runner = new BehaviorTreeRunner(behavior, adapter)
+    const runner = new BehaviorTreeRunner(behavior, adapter, {})
     runner.start()
     expect(runner.state).toBe('running')
   })
 
   it('calls adapter.init on start', () => {
     const behavior = getBehavior('fox')!
-    const runner = new BehaviorTreeRunner(behavior, adapter)
+    const runner = new BehaviorTreeRunner(behavior, adapter, {})
     runner.start()
     expect(adapter.init).toHaveBeenCalled()
   })
 
   it('calls adapter.destroy on stop', () => {
     const behavior = getBehavior('fox')!
-    const runner = new BehaviorTreeRunner(behavior, adapter)
+    const runner = new BehaviorTreeRunner(behavior, adapter, {})
     runner.start()
     runner.stop()
     expect(adapter.destroy).toHaveBeenCalled()
@@ -83,7 +83,7 @@ describe('BehaviorTreeRunner', () => {
 
   it('returns stopped on double-start', () => {
     const behavior = getBehavior('fox')!
-    const runner = new BehaviorTreeRunner(behavior, adapter)
+    const runner = new BehaviorTreeRunner(behavior, adapter, {})
     runner.start()
     runner.start() // should be a no-op
     expect(runner.state).toBe('running')
@@ -92,7 +92,7 @@ describe('BehaviorTreeRunner', () => {
   describe('pause / resume', () => {
     it('pauses the runner', () => {
       const behavior = getBehavior('fox')!
-      const runner = new BehaviorTreeRunner(behavior, adapter)
+      const runner = new BehaviorTreeRunner(behavior, adapter, {})
       runner.start()
       runner.pause()
       expect(runner.state).toBe('paused')
@@ -100,7 +100,7 @@ describe('BehaviorTreeRunner', () => {
 
     it('resumes from paused state', () => {
       const behavior = getBehavior('fox')!
-      const runner = new BehaviorTreeRunner(behavior, adapter)
+      const runner = new BehaviorTreeRunner(behavior, adapter, {})
       runner.start()
       runner.pause()
       runner.resume()
@@ -109,7 +109,7 @@ describe('BehaviorTreeRunner', () => {
 
     it('resume is no-op when not paused', () => {
       const behavior = getBehavior('fox')!
-      const runner = new BehaviorTreeRunner(behavior, adapter)
+      const runner = new BehaviorTreeRunner(behavior, adapter, {})
       runner.start()
       runner.resume() // should not crash
       expect(runner.state).toBe('running')
@@ -119,7 +119,7 @@ describe('BehaviorTreeRunner', () => {
   describe('snapshot', () => {
     it('returns current state snapshot', () => {
       const behavior = getBehavior('fox')!
-      const runner = new BehaviorTreeRunner(behavior, adapter)
+      const runner = new BehaviorTreeRunner(behavior, adapter, {})
       runner.start()
 
       const snap = runner.snapshot()
@@ -135,7 +135,7 @@ describe('BehaviorTreeRunner', () => {
 
     it('snapshot blackboard is a copy', () => {
       const behavior = getBehavior('fox')!
-      const runner = new BehaviorTreeRunner(behavior, adapter)
+      const runner = new BehaviorTreeRunner(behavior, adapter, {})
       runner.start()
 
       const originalX = runner.blackboard.x
@@ -153,7 +153,7 @@ describe('BehaviorTreeRunner', () => {
   describe('setCanvasSize', () => {
     it('updates blackboard dimensions', () => {
       const behavior = getBehavior('fox')!
-      const runner = new BehaviorTreeRunner(behavior, adapter)
+      const runner = new BehaviorTreeRunner(behavior, adapter, {})
       runner.setCanvasSize(800, 600)
       const snap = runner.snapshot()
       expect(snap.blackboard.canvasWidth).toBe(800)
@@ -164,7 +164,7 @@ describe('BehaviorTreeRunner', () => {
   describe('setPointer', () => {
     it('updates pointer position and active state', () => {
       const behavior = getBehavior('fox')!
-      const runner = new BehaviorTreeRunner(behavior, adapter)
+      const runner = new BehaviorTreeRunner(behavior, adapter, {})
       runner.setPointer(250, 180, true)
       const snap = runner.snapshot()
       expect(snap.blackboard.pointerX).toBe(250)
@@ -174,7 +174,7 @@ describe('BehaviorTreeRunner', () => {
 
     it('sets pointerActive to false', () => {
       const behavior = getBehavior('fox')!
-      const runner = new BehaviorTreeRunner(behavior, adapter)
+      const runner = new BehaviorTreeRunner(behavior, adapter, {})
       runner.setPointer(100, 100, false)
       const snap = runner.snapshot()
       expect(snap.blackboard.pointerActive).toBe(false)
@@ -185,7 +185,7 @@ describe('BehaviorTreeRunner', () => {
     it('resets with a new behavior', () => {
       const behavior1 = getBehavior('fox')!
       const behavior2 = getBehavior('puppy')!
-      const runner = new BehaviorTreeRunner(behavior1, adapter)
+      const runner = new BehaviorTreeRunner(behavior1, adapter, {})
       runner.start()
 
       tickRunner(runner, 1)
@@ -198,7 +198,7 @@ describe('BehaviorTreeRunner', () => {
 
     it('resets blackboard to defaults', () => {
       const behavior = getBehavior('fox')!
-      const runner = new BehaviorTreeRunner(behavior, adapter)
+      const runner = new BehaviorTreeRunner(behavior, adapter, {})
       runner.start()
 
       // Modify blackboard
@@ -217,7 +217,7 @@ describe('BehaviorTreeRunner', () => {
     it('invokes onTick after each tick', () => {
       const behavior = getBehavior('fox')!
       const callback = vi.fn()
-      const runner = new BehaviorTreeRunner(behavior, adapter)
+      const runner = new BehaviorTreeRunner(behavior, adapter, {})
       runner.onTick = callback
       runner.start()
 
@@ -233,7 +233,7 @@ describe('BehaviorTreeRunner', () => {
   describe('TPS tracking', () => {
     it('tracks ticks per second', () => {
       const behavior = getBehavior('fox')!
-      const runner = new BehaviorTreeRunner(behavior, adapter)
+      const runner = new BehaviorTreeRunner(behavior, adapter, {})
       runner.start()
 
       // Advance enough for the TPS counter to update (1 second)
@@ -248,7 +248,7 @@ describe('BehaviorTreeRunner', () => {
   describe('integration: full lifecycle', () => {
     it('runs for 10 ticks without error', () => {
       const behavior = getBehavior('fox')!
-      const runner = new BehaviorTreeRunner(behavior, adapter)
+      const runner = new BehaviorTreeRunner(behavior, adapter, {})
       let tickCount = 0
       runner.onTick = () => { tickCount++ }
       runner.start()
