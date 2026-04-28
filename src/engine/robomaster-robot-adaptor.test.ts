@@ -10,19 +10,25 @@ import {
   createRoboMasterWebSocketAdapter,
   motionPrimitive,
 } from './robomaster-robot-adaptor'
-import type { RobotAdapter, AdapterCommand } from './types'
+import type { AdapterCommand } from './types'
+import type { RobotAdapterV2, RobotCapabilitiesV2 } from '@cyber-agent/sdk/adapter/contract'
 
 // ─── Helpers ──────────────────────────────────────────────────────
 
-function createBaseAdapter(): RobotAdapter {
+function createBaseAdapter(): RobotAdapterV2 {
   return {
     type: 'base',
     name: 'Base',
+    contractVersion: 'v2' as const,
+    connect: vi.fn().mockResolvedValue(undefined),
+    disconnect: vi.fn().mockResolvedValue(undefined),
     init: vi.fn(),
     update: vi.fn(),
     destroy: vi.fn(),
     sendCommand: vi.fn(),
-    capabilities: () => ({
+    onTelemetry: vi.fn().mockReturnValue(() => {}),
+    selfTest: vi.fn().mockReturnValue({ ok: true, status: 'healthy', summary: 'mock', checks: [], timestamp: 0, version: 'v2' }),
+    capabilities: (): RobotCapabilitiesV2 => ({
       movement: true,
       rotation: true,
       speed: true,
@@ -31,6 +37,11 @@ function createBaseAdapter(): RobotAdapter {
       gesture: false,
       maxSpeed: 100,
       maxRotationSpeed: 180,
+      batteryReporting: false,
+      distanceReporting: false,
+      imuReporting: false,
+      selfTestable: false,
+      hardwareEStop: false,
     }),
   }
 }
@@ -70,7 +81,7 @@ describe('motionPrimitive', () => {
 })
 
 describe('RoboMasterMotionAdapter', () => {
-  let baseAdapter: RobotAdapter
+  let baseAdapter: RobotAdapterV2
 
   beforeEach(() => {
     baseAdapter = createBaseAdapter()

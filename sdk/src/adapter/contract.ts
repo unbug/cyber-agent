@@ -50,6 +50,21 @@ export interface TelemetryEvent {
 }
 
 /**
+ * Base robot capabilities — what the adapter can do.
+ * Used by the BT editor to grey out incompatible nodes.
+ */
+export interface RobotCapabilities {
+  movement: boolean
+  rotation: boolean
+  speed: boolean
+  led: boolean
+  sound: boolean
+  gesture: boolean
+  maxSpeed: number
+  maxRotationSpeed: number
+}
+
+/**
  * Extended capabilities for v2.
  * Adds diagnostic and safety information.
  */
@@ -230,7 +245,6 @@ export function isAdapterV2(adapter: RobotAdapterV1 | RobotAdapterV2): adapter i
  */
 export function wrapV1AsV2(v1: RobotAdapterV1): RobotAdapterV2 {
   let connected = false
-  let telemetryCallback: ((event: TelemetryEvent) => void) | null = null
   let commandQueue: AdapterCommand[] = []
 
   return {
@@ -260,9 +274,9 @@ export function wrapV1AsV2(v1: RobotAdapterV1): RobotAdapterV2 {
       }
     },
 
-    onTelemetry(callback: (event: TelemetryEvent) => void): () => void {
-      telemetryCallback = callback
-      return () => { telemetryCallback = null }
+    onTelemetry(_callback: (event: TelemetryEvent) => void): () => void {
+      // v1 adapters don't emit telemetry; callback is a no-op
+      return () => {}
     },
 
     selfTest(): SelfTestReport {

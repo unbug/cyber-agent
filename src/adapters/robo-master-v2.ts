@@ -1,4 +1,5 @@
-import type { RobotAdapter, AdapterCommand, RobotCapabilities } from '../engine/types';
+import type { AdapterCommand } from '../engine/types';
+import type { RobotCapabilitiesV2, SelfTestReport, TelemetryEvent, RobotAdapterV2 } from '@cyber-agent/sdk/adapter/contract';
 import { emitAdapterTx } from '../engine/tracer';
 
 interface RoboMasterAdapterV2Config {
@@ -169,9 +170,12 @@ class HeartbeatSystem {
  * 
  * Target: <1ms tick latency, <100ms recovery, <1MB memory
  */
-export class RoboMasterAdapterV2 implements RobotAdapter {
+export class RoboMasterAdapterV2 implements RobotAdapterV2 {
   readonly type = 'robo-master-v2';
   readonly name = 'RoboMaster Adapter V2';
+  readonly contractVersion = 'v2' as const;
+  private _telemetryCallback: ((event: TelemetryEvent) => void) | null = null;
+  // _telemetryCallback is set by onTelemetry() for telemetry forwarding
   private readonly heartbeat: HeartbeatSystem;
   private commandQueue: PriorityCommandQueue;
   private isConnecting: boolean = false;
@@ -238,6 +242,31 @@ export class RoboMasterAdapterV2 implements RobotAdapter {
     // Implementation: subscribe to sensor data from robot
     return () => {};
   }
+
+  // ── v2 lifecycle ───────────────────────────────────────────
+
+  onTelemetry(callback: (event: TelemetryEvent) => void): () => void {
+    this._telemetryCallback = callback;
+    return () => { this._telemetryCallback = null; };
+  }
+
+  selfTest(): SelfTestReport {
+    const ws = this.heartbeat.getWebSocket();
+    const isConnected = ws !== null && ws.readyState === WebSocket.OPEN;
+    return {
+      ok: isConnected,
+      status: isConnected ? 'healthy' : 'unhealthy',
+      summary: `RoboMasterAdapterV2 — ${isConnected ? 'connected' : 'disconnected'}`,
+      checks: [
+        { name: 'websocket', ok: isConnected, message: isConnected ? 'WebSocket open' : 'WebSocket closed' },
+        { name: 'command_queue', ok: true, message: `Queue depth: ${this.commandQueue.length}` },
+        { name: 'heartbeat', ok: this.heartbeat !== null, message: 'Heartbeat system active' },
+        { name: 'telemetry', ok: this._telemetryCallback !== null, message: this._telemetryCallback ? 'Telemetry subscribed' : 'No subscriber' },
+      ],
+      timestamp: Date.now(),
+      version: 'v2',
+    };
+  }
   
   init(): void {
     console.log('[RoboMasterV2] Adapter initialized');
@@ -247,6 +276,12 @@ export class RoboMasterAdapterV2 implements RobotAdapter {
     if (this.isConnecting) return;
     this.isConnecting = true;
     console.log('[RoboMasterV2] Connection initiated');
+    await this.heartbeat.connect();
+  }
+
+  async disconnect(): Promise<void> {
+    await this.heartbeat.disconnect();
+    this.isConnecting = false;
   }
   
   update(): void {
@@ -278,8 +313,7 @@ export class RoboMasterAdapterV2 implements RobotAdapter {
 
   // ── Capabilities ─────────────────────────────────────────────
 
-  capabilities(): RobotCapabilities {
-    // RoboMaster S1/EP: full mobility, LED armor, speaker, gimbal
+  capabilities(): RobotCapabilitiesV2 {
     return {
       movement: true,
       rotation: true,
@@ -289,6 +323,11 @@ export class RoboMasterAdapterV2 implements RobotAdapter {
       gesture: true,
       maxSpeed: 400,
       maxRotationSpeed: 360,
+      batteryReporting: true,
+      distanceReporting: true,
+      imuReporting: true,
+      selfTestable: true,
+      hardwareEStop: true,
     }
   }
 }

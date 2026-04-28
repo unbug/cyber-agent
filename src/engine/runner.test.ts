@@ -6,21 +6,27 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { BehaviorTreeRunner } from './runner'
 import { getBehavior } from '../agents'
-import type { RobotAdapter, Blackboard } from './types'
+import type { Blackboard } from './types'
+import type { RobotAdapterV2, RobotCapabilitiesV2 } from '@cyber-agent/sdk/adapter/contract'
 
 import './builtins'
 
 // ─── Helpers ──────────────────────────────────────────────────────
 
-function mockAdapter(): RobotAdapter {
+function mockAdapter(): RobotAdapterV2 {
   return {
     type: 'mock-runner',
     name: 'MockRunner',
+    contractVersion: 'v2' as const,
+    connect: vi.fn().mockResolvedValue(undefined),
+    disconnect: vi.fn().mockResolvedValue(undefined),
     init: vi.fn(),
     update: vi.fn(),
     destroy: vi.fn(),
     sendCommand: vi.fn(),
-    capabilities: () => ({
+    onTelemetry: vi.fn().mockReturnValue(() => {}),
+    selfTest: vi.fn().mockReturnValue({ ok: true, status: 'healthy', summary: 'mock', checks: [], timestamp: 0, version: 'v2' }),
+    capabilities: (): RobotCapabilitiesV2 => ({
       movement: true,
       rotation: true,
       speed: true,
@@ -29,6 +35,11 @@ function mockAdapter(): RobotAdapter {
       gesture: false,
       maxSpeed: 100,
       maxRotationSpeed: 180,
+      batteryReporting: false,
+      distanceReporting: false,
+      imuReporting: false,
+      selfTestable: false,
+      hardwareEStop: false,
     }),
   }
 }
@@ -41,7 +52,7 @@ function tickRunner(_runner: BehaviorTreeRunner, count = 3): void {
 // ─── Tests ────────────────────────────────────────────────────────
 
 describe('BehaviorTreeRunner', () => {
-  let adapter: RobotAdapter
+  let adapter: RobotAdapterV2
 
   beforeEach(() => {
     adapter = mockAdapter()

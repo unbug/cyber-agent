@@ -6,7 +6,8 @@
  * (emotion glow, trail, bounce) make it feel alive.
  */
 
-import type { Blackboard, RobotAdapter, AdapterCommand, RobotCapabilities } from './types'
+import type { Blackboard, AdapterCommand } from './types'
+import type { RobotCapabilitiesV2, SelfTestReport, TelemetryEvent, RobotAdapterV2 } from '@cyber-agent/sdk/adapter/contract'
 import { emitAdapterTx } from './tracer'
 
 const EMOTION_COLORS: Record<string, string> = {
@@ -19,9 +20,10 @@ const EMOTION_COLORS: Record<string, string> = {
   angry: '#dc2626',
 }
 
-export class CanvasAdapter implements RobotAdapter {
+export class CanvasAdapter implements RobotAdapterV2 {
   readonly type = 'canvas'
   readonly name = 'Browser Canvas'
+  readonly contractVersion = 'v2' as const
 
   private ctx: CanvasRenderingContext2D | null = null
   private canvas: HTMLCanvasElement | null = null
@@ -102,6 +104,35 @@ export class CanvasAdapter implements RobotAdapter {
     console.debug('[CanvasAdapter] command:', command.type, command.payload)
   }
 
+  // ── v2 lifecycle ───────────────────────────────────────────
+
+  async connect(): Promise<void> {
+    // Canvas is already "connected" — it's in-browser
+    return Promise.resolve()
+  }
+
+  async disconnect(): Promise<void> {
+    return Promise.resolve()
+  }
+
+  onTelemetry(_callback: (event: TelemetryEvent) => void): () => void {
+    return () => { /* no telemetry for canvas */ }
+  }
+
+  selfTest(): SelfTestReport {
+    return {
+      ok: true,
+      status: 'healthy',
+      summary: 'CanvasAdapter — browser rendering (synthetic)',
+      checks: [
+        { name: 'canvas_context', ok: this.ctx !== null, message: this.ctx ? 'Canvas 2D context available' : 'Canvas context missing' },
+        { name: 'canvas_size', ok: this.canvas !== null, message: this.canvas ? `Canvas ${this.canvas.width}×${this.canvas.height}` : 'Canvas element missing' },
+      ],
+      timestamp: Date.now(),
+      version: 'v2',
+    }
+  }
+
   // ── Private drawing helpers ─────────────────────────────────
 
   private drawGrid(ctx: CanvasRenderingContext2D, w: number, h: number) {
@@ -175,7 +206,19 @@ export class CanvasAdapter implements RobotAdapter {
 
   // ── Capabilities ─────────────────────────────────────────────
 
-  capabilities(): RobotCapabilities {
+  capabilities(): RobotCapabilitiesV2 {
+    return {
+      ...this._baseCapabilities(),
+      batteryReporting: false,
+      distanceReporting: false,
+      imuReporting: false,
+      selfTestable: true,
+      hardwareEStop: false,
+    }
+  }
+
+  private _baseCapabilities(): Omit<RobotCapabilitiesV2,
+    'batteryReporting'|'distanceReporting'|'imuReporting'|'selfTestable'|'hardwareEStop'> {
     return {
       movement: true,
       rotation: true,

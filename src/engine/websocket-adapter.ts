@@ -13,7 +13,8 @@
  *   agent.start(wsAdapter)
  */
 
-import type { Blackboard, RobotAdapter, AdapterCommand, RobotCapabilities } from './types'
+import type { Blackboard, AdapterCommand } from './types'
+import type { RobotCapabilitiesV2, SelfTestReport, TelemetryEvent, RobotAdapterV2 } from '@cyber-agent/sdk/adapter/contract'
 import { emitAdapterTx, emitAdapterRx } from './tracer'
 
 export interface WebSocketAdapterConfig {
@@ -24,9 +25,10 @@ export interface WebSocketAdapterConfig {
   autoConnect?: boolean
 }
 
-export class WebSocketAdapter implements RobotAdapter {
+export class WebSocketAdapter implements RobotAdapterV2 {
   readonly type = 'websocket'
   readonly name = 'WebSocket Robot Adapter'
+  readonly contractVersion = 'v2' as const
   
   private ws: WebSocket | null = null
   private config: WebSocketAdapterConfig
@@ -35,6 +37,7 @@ export class WebSocketAdapter implements RobotAdapter {
   private reconnectAttempts = 0
   private commandQueue: AdapterCommand[] = []
   private isConnectedCallback?: (connected: boolean) => void
+  private _telemetryCallback: ((event: TelemetryEvent) => void) | null = null
   
   constructor(config: WebSocketAdapterConfig) {
     this.config = {
@@ -56,7 +59,7 @@ export class WebSocketAdapter implements RobotAdapter {
   
   // ─── Connection Management ──────────────────────────────────
   
-  connect() {
+  async connect(): Promise<void> {
     if (this.ws?.readyState === WebSocket.CONNECTING || this.ws?.readyState === WebSocket.OPEN) {
       return // Already connecting or open
     }
@@ -110,6 +113,43 @@ export class WebSocketAdapter implements RobotAdapter {
   private onConnect(connected: boolean) {
     if (this.isConnectedCallback) {
       this.isConnectedCallback(connected)
+    }
+  }
+
+  // ── v2 lifecycle ───────────────────────────────────────────
+
+  async disconnect(): Promise<void> {
+    this.stopHeartbeat()
+    if (this.reconnectTimer) {
+      clearTimeout(this.reconnectTimer)
+      this.reconnectTimer = null
+    }
+    if (this.ws) {
+      this.ws.onclose = null
+      this.ws.close(1000, 'disconnect')
+      this.ws = null
+    }
+    this.commandQueue = []
+    return Promise.resolve()
+  }
+
+  onTelemetry(callback: (event: TelemetryEvent) => void): () => void {
+    this._telemetryCallback = callback
+    return () => { this._telemetryCallback = null }
+  }
+
+  selfTest(): SelfTestReport {
+    const isConnected = this.ws?.readyState === WebSocket.OPEN
+    return {
+      ok: isConnected,
+      status: isConnected ? 'healthy' : 'unhealthy',
+      summary: `WebSocketAdapter — ${isConnected ? 'connected' : 'disconnected'} to ${this.config.url}`,
+      checks: [
+        { name: 'connection', ok: isConnected, message: isConnected ? 'WebSocket open' : 'WebSocket not connected' },
+        { name: 'heartbeat', ok: this.heartbeatTimer !== null, message: this.heartbeatTimer ? 'Heartbeat active' : 'Heartbeat stopped' },
+      ],
+      timestamp: Date.now(),
+      version: 'v2',
     }
   }
   
@@ -189,6 +229,15 @@ export class WebSocketAdapter implements RobotAdapter {
     try {
       const data = JSON.parse(event.data)
       emitAdapterRx({ type: data.type, raw: true }, performance.now())
+
+      // Forward telemetry to registered callback
+      if (this._telemetryCallback && data.type) {
+        this._telemetryCallback({
+          type: data.type,
+          payload: data.payload ?? {},
+          t: Date.now(),
+        })
+      }
 
       switch (data.type) {
         case 'heartbeat_ack':
@@ -276,9 +325,7 @@ export class WebSocketAdapter implements RobotAdapter {
 
   // ── Capabilities ─────────────────────────────────────────────
 
-  capabilities(): RobotCapabilities {
-    // WebSocketAdapter is a generic passthrough — assumes the downstream
-    // robot supports everything (the actual robot defines real limits)
+  capabilities(): RobotCapabilitiesV2 {
     return {
       movement: true,
       rotation: true,
@@ -288,12 +335,17 @@ export class WebSocketAdapter implements RobotAdapter {
       gesture: true,
       maxSpeed: 200,
       maxRotationSpeed: 360,
+      batteryReporting: true,
+      distanceReporting: true,
+      imuReporting: true,
+      selfTestable: true,
+      hardwareEStop: true,
     }
   }
 }
 
 // ─── Factory function for easier usage ──────────────────────────────────
 
-export function createWebSocketAdapter(config: WebSocketAdapterConfig): RobotAdapter {
+export function createWebSocketAdapter(config: WebSocketAdapterConfig): RobotAdapterV2 {
   return new WebSocketAdapter(config)
 }

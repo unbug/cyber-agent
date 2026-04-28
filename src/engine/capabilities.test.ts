@@ -14,7 +14,8 @@ import { WebSocketAdapter } from './websocket-adapter'
 import { MBotAdapter } from '@/adapters/mbot'
 import { RoboMasterAdapterV2 } from '@/adapters/robo-master-v2'
 import { RoboMasterMotionAdapter } from './robomaster-robot-adaptor'
-import type { RobotCapabilities, RobotAdapter } from './types'
+import type { RobotCapabilities } from './types'
+import type { RobotAdapterV2, RobotCapabilitiesV2 } from '@cyber-agent/sdk/adapter/contract'
 
 // ─── isNodeCompatible tests ───────────────────────────────────
 
@@ -162,17 +163,24 @@ describe('RoboMasterAdapterV2.capabilities()', () => {
 
 describe('RoboMasterMotionAdapter.capabilities()', () => {
   it('delegates capabilities to underlying adapter', () => {
-    const mockBase: RobotAdapter = {
+    const mockBase: RobotAdapterV2 = {
       type: 'mock',
       name: 'Mock',
+      contractVersion: 'v2' as const,
+      connect: () => Promise.resolve(),
+      disconnect: () => Promise.resolve(),
       init: () => {},
       update: () => {},
       destroy: () => {},
       sendCommand: () => {},
-      capabilities: () => ({
+      onTelemetry: () => () => {},
+      selfTest: () => ({ ok: true, status: 'healthy', summary: 'mock', checks: [], timestamp: 0, version: 'v2' }),
+      capabilities: (): RobotCapabilitiesV2 => ({
         movement: true, rotation: true, speed: true,
         led: false, sound: false, gesture: false,
         maxSpeed: 50, maxRotationSpeed: 90,
+        batteryReporting: false, distanceReporting: false, imuReporting: false,
+        selfTestable: false, hardwareEStop: false,
       }),
     }
     const adapter = new RoboMasterMotionAdapter(mockBase)

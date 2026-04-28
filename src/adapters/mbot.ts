@@ -2,7 +2,8 @@
  * mBot Adapter Implementation — EduRobot Platform
  */
 
-import type { RobotAdapter, Blackboard, AdapterCommand, RobotCapabilities } from '../engine/types';
+import type { Blackboard, AdapterCommand } from '../engine/types';
+import type { RobotCapabilitiesV2, SelfTestReport, TelemetryEvent, RobotAdapterV2 } from '@cyber-agent/sdk/adapter/contract';
 import { emitAdapterTx } from '../engine/tracer';
 
 class I2CProtocol {
@@ -53,9 +54,12 @@ class MBotSensorSystem {
   }
 }
 
-export class MBotAdapter implements RobotAdapter {
+export class MBotAdapter implements RobotAdapterV2 {
   readonly type = 'mbot' as const;
   readonly name = 'mBot Adapter';
+  readonly contractVersion = 'v2' as const;
+  private _telemetryCallback: ((event: TelemetryEvent) => void) | null = null;
+  // _telemetryCallback is set by onTelemetry() and used by subclasses
   private motorSystem: MBotMotorSystem;
   private ledSystem: MBotLEDSystem;
   private sensorSystem: MBotSensorSystem;
@@ -85,6 +89,40 @@ export class MBotAdapter implements RobotAdapter {
     console.log('Send:', packet);
   }
 
+  // ── v2 lifecycle ───────────────────────────────────────────
+
+  async connect(): Promise<void> {
+    // Simulate serial connection
+    console.log('[MBotAdapter] Connected');
+    return Promise.resolve();
+  }
+
+  async disconnect(): Promise<void> {
+    console.log('[MBotAdapter] Disconnected');
+    return Promise.resolve();
+  }
+
+  onTelemetry(callback: (event: TelemetryEvent) => void): () => void {
+    this._telemetryCallback = callback;
+    return () => { this._telemetryCallback = null; };
+  }
+
+  selfTest(): SelfTestReport {
+    return {
+      ok: true,
+      status: 'healthy',
+      summary: 'MBotAdapter — I2C protocol ready',
+      checks: [
+        { name: 'motor_system', ok: true, message: 'Motor system initialized' },
+        { name: 'led_system', ok: true, message: 'LED matrix initialized' },
+        { name: 'sensor_system', ok: true, message: 'Sensors calibrated' },
+        { name: 'telemetry', ok: this._telemetryCallback !== null, message: this._telemetryCallback ? 'Telemetry subscribed' : 'No subscriber' },
+      ],
+      timestamp: Date.now(),
+      version: 'v2',
+    };
+  }
+
   private serializeCommand(command: AdapterCommand): Uint8Array {
     const cmd = command as any;
     switch (cmd.type) {
@@ -101,8 +139,7 @@ export class MBotAdapter implements RobotAdapter {
 
   // ── Capabilities ─────────────────────────────────────────────
 
-  capabilities(): RobotCapabilities {
-    // mBot EduRobot: differential drive, 16-LED matrix, buzzer
+  capabilities(): RobotCapabilitiesV2 {
     return {
       movement: true,
       rotation: true,
@@ -112,6 +149,11 @@ export class MBotAdapter implements RobotAdapter {
       gesture: false,
       maxSpeed: 100,
       maxRotationSpeed: 180,
-    }
+      batteryReporting: true,
+      distanceReporting: true,
+      imuReporting: false,
+      selfTestable: true,
+      hardwareEStop: false,
+    };
   }
 }

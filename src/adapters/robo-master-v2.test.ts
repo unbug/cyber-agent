@@ -275,6 +275,8 @@ describe('RoboMasterAdapterV2', () => {
     expect(sent.type).toBe('move')
   })
 
+
+
   it('tick does nothing when queue is empty', async () => {
     const ws = makeOpenWs()
     const adapter = makeAdapterWithWs(ws)
@@ -299,7 +301,10 @@ describe('RoboMasterAdapterV2', () => {
 
   it('connect sets isConnecting flag', async () => {
     const adapter = RoboMasterAdapterV2._forTest(makeFullConfig())
+    // Mock heartbeat.connect to avoid real WebSocket
+    const connectSpy = vi.spyOn(adapter['heartbeat'], 'connect').mockResolvedValue(undefined)
     await adapter.connect()
+    expect(connectSpy).toHaveBeenCalled()
     expect(adapter['isConnecting']).toBe(true)
   })
 

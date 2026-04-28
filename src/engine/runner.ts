@@ -18,9 +18,9 @@
 import type {
   CharacterBehavior,
   Blackboard,
-  RobotAdapter,
   RuntimeNode,
 } from './types'
+import type { RobotAdapterV2 } from '@cyber-agent/sdk/adapter/contract'
 import { createBlackboard } from './types'
 import { hydrate, tick, resetTree } from './executor'
 import { emitTickStart, emitBbSet } from './tracer'
@@ -46,7 +46,7 @@ export interface RunnerOptions {
 export class BehaviorTreeRunner {
   private root: RuntimeNode
   private bb: Blackboard
-  private adapter: RobotAdapter
+  private adapter: RobotAdapterV2
   private intervalMs: number
   private timerId: ReturnType<typeof setInterval> | null = null
   private animFrameId: number | null = null
@@ -65,7 +65,7 @@ export class BehaviorTreeRunner {
   /** Callback fired when safety event occurs */
   public onSafetyEvent: ((event: SafetyEvent) => void) | null = null
 
-  constructor(behavior: CharacterBehavior, adapter: RobotAdapter, opts?: RunnerOptions) {
+  constructor(behavior: CharacterBehavior, adapter: RobotAdapterV2, opts?: RunnerOptions) {
     this.root = hydrate(behavior.tree)
     this.intervalMs = behavior.tickIntervalMs ?? 100
     this.adapter = adapter
