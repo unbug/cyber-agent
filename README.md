@@ -172,7 +172,7 @@ maintainer single-steps through it locally to root-cause a bug.
       selfTest()` returning a structured report.
 - [x] Hardware-in-Loop (HIL) checklist a contributor can run with a $50
       mBot to certify a new adapter (`docs/hil/mbot/CHECKLIST.md`).
-- [ ] Migrate existing 5 adapters to v2; deprecate v1 with a 1-version
+- [x] Migrate existing 5 adapters to v2; deprecate v1 with a 1-version
       grace.
 - [x] Safety supervisor node: kill switch on >200 ms heartbeat loss,
       watt-dog on motor stall.
