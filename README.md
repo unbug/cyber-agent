@@ -185,7 +185,8 @@ adapter accepted using only the v2 contract.
 Width of real toys — every adapter ships with HIL evidence under
 `docs/hil/<adapter>/`.
 
-- [ ] LEGO SPIKE / Mindstorms (Bluetooth LE).
+- [x] LEGO SPIKE / Mindstorms (Bluetooth LE).
+- [ ] Generic ESP32 + reference firmware (WebSocket protocol v2).
 - [ ] Generic ESP32 + reference firmware (WebSocket protocol v2).
 - [ ] Unitree Go1 / Go2 high-level SDK with documented safety envelope.
 - [ ] iRobot Create 3 / Roomba SDK.
