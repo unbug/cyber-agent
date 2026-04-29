@@ -194,7 +194,16 @@ Width of real toys — every adapter ships with HIL evidence under
   - 47 unit tests covering serialization, parsing, lifecycle, queueing
   - Reference firmware: `firmware/esp32/CyberAgentESP32.ino` (Arduino, WiFi AP/station, WS server)
   - HIL checklist: `docs/hil/esp32/CHECKLIST.md`
-- [ ] Unitree Go1 / Go2 high-level SDK with documented safety envelope.
+- [x] Unitree Go1 / Go2 high-level SDK with documented safety envelope.
+  - `src/adapters/unitree-go1.ts` — `UnitreeGo1Adapter` implementing `RobotAdapterV2`
+  - Relay server WebSocket protocol (browser → relay → UDP/DDS → robot)
+  - High-level API: `move`, `setBodyHeight`, `setGait`, `setPose`, `damping`, `standUp`, `sit`, `standDown`, `dance`, `jump`, `flip`, `emergencyStop`
+  - Telemetry parsing: battery, IMU, joint_state, terrain, foot_force, state, position, heartbeat, ack
+  - Safety envelope: speed clamping, body height limits, angle limits, battery thresholds
+  - Enums: `GaitType` (0-4), `MotionMode` (0-13), `SpeedLevel` (0-2), `RobotModel` ('go1' | 'go2')
+  - 75 unit tests covering serialization, parsing, lifecycle, queueing
+  - HIL checklist: `docs/hil/unitree-go1/CHECKLIST.md`
+  - ADAPTER_INFO entry + character compatibleAdapters updated
 - [ ] iRobot Create 3 / Roomba SDK.
 - [ ] DJI Tello / Tello EDU (drone, indoor only).
 - [x] Marketplace UI surfaces adapter compatibility per character.

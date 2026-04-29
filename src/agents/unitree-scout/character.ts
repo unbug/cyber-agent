@@ -9,5 +9,5 @@ export const character: Character = {
   tags: ['observant', 'fast', 'strategic', 'terrain-scanner'],
   personality: ['curious', 'efficient', 'alert'],
   difficulty: 'hard',
-  compatibleAdapters: ["canvas", "esp32", "unitree"],
+  compatibleAdapters: ["canvas", "esp32", "unitree", "unitree-go1"],
 }
