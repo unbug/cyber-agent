@@ -9,4 +9,5 @@ export const character: Character = {
   tags: ['dramatic', 'showy', 'proud'],
   personality: ['proud', 'dramatic', 'social'],
   difficulty: 'medium',
+  compatibleAdapters: ["canvas", "esp32", "spike", "mbot", "robo-master-v2"],
 }

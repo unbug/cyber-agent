@@ -203,6 +203,29 @@ export function getCharactersByCategory(category: Character['category']): Charac
   return characters.filter((c) => c.category === category)
 }
 
+/** Adapter display metadata for UI rendering */
+export const ADAPTER_INFO: Record<string, { label: string; emoji: string }> = {
+  canvas:       { label: 'Canvas (Browser)',    emoji: '🖥️' },
+  esp32:        { label: 'ESP32 (WiFi)',        emoji: '📡' },
+  spike:        { label: 'LEGO SPIKE Hub',      emoji: '🧱' },
+  mbot:         { label: 'Makeblock mBot',      emoji: '🤖' },
+  'robo-master-v2': { label: 'DJI RoboMaster',  emoji: '🎮' },
+  unitree:      { label: 'Unitree Go1/Go2',     emoji: '🐕' },
+}
+
+/** Get the list of compatible adapter info for a character (for UI display) */
+export function getCompatibleAdapters(
+  character: Character,
+): Array<{ id: string; label: string; emoji: string }> {
+  const adapters = character.compatibleAdapters
+  return adapters
+    .map((id) => {
+      const info = ADAPTER_INFO[id]
+      return info ? { id, label: info.label, emoji: info.emoji } : null
+    })
+    .filter((a): a is NonNullable<typeof a> => a !== null)
+}
+
 export function getBehavior(characterId: string): CharacterBehavior | undefined {
   return behaviorMap.get(characterId)
 }

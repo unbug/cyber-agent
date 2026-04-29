@@ -1,8 +1,9 @@
 import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, ArrowRight, FileCode, Download, Heart, Tag, Brain } from 'lucide-react'
+import { X, ArrowRight, FileCode, Download, Heart, Tag, Brain, Cpu } from 'lucide-react'
 import { HoverBeam } from '@/components/HoverBeam'
+import { getCompatibleAdapters } from '@/agents'
 import type { Character } from '@/agents'
 import { downloadCharacter } from '@/utils/downloadCharacter'
 import { useI18n } from '@/i18n'
@@ -103,6 +104,21 @@ export function CharacterDetailModal({ character, onClose }: CharacterDetailModa
               <div className={styles.traitList}>
                 {character.personality.map((trait) => (
                   <span key={trait} className={styles.trait}>{trait}</span>
+                ))}
+              </div>
+            </div>
+
+            {/* Compatible Adapters */}
+            <div className={styles.section}>
+              <div className={styles.sectionHeader}>
+                <Cpu size={16} />
+                <span className={styles.sectionTitle}>{t('detail.adapters')}</span>
+              </div>
+              <div className={styles.tagList}>
+                {getCompatibleAdapters(character).map((a) => (
+                  <span key={a.id} className={styles.tag}>
+                    {a.emoji} {a.label}
+                  </span>
                 ))}
               </div>
             </div>

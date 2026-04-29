@@ -9,4 +9,5 @@ export const character: Character = {
   tags: ['plants', 'growth', 'zen'],
   personality: ['peaceful', 'methodical', 'nurturing'],
   difficulty: 'easy',
+  compatibleAdapters: ["canvas", "esp32", "spike"],
 }

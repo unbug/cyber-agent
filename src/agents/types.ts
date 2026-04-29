@@ -7,4 +7,6 @@ export interface Character {
   tags: string[]
   personality: string[]
   difficulty: 'easy' | 'medium' | 'hard'
+  /** Which robot platforms this character can run on */
+  compatibleAdapters: string[]
 }

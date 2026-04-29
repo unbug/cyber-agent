@@ -9,4 +9,5 @@ export const character: Character = {
   tags: ['chirping', 'hopping', 'rhythmic', 'performer'],
   personality: ['energetic', 'musical', 'playful'],
   difficulty: 'easy',
+  compatibleAdapters: ["canvas", "esp32", "spike", "mbot", "robo-master-v2"],
 }

@@ -88,6 +88,7 @@
     "position": "位置",
     "performance": "性能",
     "personality": "性格",
+    "adapters": "兼容适配器",
     "tags": "标签",
     "live_preview": "实时预览",
     "start_bt": "启动行为树",
@@ -150,5 +151,13 @@
     "total_chars": "角色数量",
     "categories": "分类",
     "possibilities": "可能性"
+  },
+  "detail": {
+    "personality": "性格",
+    "adapters": "兼容适配器",
+    "tags": "标签",
+    "view_agent": "查看角色",
+    "edit_bt": "编辑行为树",
+    "download": "下载 JSON"
   }
 }

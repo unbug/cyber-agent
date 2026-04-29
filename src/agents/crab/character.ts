@@ -9,4 +9,5 @@ export const character: Character = {
   tags: ['beach', 'sidestep', 'scuttle'],
   personality: ['quirky', 'independent', 'scuttling'],
   difficulty: 'easy',
+  compatibleAdapters: ["canvas", "esp32", "spike", "mbot", "robo-master-v2"],
 }

@@ -9,4 +9,5 @@ export const character: Character = {
   tags: ['play', 'kids', 'social'],
   personality: ['enthusiastic', 'generous', 'interactive'],
   difficulty: 'medium',
+  compatibleAdapters: ["canvas", "esp32", "spike"],
 }

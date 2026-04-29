@@ -9,4 +9,5 @@ export const character: Character = {
   tags: ['delivery', 'navigation', 'task-oriented'],
   personality: ['efficient', 'determined', 'reliable'],
   difficulty: 'medium',
+  compatibleAdapters: ["canvas", "esp32", "spike"],
 }

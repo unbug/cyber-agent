@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import { Search, ArrowRight, FileCode, Plus, Shuffle, Dices } from 'lucide-react'
 import { HoverBeam } from '@/components/HoverBeam'
 import { CharacterDetailModal } from '@/components/CharacterDetailModal'
-import { characters, type Character } from '@/agents'
+import { characters, getCompatibleAdapters, type Character } from '@/agents'
 import { useI18n } from '@/i18n'
 import styles from './Gallery.module.css'
 
@@ -285,6 +285,13 @@ function CharacterCard({ character, onSelect }: { character: Character; onSelect
                   <div className={styles.cardTags}>
                     {character.tags.map((tag) => (
                       <span key={tag} className={styles.tag}>{tag}</span>
+                    ))}
+                  </div>
+                  <div className={styles.cardAdapters}>
+                    {getCompatibleAdapters(character).slice(0, 3).map((a) => (
+                      <span key={a.id} className={styles.adapterChip} title={a.label}>
+                        {a.emoji}
+                      </span>
                     ))}
                   </div>
                   <ArrowRight size={16} className={styles.cardArrow} />

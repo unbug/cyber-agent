@@ -9,4 +9,5 @@ export const character: Character = {
   tags: ['helpful', 'organized', 'reliable', 'productive'],
   personality: ['diligent', 'pragmatic', 'efficient', 'trustworthy'],
   difficulty: 'easy',
+  compatibleAdapters: ["canvas", "esp32", "mbot"],
 }

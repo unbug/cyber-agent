@@ -107,6 +107,15 @@
   color: var(--text-muted);
 }
 
+.adapterChip {
+  font-size: 0.75rem;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--success-muted);
+  color: var(--success);
+  white-space: nowrap;
+}
+
 /* Control panel */
 .panel {
   display: flex;

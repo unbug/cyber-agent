@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import { ArrowLeft, Play, Square, Pause, Zap, Activity } from 'lucide-react'
 import { HoverBeam } from '@/components/HoverBeam'
 import { TelemetryDashboard } from '@/components/TelemetryDashboard'
-import { getCharacter } from '@/agents'
+import { getCharacter, getCompatibleAdapters } from '@/agents'
 import { useBehaviorTree } from '@/hooks/useBehaviorTree'
 import { useTelemetry } from '@/hooks/useTelemetry'
 import { useI18n } from '@/i18n'
@@ -70,6 +70,17 @@ export function AgentPage() {
                   <div className={styles.traitList}>
                     {character.personality.map((p) => (
                       <span key={p} className={styles.trait}>{p}</span>
+                    ))}
+                  </div>
+                </div>
+
+                <div className={styles.traits}>
+                  <h3 className={styles.traitsTitle}>{t('agent.adapters')}</h3>
+                  <div className={styles.traitList}>
+                    {getCompatibleAdapters(character).map((a) => (
+                      <span key={a.id} className={styles.adapterChip}>
+                        {a.emoji} {a.label}
+                      </span>
                     ))}
                   </div>
                 </div>

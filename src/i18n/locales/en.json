@@ -88,6 +88,7 @@
     "position": "Position",
     "performance": "Performance",
     "personality": "Personality",
+    "adapters": "Compatible Adapters",
     "tags": "Tags",
     "live_preview": "Live Preview",
     "start_bt": "Start Behavior Tree",
@@ -150,5 +151,13 @@
     "total_chars": "Characters",
     "categories": "Categories",
     "possibilities": "Possibilities"
+  },
+  "detail": {
+    "personality": "Personality",
+    "adapters": "Compatible Adapters",
+    "tags": "Tags",
+    "view_agent": "View Agent",
+    "edit_bt": "Edit Behavior Tree",
+    "download": "Download JSON"
   }
 }

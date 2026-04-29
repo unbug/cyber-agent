@@ -328,6 +328,21 @@
   color: var(--text-muted);
 }
 
+.cardAdapters {
+  display: flex;
+  gap: var(--space-1);
+  align-items: center;
+}
+
+.adapterChip {
+  font-size: 0.75rem;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--success-muted);
+  color: var(--success);
+  white-space: nowrap;
+}
+
 .cardArrow {
   color: var(--text-muted);
   transition: all 0.2s ease;

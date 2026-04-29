@@ -9,4 +9,5 @@ export const character: Character = {
   tags: ['demo', 'ws', 'robot', 'integration'],
   personality: ['adaptive', 'responsive', 'connected'],
   difficulty: 'easy',
+  compatibleAdapters: ["canvas", "esp32", "mbot"],
 }

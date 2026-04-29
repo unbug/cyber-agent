@@ -9,4 +9,5 @@ export const character: Character = {
   tags: ['predator', 'fast', 'strategic'],
   personality: ['aggressive', 'focused', 'alert'],
   difficulty: 'hard',
+  compatibleAdapters: ["canvas", "esp32", "mbot"],
 }

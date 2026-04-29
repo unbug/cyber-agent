@@ -9,4 +9,5 @@ export const character: Character = {
   tags: ['flow', 'entertaining', 'artistic'],
   personality: ['creative', 'rhythmic', 'joyful'],
   difficulty: 'medium',
+  compatibleAdapters: ["canvas", "esp32", "mbot"],
 }

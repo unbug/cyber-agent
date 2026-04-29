@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Download, Github, Package, Star, Search, ArrowRight, ExternalLink } from 'lucide-react'
 import { HoverBeam } from '@/components/HoverBeam'
-import { characters } from '@/agents'
+import { characters, getCompatibleAdapters } from '@/agents'
 import { downloadCharacter } from '@/utils/downloadCharacter'
 import { useI18n } from '@/i18n'
 import styles from './MarketplacePage.module.css'
@@ -51,11 +51,6 @@ const EMOJI_MAP: Record<string, string> = {
   'rhino': '🦏', 'heron': '🦢', 'otter': '🦦', 'crane': '🦢', 'gorilla': '🦍',
   'manta': '🪼', 'eagle': '🦅', 'sloth': '🦥', 'narwhal': '🦄', 'cricket': '🦗',
   'bat': '🦇', 'night-watch': '🦉',
-}
-
-// ── Helpers ───────────────────────────────────────────────────────
-function getRobots(category: string): string[] {
-  return CATEGORY_PACKS.find(p => p.key === category)?.robots as unknown as string[] ?? ['Any']
 }
 
 // ── Page ──────────────────────────────────────────────────────────
@@ -120,8 +115,10 @@ export function MarketplacePage() {
                       <h3 className={styles.featuredName}>{char.name}</h3>
                       <p className={styles.featuredDesc}>{char.description}</p>
                       <div className={styles.featuredRobots}>
-                        {getRobots(char.category).map(r => (
-                          <span key={r} className={styles.robotChip}>{r}</span>
+                        {getCompatibleAdapters(char).map(a => (
+                          <span key={a.id} className={styles.robotChip} title={a.label}>
+                            {a.emoji} {a.label}
+                          </span>
                         ))}
                       </div>
                     </div>
@@ -278,7 +275,7 @@ function CharRow({
   onDownload: (char: (typeof characters)[0]) => void
 }) {
   const emoji = EMOJI_MAP[character.id] || character.emoji
-  const robots = getRobots(character.category)
+  const adapters = getCompatibleAdapters(character)
 
   return (
     <div className={styles.row} data-category={character.category}>
@@ -290,7 +287,11 @@ function CharRow({
         </span>
       </div>
       <div className={styles.rowRobots}>
-        {robots.map(r => <span key={r} className={styles.robotChip}>{r}</span>)}
+        {adapters.map(a => (
+          <span key={a.id} className={styles.robotChip} title={a.label}>
+            {a.emoji} {a.label}
+          </span>
+        ))}
       </div>
       <span className={styles.rowDiff} data-level={character.difficulty}>{character.difficulty}</span>
       <div className={styles.rowActions}>
