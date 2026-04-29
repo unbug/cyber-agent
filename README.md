@@ -186,8 +186,14 @@ Width of real toys — every adapter ships with HIL evidence under
 `docs/hil/<adapter>/`.
 
 - [x] LEGO SPIKE / Mindstorms (Bluetooth LE).
-- [ ] Generic ESP32 + reference firmware (WebSocket protocol v2).
-- [ ] Generic ESP32 + reference firmware (WebSocket protocol v2).
+- [x] Generic ESP32 + reference firmware (WebSocket protocol v2).
+  - `src/adapters/esp32.ts` — `ESP32Adapter` implementing `RobotAdapterV2`
+  - WebSocket protocol v2 spec (typed JSON messages: move, motors, led, sound, gesture, emergency_stop)
+  - Telemetry parser (battery, IMU, distance, bump, motor_state, heartbeat, ack)
+  - Auto-reconnect with exponential backoff, heartbeat, command queue
+  - 47 unit tests covering serialization, parsing, lifecycle, queueing
+  - Reference firmware: `firmware/esp32/CyberAgentESP32.ino` (Arduino, WiFi AP/station, WS server)
+  - HIL checklist: `docs/hil/esp32/CHECKLIST.md`
 - [ ] Unitree Go1 / Go2 high-level SDK with documented safety envelope.
 - [ ] iRobot Create 3 / Roomba SDK.
 - [ ] DJI Tello / Tello EDU (drone, indoor only).

@@ -64,6 +64,9 @@ export { CanvasAdapter } from './adapters/canvas-adapter'
 export { WebSocketAdapter, createWebSocketAdapter } from './adapters/websocket-adapter'
 export type { WebSocketAdapterOptions } from './adapters/websocket-adapter'
 
+export { ESP32Adapter, createESP32Adapter } from './adapters/esp32-adapter'
+export type { ESP32AdapterConfig } from './adapters/esp32-adapter'
+
 // ─── Convenience ──────────────────────────────────────────────
 
 /**
