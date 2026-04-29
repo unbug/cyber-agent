@@ -197,7 +197,7 @@ Width of real toys — every adapter ships with HIL evidence under
 - [ ] Unitree Go1 / Go2 high-level SDK with documented safety envelope.
 - [ ] iRobot Create 3 / Roomba SDK.
 - [ ] DJI Tello / Tello EDU (drone, indoor only).
-- [ ] Marketplace UI surfaces adapter compatibility per character.
+- [x] Marketplace UI surfaces adapter compatibility per character.
 
 **Release gate**: 10 adapters total, every character page lists which
 toys can run it.
