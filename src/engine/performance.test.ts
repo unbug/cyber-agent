@@ -9,13 +9,25 @@
 
 import { describe, it, expect } from 'vitest'
 import { createBlackboard } from './types'
+import type { BehaviorNodeDef, RuntimeNode } from './types'
 import { hydrate, tick } from './executor'
 // Ensure built-in actions/conditions are registered (side-effect import)
 import './builtins'
 
+// Minimal mock adapter for tick() calls
+const mockAdapter: any = {
+  capabilities: () => ({}),
+  selfTest: async () => ({ ok: true }),
+  init: () => {},
+  update: () => {},
+  destroy: () => {},
+  sendCommand: () => {},
+  onTelemetry: () => () => {},
+}
+
 describe('performance — tick budget', () => {
   it('hydrates a full character tree in <10 ms', () => {
-    const tree = {
+    const tree: BehaviorNodeDef = {
       type: 'selector',
       children: [
         {
@@ -47,7 +59,7 @@ describe('performance — tick budget', () => {
   })
 
   it('ticks a hydrated tree 1000× in <16 ms average', () => {
-    const tree = {
+    const tree: BehaviorNodeDef = {
       type: 'selector',
       children: [
         {
@@ -75,7 +87,7 @@ describe('performance — tick budget', () => {
 
     const start = performance.now()
     for (let i = 0; i < 1000; i++) {
-      tick(root, bb)
+      tick(root, bb, mockAdapter)
     }
     const elapsed = performance.now() - start
     const avg = elapsed / 1000
@@ -85,7 +97,7 @@ describe('performance — tick budget', () => {
 
   it('ticks a complex tree (puppy) 100× in <16 ms average', () => {
     // Complex tree: sequence of selector → sequence → actions
-    const tree = {
+    const tree: BehaviorNodeDef = {
       type: 'sequence',
       children: [
         { type: 'condition', check: 'pointerActive' },
@@ -109,7 +121,7 @@ describe('performance — tick budget', () => {
 
     const start = performance.now()
     for (let i = 0; i < 100; i++) {
-      tick(root, bb)
+      tick(root, bb, mockAdapter)
     }
     const elapsed = performance.now() - start
     const avg = elapsed / 100
@@ -118,7 +130,7 @@ describe('performance — tick budget', () => {
   })
 
   it('ticks 10 concurrent trees in <16 ms average', () => {
-    const trees = Array.from({ length: 10 }, () => ({
+    const trees: BehaviorNodeDef[] = Array.from({ length: 10 }, () => ({
       type: 'selector',
       children: [
         { type: 'condition', check: 'pointerActive' },
@@ -126,13 +138,14 @@ describe('performance — tick budget', () => {
       ],
     }))
 
-    const roots = trees.map(hydrate)
+    const roots = trees.map(hydrate) as RuntimeNode[]
     const bbs = roots.map(() => createBlackboard())
 
     const start = performance.now()
     for (let i = 0; i < 100; i++) {
       for (let j = 0; j < roots.length; j++) {
-        tick(roots[j], bbs[j])
+        const node = roots[j]
+        if (node) tick(node, bbs[j]!, mockAdapter)
       }
     }
     const elapsed = performance.now() - start
