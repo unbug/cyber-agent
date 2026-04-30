@@ -239,7 +239,8 @@ working until v2.0.
   - Updated `Docs.tsx` with v1.0 API reference, adapter contract v2, migration guide
 - [x] Migration guide from 0.x.
   - `sdk/MIGRATION.md` — adapter v2, trace schema, import paths
-- [ ] Performance budget: <16 ms tick on a $50 mBot.
+- [x] Performance budget: <16 ms tick on a $50 mBot.
+  - `src/engine/performance.test.ts` — 4 benchmarks all pass <16ms
 
 **Release gate**: passes a 24-hour soak test (1 character × 5 adapters,
 zero crash, zero memory leak).
