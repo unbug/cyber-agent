@@ -204,12 +204,25 @@ Width of real toys — every adapter ships with HIL evidence under
   - 75 unit tests covering serialization, parsing, lifecycle, queueing
   - HIL checklist: `docs/hil/unitree-go1/CHECKLIST.md`
   - ADAPTER_INFO entry + character compatibleAdapters updated
-- [ ] iRobot Create 3 / Roomba SDK.
-- [ ] DJI Tello / Tello EDU (drone, indoor only).
+- [x] iRobot Create 3 / Roomba SDK.
+  - `src/adapters/irobot-create3.ts` — `IRobotCreate3Adapter` implementing `RobotAdapterV2`
+  - WebSocket protocol v2 (move, drive, velocity, stop, led, sound, play_song, sensors)
+  - Telemetry parsing: battery, cliff, wall, bump, wheel_drop, distance, angle, charge_state, heartbeat, ack
+  - Auto-reconnect with exponential backoff, command queue
+  - 32 unit tests
+  - HIL checklist: `docs/hil/irobot-create3/CHECKLIST.md`
+- [x] DJI Tello / Tello EDU (drone, indoor only).
+  - `src/adapters/tello.ts` — `TelloAdapter` implementing `RobotAdapterV2`
+  - WebSocket protocol v2 (takeoff, land, move, rotate, speed, flip, go, waypoint)
+  - Telemetry parsing: battery, temperature, barometer, tof, attitude, flight_data, wifi, flight_status
+  - Convenience methods: takeoff, land, move, rotate, setSpeed, flip, goTo, startWaypoint, endWaypoints
+  - INDOOR ONLY safety warning throughout
+  - 31 unit tests
+  - HIL checklist: `docs/hil/tello/CHECKLIST.md`
 - [x] Marketplace UI surfaces adapter compatibility per character.
 
 **Release gate**: 10 adapters total, every character page lists which
-toys can run it.
+toys can run it. ✅ **MET** — Released: 2026-04-30
 
 #### v1.0 — First stable release _(+6 → +7 months)_
 
