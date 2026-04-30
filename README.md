@@ -229,10 +229,16 @@ toys can run it. ✅ **MET** — Released: 2026-04-30
 The "1.0" promise: anything `npm install @cyber-agent/sdk@1` will keep
 working until v2.0.
 
-- [ ] Stable SDK API surface (TypeScript types frozen, semver).
-- [ ] Stable `.cybertrace` schema v1.
-- [ ] Documentation site (`/docs`) covers every public API.
-- [ ] Migration guide from 0.x.
+- [x] Stable SDK API surface (TypeScript types frozen, semver).
+  - `sdk/src/public-api.ts` — exact public API boundary
+  - `sdk/CHANGELOG.md` — version history
+- [x] Stable `.cybertrace` schema v1.
+  - `sdk/src/trace/schema.ts` — versioned with `TRACE_SCHEMA_VERSION`
+  - `validateTrace()` / `migrateTrace()` included
+- [x] Documentation site (`/docs`) covers every public API.
+  - Updated `Docs.tsx` with v1.0 API reference, adapter contract v2, migration guide
+- [x] Migration guide from 0.x.
+  - `sdk/MIGRATION.md` — adapter v2, trace schema, import paths
 - [ ] Performance budget: <16 ms tick on a $50 mBot.
 
 **Release gate**: passes a 24-hour soak test (1 character × 5 adapters,

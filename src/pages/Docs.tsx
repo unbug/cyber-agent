@@ -31,6 +31,11 @@ const sections = [
     titleKey: 'docs.robots',
   },
   {
+    id: 'migration',
+    icon: <GitBranch size={18} />,
+    titleKey: 'docs.migration',
+  },
+  {
     id: 'contributing',
     icon: <GitBranch size={18} />,
     titleKey: 'docs.agents_guide',
@@ -159,7 +164,7 @@ Built-in actions include: \`moveToPointer\`, \`wander\`, \`patrol\`, \`bounceFro
 Register new actions that your characters can use:
 
 \`\`\`typescript
-import { registerAction } from './engine';
+import { registerAction } from '@cyber-agent/sdk';
 
 registerAction('spin', (bb, adapter, args) => {
   bb.rotation += (args?.speed as number) ?? 5;
@@ -170,36 +175,73 @@ registerAction('spin', (bb, adapter, args) => {
 ### Custom Conditions
 
 \`\`\`typescript
-import { registerCondition } from './engine';
+import { registerCondition } from '@cyber-agent/sdk';
 
 registerCondition('isNight', (bb) => {
   return new Date().getHours() >= 20;
 });
 \`\`\`
 
-### Custom Robot Adapter
+### Robot Adapter v2 (Stable)
 
-Implement the \`RobotAdapter\` interface to drive real hardware:
+Implement the \`RobotAdapterV2\` interface to drive real hardware:
 
 \`\`\`typescript
-class MyRobotAdapter implements RobotAdapter {
+import { RobotAdapterV2, SelfTestReport } from '@cyber-agent/sdk';
+
+class MyRobotAdapter implements RobotAdapterV2 {
   readonly type = 'my-robot';
   readonly name = 'My Custom Robot';
-  init(bb) { /* open connection */ }
+  readonly contractVersion = 'v2';
+
+  async connect(): Promise<void> { /* open connection */ }
+  init(bb) { /* initialize */ }
   update(bb) { /* send position/emotion to motors */ }
-  destroy() { /* close connection */ }
+  destroy() { /* cleanup */ }
   sendCommand(cmd) { /* forward to hardware */ }
+
+  onTelemetry(cb) { /* register handler */ return () => {}; }
+  selfTest(): SelfTestReport { return { ok: true, status: 'healthy', summary: 'OK', checks: [], timestamp: Date.now(), version: '1.0' }; }
+  capabilities() { return { batteryReporting: false }; }
+  async disconnect(): Promise<void> { /* close connection */ }
 }
 \`\`\`
+
+> **Stability guarantee**: All types and functions exported from \`@cyber-agent/sdk\` are stable until v2.0. Import from the root package, not sub-paths.
     `.trim(),
     sdk: `
-**@cyber-agent/sdk** is the standalone package for building custom characters and robot adapters.
+**@cyber-agent/sdk@1** is the stable package for building custom characters and robot adapters.
 
 ### Installation
 
 \`\`\`bash
-npm install @cyber-agent/sdk
+npm install @cyber-agent/sdk@1
 \`\`\`
+
+### Import from the Stable Surface
+
+\`\`\`typescript
+import {
+  BehaviorTreeRunner,
+  CanvasAdapter,
+  ESP32Adapter,
+  registerAction,
+  registerCondition,
+  registerBuiltins,
+  createBlackboard,
+  hydrate,
+  tick,
+  resetTree,
+  RobotAdapterV2,
+  SelfTestReport,
+  TRACE_SCHEMA_VERSION,
+  validateTrace,
+  wrapV1AsV2,
+  DEFAULT_CAPABILITIES_V2,
+} from '@cyber-agent/sdk';
+\`\`\`
+
+All exports above are **stable until v2.0**. See [public-api.ts](https://github.com/unbug/cyber-agent/blob/main/sdk/src/public-api.ts) for the complete surface.
 
 ### Quick Start
 
@@ -207,44 +249,64 @@ npm install @cyber-agent/sdk
 import {
   BehaviorTreeRunner,
   CanvasAdapter,
-  registerAction,
+  registerBuiltins,
 } from '@cyber-agent/sdk';
 
-// Register custom actions
-registerAction('dance', (bb) => {
-  bb.excitement = Math.min(bb.excitement + 0.3, 1);
-  return 'success';
-});
+registerBuiltins();
 
-// Define character behavior
 const myCharacter = {
   characterId: 'my-puppy',
   tree: { type: 'selector', children: [
     { type: 'condition', check: 'isPointerActive' },
     { type: 'action', action: 'moveToPointer' },
-    { type: 'action', action: 'dance' },
   ] },
   defaults: { emotion: 'happy', speed: 3 },
 };
 
-// Run!
 const adapter = new CanvasAdapter(canvasElement);
 const runner = new BehaviorTreeRunner(myCharacter, adapter);
 runner.start();
 \`\`\`
 
-### API
+### API Reference
+
+**Behavior Tree Engine:**
 
 | Export | Description |
 |--------|-------------|
-| \`BehaviorTreeRunner\` | Manages the BT tick loop |
-| \`CanvasAdapter\` | 2D canvas renderer |
-| \`WebSocketAdapter\` | WebSocket robot adapter |
-| \`registerAction()\` | Register custom actions |
-| \`registerCondition()\` | Register custom conditions |
-| \`createBlackboard()\` | Create blackboard state |
-| \`hydrate()\` | Convert BT def → runtime |
+| \`BehaviorTreeRunner\` | Lifecycle manager (start/stop/pause/resume) |
+| \`hydrate()\` | Convert BT def → runtime nodes |
 | \`tick()\` | Execute one BT frame |
+| \`resetTree()\` | Reset all node states |
+| \`registerAction()\` | Register custom action |
+| \`registerCondition()\` | Register custom condition |
+| \`registerBuiltins()\` | Register all built-in nodes |
+| \`createBlackboard()\` | Create blackboard state |
+
+**Adapter Contract v2:**
+
+| Export | Description |
+|--------|-------------|
+| \`RobotAdapterV2\` | Interface for robot adapters |
+| \`SelfTestReport\` | Self-test result type |
+| \`wrapV1AsV2()\` | Shim for v1 adapters |
+| \`DEFAULT_CAPABILITIES_V2\` | Default capabilities |
+
+**Trace Schema:**
+
+| Export | Description |
+|--------|-------------|
+| \`TRACE_SCHEMA_VERSION\` | Current schema version |
+| \`validateTrace()\` | Validate a trace file |
+| \`migrateTrace()\` | Migrate old traces |
+
+**Pre-built Adapters:**
+
+| Class | Protocol |
+|-------|----------|
+| \`CanvasAdapter\` | 2D canvas (demo) |
+| \`WebSocketAdapter\` | Generic WebSocket |
+| \`ESP32Adapter\` | ESP32 WiFi |
 
 ### Behavior Tree Nodes
 
@@ -260,9 +322,63 @@ runner.start();
 | \`action\` | Leaf | Executes action |
 | \`wait\` | Leaf | Waits duration |
 
-Built-in actions: \`moveForward\`, \`moveBackward\`, \`turnLeft\`, \`turnRight\`, \`moveToPointer\`, \`idle\`, \`setEmotion\`.
+Built-in actions: \`moveForward\`, \`moveBackward\`, \`turnLeft\`, \`turnRight\`, \`moveToPointer\`, \`wander\`, \`patrol\`, \`bounceFromEdge\`, \`setEmotion\`, \`drainEnergy\`, \`restoreEnergy\`.
 
 Built-in conditions: \`atBoundary\`, \`isPointerActive\`, \`hasLowEnergy\`, \`isNear\`.
+    `.trim(),
+    migration: `
+**@cyber-agent/sdk 0.x → 1.0 Migration Guide**
+
+### Adapter Contract v2
+
+All adapters now implement \`RobotAdapterV2\` instead of \`RobotAdapterV1\`.
+
+**Breaking changes:**
+- New required: \`connect()\`, \`disconnect()\`, \`onTelemetry()\`, \`selfTest()\`
+- \`contractVersion = 'v2'\` required
+- \`capabilities()\` returns \`RobotCapabilitiesV2\`
+
+**Migration options:**
+
+1. **Use the shim** (temporary, deprecated in v1.1):
+\`\`\`typescript
+import { wrapV1AsV2 } from '@cyber-agent/sdk';
+const v2Adapter = wrapV1AsV2(myV1Adapter);
+\`\`\`
+
+2. **Migrate to v2** (recommended):
+\`\`\`typescript
+class MyAdapter implements RobotAdapterV2 {
+  readonly contractVersion = 'v2';
+  async connect() { /* ... */ }
+  async disconnect() { /* ... */ }
+  onTelemetry(cb) { /* ... */ return () => {}; }
+  selfTest() { return { ok: true, status: 'healthy', summary: 'OK', checks: [], timestamp: Date.now(), version: '1.0' }; }
+}
+\`\`\`
+
+### Trace Schema v1
+
+\`.cybertrace\` files are now versioned. Validate and migrate:
+
+\`\`\`bash
+npx @cyber-agent/sdk trace lint my-trace.cybertrace
+npx @cyber-agent/sdk trace migrate old.cybertrace new.cybertrace
+\`\`\`
+
+### Import Paths
+
+**Before (unstable):**
+\`\`\`typescript
+import { hydrate } from '@cyber-agent/sdk/engine/executor'
+\`\`\`
+
+**After (stable):**
+\`\`\`typescript
+import { hydrate } from '@cyber-agent/sdk'
+\`\`\`
+
+Full guide: [sdk/MIGRATION.md](https://github.com/unbug/cyber-agent/blob/main/sdk/MIGRATION.md)
     `.trim(),
     contributing: `
 We welcome contributions! Here's how to get started:

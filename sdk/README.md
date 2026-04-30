@@ -210,6 +210,39 @@ const myCharacter: CharacterBehavior = {
 }
 ```
 
+## Stability & Versioning
+
+**`@cyber-agent/sdk@1.x` is a stable release.** All exports in
+[`sdk/src/public-api.ts`](./src/public-api.ts) are frozen and will not
+change until `@cyber-agent/sdk@2.0.0`.
+
+### What's stable
+
+| Category | Guarantee |
+|----------|-----------|
+| **Core types** | `Blackboard`, `BehaviorNodeDef`, `CharacterBehavior`, `RuntimeNode`, `NodeStatus`, `Emotion` |
+| **Engine API** | `BehaviorTreeRunner`, `hydrate()`, `tick()`, `resetTree()`, `registerAction()`, `registerCondition()` |
+| **Adapter contract** | `RobotAdapterV2` interface, `RobotAdapterV1` (deprecated, 1-version grace) |
+| **Built-in adapters** | `CanvasAdapter`, `WebSocketAdapter`, `ESP32Adapter` |
+| **Trace schema** | `.cybertrace` format v1, `validateTrace()`, `migrateTrace()` |
+| **CLI** | `cyber-agent record`, `cyber-agent replay`, `cyber-agent trace lint` |
+
+### What's not stable
+
+- Sub-path imports not listed in `public-api.ts` (e.g., `engine/builtins.ts`)
+- Internal types (e.g., `RuntimeNode.state` shape)
+- Experimental adapters under `experimental/`
+
+### Migration
+
+See [CHANGELOG.md](./CHANGELOG.md) for version history and migration notes.
+For `0.x` → `1.0` migration:
+
+1. Update to `RobotAdapterV2` interface (use `wrapV1AsV2()` shim for v1 adapters)
+2. Replace `init()` connection with `connect()` + `disconnect()` lifecycle
+3. Add `onTelemetry()` handler for robot data
+4. Call `selfTest()` before first use
+
 ## Contributing
 
 This SDK is part of the [CyberAgent](https://github.com/unbug/cyber-agent) project.

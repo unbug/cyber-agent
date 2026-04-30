@@ -9,13 +9,13 @@
   },
   "home": {
     "hero_title": "AI Characters for Physical Robots",
-    "hero_subtitle": "CyberAgent is an open-source library of 70+ AI agent personalities. Each character runs a behavior tree that drives a real robot — RoboMaster, mBot, and more.",
+    "hero_subtitle": "CyberAgent is an open-source library of 70+ AI agent personalities. Each character runs a behavior tree that drives a real robot \u2014 RoboMaster, mBot, and more.",
     "hero_cta": "Explore Gallery",
     "features_title": "Why CyberAgent?",
     "feature_agents_title": "Virtual Agent Ecosystem",
     "feature_agents_desc": "Each agent has unique behavior trees defining personality, reactions, and movement patterns.",
     "feature_robot_title": "Robot Integration",
-    "feature_robot_desc": "Bridge virtual agents to physical hardware — RoboMaster, LEGO, and more.",
+    "feature_robot_desc": "Bridge virtual agents to physical hardware \u2014 RoboMaster, LEGO, and more.",
     "feature_evolve_title": "Self-Evolving Platform",
     "feature_evolve_desc": "Every day, autonomously review, iterate, and improve the platform.",
     "agents_title": "Virtual Agents",
@@ -50,7 +50,7 @@
   },
   "gallery": {
     "title": "Agent Gallery",
-    "subtitle": "Explore all 70+ AI characters. Click any card to preview behavior, personality, and tags — then launch one in the playground.",
+    "subtitle": "Explore all 70+ AI characters. Click any card to preview behavior, personality, and tags \u2014 then launch one in the playground.",
     "search_placeholder": "Search by name or tag...",
     "no_results": "No agents found matching your search.",
     "all": "All",
@@ -109,14 +109,16 @@
     "robots_desc": "Supported robot platforms and integration guides.",
     "agents_guide": "Agent Creation Guide",
     "agents_guide_desc": "How to create custom virtual agents.",
-    "on_this_page": "On this page"
+    "on_this_page": "On this page",
+    "migration": "Migration (0.x \u2192 1.0)",
+    "migration_desc": "Breaking changes and how to upgrade."
   },
   "footer": {
     "rights": "All rights reserved."
   },
   "language": {
     "en": "EN",
-    "zh": "中文"
+    "zh": "\u4e2d\u6587"
   },
   "telemetry": {
     "emotion": "Emotion",
