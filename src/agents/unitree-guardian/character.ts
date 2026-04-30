@@ -9,5 +9,5 @@ export const character: Character = {
   tags: ['protective', 'loyal', 'aggressive', 'territorial'],
   personality: ['vigilant', 'loyal', 'territorial'],
   difficulty: 'medium',
-  compatibleAdapters: ["canvas", "esp32", "unitree", "unitree-go1"],
+  compatibleAdapters: ["canvas", "esp32", "unitree-go1"],
 }

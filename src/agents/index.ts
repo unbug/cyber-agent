@@ -212,6 +212,8 @@ export const ADAPTER_INFO: Record<string, { label: string; emoji: string }> = {
   'robo-master-v2': { label: 'DJI RoboMaster',  emoji: '🎮' },
   unitree:      { label: 'Unitree Go1/Go2',     emoji: '🐕' },
   'unitree-go1': { label: 'Unitree Go1/Go2',     emoji: '🐕' },
+  'irobot-create3': { label: 'iRobot Create 3',   emoji: '🤖' },
+  tello:        { label: 'DJI Tello',             emoji: '🚁' },
 }
 
 /** Get the list of compatible adapter info for a character (for UI display) */

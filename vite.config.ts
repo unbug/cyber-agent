@@ -18,6 +18,12 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
+    environmentOptions: {
+      jsdom: {
+        resources: 'usable',
+        cookieJar: { allowSpecialUse: true },
+      },
+    },
     setupFiles: './src/test/setup.ts',
     css: { modules: { classNameStrategy: 'non-scoped' } },
   },
