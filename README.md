@@ -249,19 +249,35 @@ zero crash, zero memory leak).
 
 Sensors close the loop.
 
-- [ ] `src/perception/` — typed event stream
+- [x] `src/perception/` — typed event stream
       (`see.face`, `see.object.<id>`, `hear.word.<id>`, `near.<distance>`,
       `tilt`, `bump`).
-- [ ] Webcam adapter (browser + WebRTC) with face / hand / object
+      - `src/perception/types.ts` — PerceptionEvent union type + category interfaces
+      - `src/perception/bus.ts` — PerceptionBus pub/sub with circular buffer
+      - `src/perception/nodes.ts` — BT conditions (perceive.*) + actions (memorize.*)
+- [x] Webcam adapter (browser + WebRTC) with face / hand / object
       detection; `/debug` overlays bounding boxes on the timeline.
-- [ ] Microphone adapter (VAD + keyword spotting).
-- [ ] On-device option: ESP32 / RPi relay perception events to browser.
-- [ ] BT primitives: `Perceive`, `Memorize`.
-- [ ] 5 sample characters that only make sense with perception
+      - `src/adapters/webcam.ts` — WebcamAdapter with simulate mode
+      - `/debug` Perception panel shows face/object detection events
+- [x] Microphone adapter (VAD + keyword spotting).
+      - `src/adapters/microphone.ts` — MicrophoneAdapter with VAD + keyword spotting
+- [x] On-device option: ESP32 / RPi relay perception events to browser.
+      - `src/adapters/esp32-perception-relay.ts` — ESP32PerceptionRelay
+      - `firmware/esp32-perception-relay/CyberAgentPerceptionRelay.ino` — reference firmware
+      - `docs/hil/esp32-perception-relay/CHECKLIST.md` — HIL checklist
+- [x] BT primitives: `Perceive`, `Memorize`.
+      - `perceive.face`, `perceive.object`, `perceive.word`, `perceive.sound`, `perceive.near`, `perceive.bump`
+      - `memorize`, `memorize.face`, `memorize.object`, `memorize.word`
+- [x] 5 sample characters that only make sense with perception
       (e.g. cat hides on face).
+      - `shy-cat` — hides from faces, warms to familiar
+      - `playful-dog` — chases objects, reacts to sounds
+      - `guardian-bot` — patrols, alerts on detection
+      - `musician-bot` — dances to sounds, sings when alone
+      - `curious-bird` — flies toward objects, avoids faces
 
 **Release gate**: real toy reacts in <200 ms to a webcam stimulus; trace
-shows the full perception → BT → motor chain.
+shows the full perception → BT → motor chain. _(requires real hardware test)_
 
 #### v1.2 — Episodic memory _(+9 → +10 months)_
 
