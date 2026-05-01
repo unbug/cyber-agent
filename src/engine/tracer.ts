@@ -32,6 +32,7 @@ export type TracerEventType =
   | 'adapter.rx'
   | 'error'
   | 'breakpoint.triggered'
+  | 'perception'
 
 // Re-export breakpoint types for consumers
 export type { Breakpoint, BreakpointKind } from './breakpoints'
@@ -247,4 +248,25 @@ export function emitAdapterRx(payload: Record<string, unknown>, t: number) {
 
 export function emitError(message: string, t: number) {
   tracer.emit({ t, type: 'error', label: 'error', payload: { message } })
+}
+
+// ─── Perception Events ─────────────────────────────────────────────
+
+export function emitPerceptionEvent(event: {
+  category: string
+  payload: Record<string, unknown>
+  source: string
+  timestamp: number
+  confidence?: number | null
+}) {
+  tracer.emit({
+    t: event.timestamp,
+    type: 'perception',
+    label: event.category,
+    payload: {
+      source: event.source,
+      confidence: event.confidence,
+      ...event.payload,
+    },
+  })
 }

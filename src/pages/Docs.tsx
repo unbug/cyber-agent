@@ -36,6 +36,11 @@ const sections = [
     titleKey: 'docs.migration',
   },
   {
+    id: 'perception-bus',
+    icon: <BookOpen size={18} />,
+    titleKey: 'docs.perception_bus',
+  },
+  {
     id: 'contributing',
     icon: <GitBranch size={18} />,
     titleKey: 'docs.agents_guide',
@@ -379,6 +384,140 @@ import { hydrate } from '@cyber-agent/sdk'
 \`\`\`
 
 Full guide: [sdk/MIGRATION.md](https://github.com/unbug/cyber-agent/blob/main/sdk/MIGRATION.md)
+    `.trim(),
+    'perception-bus': `
+**v1.1 — Perception Bus**
+
+Sensors close the loop. CyberAgent v1.1 introduces a typed perception event
+stream that bridges external sensors (webcam, microphone, ESP32 relay) into
+the behavior tree.
+
+### Architecture
+
+\`\`\`
+[Webcam] ──see.face────┐
+[Microphone] ──hear.word─┤──→ PerceptionBus ──→ Blackboard ──→ BT Engine
+[ESP32 Relay] ──near────┘
+\`\`\`
+
+### PerceptionBus API
+
+\`\`\`typescript
+import { PerceptionBus } from '@cyber-agent/sdk/perception/bus';
+import type { PerceptionCategory } from '@cyber-agent/sdk/perception/types';
+
+const bus = new PerceptionBus({ bufferSize: 256, emitToTracer: true });
+
+// Publish events from sensors
+bus.publish({
+  category: 'see.face',
+  payload: { bbox: [x, y, w, h], emotion: 'happy' },
+  source: 'webcam',
+  timestamp: performance.now(),
+});
+
+// Subscribe to events
+bus.on('see.face', (event) => {
+  console.log('Face:', event.payload.bbox);
+});
+
+// Get recent events
+const recent = bus.getRecent(50);
+\`\`\`
+
+### PerceptionBT Primitives
+
+New BT nodes that bridge perception events to the behavior tree:
+
+| Node | Type | Description |
+|------|------|-------------|
+| \`perceive.face\` | Condition | True if face seen within N ms |
+| \`perceive.object\` | Condition | True if object class seen within N ms |
+| \`perceive.word\` | Condition | True if keyword heard within N ms |
+| \`perceive.sound\` | Condition | True if sound type heard within N ms |
+| \`perceive.near\` | Condition | True if proximity < threshold |
+| \`perceive.bump\` | Condition | True if bump detected within N ms |
+| \`memorize\` | Action | Store latest event to blackboard |
+| \`memorize.face\` | Action | Store latest face to blackboard |
+| \`memorize.object\` | Action | Store latest object to blackboard |
+| \`memorize.word\` | Action | Store latest word to blackboard |
+
+\`\`\`typescript
+import { PerceptionBus } from '@cyber-agent/sdk/perception/bus';
+import { WebcamAdapter } from '@cyber-agent/sdk/adapters/webcam';
+import { MicrophoneAdapter } from '@cyber-agent/sdk/adapters/microphone';
+
+const bus = new PerceptionBus();
+
+// Connect sensors to the bus
+const webcam = new WebcamAdapter({ perceptionBus: bus });
+await webcam.connect();
+
+const mic = new MicrophoneAdapter({
+  perceptionBus: bus,
+  keywords: ['hello', 'stop', 'come'],
+});
+await mic.connect();
+\`\`\`
+
+### Perception Event Categories
+
+| Category | Source | Payload |
+|----------|--------|---------|
+| \`see.face\` | Webcam | bbox, emotion, landmarks |
+| \`see.object\` | Webcam | class, confidence, bbox |
+| \`hear.word\` | Microphone | text, confidence, speaker |
+| \`hear.sound\` | Microphone | type, confidence, volume |
+| \`near\` | ESP32/IMU | distance, unit, direction |
+| \`tilt\` | IMU | pitch, roll, yaw |
+| \`bump\` | Collision | direction, force |
+
+### Perception-Driven Characters
+
+v1.1 ships 5 new characters that only make sense with perception:
+
+| Character | Emoji | Behavior |
+|-----------|-------|----------|
+| Shy Cat | 🙀 | Hides from faces, explores when alone |
+| Playful Dog | 🐕 | Chases objects, greets faces, dances on claps |
+| Guardian Bot | 🛡️ | Patrols, alerts on detection |
+| Musician Bot | 🎵 | Dances on sounds, sings when alone |
+| Curious Bird | 🐦 | Flies toward objects, flees faces |
+
+### Debugger: Perception Panel
+
+The \`/debug\` page includes a **Perception** panel showing:
+- Category summary badges (face, object, word, sound, proximity)
+- Recent events with timestamp, confidence, and source
+- Color-coded by category
+
+### Sample: Perception-Driven Behavior Tree
+
+\`\`\`typescript
+// Shy Cat: hides from faces, explores when alone
+{
+  type: 'selector',
+  children: [
+    // Hide when face detected
+    {
+      type: 'sequence',
+      children: [
+        { type: 'condition', check: 'perceive.face', args: { within: 2000 } },
+        { type: 'action', action: 'setEmotion', args: { emotion: 'angry' } },
+        { type: 'action', action: 'fleeFromPointer', args: { speed: 3 } },
+      ],
+    },
+    // Calm exploration when alone
+    {
+      type: 'sequence',
+      children: [
+        { type: 'action', action: 'setEmotion', args: { emotion: 'idle' } },
+        { type: 'action', action: 'wander', args: { speed: 0.6 } },
+      ],
+    },
+  ],
+}
+\`\`\`
     `.trim(),
     contributing: `
 We welcome contributions! Here's how to get started:

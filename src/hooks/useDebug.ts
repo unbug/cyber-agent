@@ -29,6 +29,8 @@ interface DebugState {
   prevBlackboard: Blackboard | null
   /** Adapter tx/rx events */
   adapterEvents: TracerEvent[]
+  /** Perception events */
+  perceptionEvents: TracerEvent[]
   /** Tick timestamps for rate calculation */
   tickTimes: number[]
   /** Error events */
@@ -71,6 +73,7 @@ export function useDebug(): DebugState & {
     blackboard: null,
     prevBlackboard: null,
     adapterEvents: [],
+    perceptionEvents: [],
     tickTimes: [],
     errors: [],
     totalEvents: 0,
@@ -102,6 +105,7 @@ export function useDebug(): DebugState & {
       blackboard: null,
       prevBlackboard: null,
       adapterEvents: [],
+      perceptionEvents: [],
       tickTimes: [],
       errors: [],
       totalEvents: 0,
@@ -147,6 +151,11 @@ export function useDebug(): DebugState & {
           setState(prev => ({ ...prev, adapterEvents }))
           break
         }
+        case 'perception': {
+          const perceptionEvents = [...s.perceptionEvents, event].slice(-200)
+          setState(prev => ({ ...prev, perceptionEvents }))
+          break
+        }
         case 'error': {
           const errors = [...s.errors, event]
           setState(prev => ({ ...prev, errors }))
@@ -166,6 +175,7 @@ export function useDebug(): DebugState & {
 
   return {
     ...state,
+    perceptionEvents: state.perceptionEvents,
     tickRate,
     avgLatency,
     captureBlackboard,

@@ -111,7 +111,9 @@
     "agents_guide_desc": "How to create custom virtual agents.",
     "on_this_page": "On this page",
     "migration": "Migration (0.x \u2192 1.0)",
-    "migration_desc": "Breaking changes and how to upgrade."
+    "migration_desc": "Breaking changes and how to upgrade.",
+    "perception_bus": "Perception Bus (v1.1)",
+    "perception_bus_desc": "Sensor-driven behavior: webcam, microphone, ESP32 relay."
   },
   "footer": {
     "rights": "All rights reserved."

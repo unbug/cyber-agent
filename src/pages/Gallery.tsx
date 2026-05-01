@@ -84,6 +84,12 @@ const EMOJI_MAP: Record<string, string> = {
   'cricket': '🦗',
   'bat': '🦇',
   'night-watch': '🦉',
+  // v1.1 perception-driven characters
+  'shy-cat': '🙀',
+  'playful-dog': '🐕',
+  'guardian-bot': '🛡️',
+  'musician-bot': '🎵',
+  'curious-bird': '🐦',
 }
 
 const CATEGORIES = [

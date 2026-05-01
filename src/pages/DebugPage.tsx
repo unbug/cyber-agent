@@ -12,6 +12,7 @@ import { useMemo, useCallback, useState } from 'react'
 import { tracer, type TracerEvent, type TracerEventType } from '@/engine/tracer'
 import { useDebug, diffBlackboards, type BbDiff } from '@/hooks/useDebug'
 import type { RuntimeNode } from '@/engine/types'
+import type { PerceptionCategory } from '@/perception/types'
 import { TraceScrubber } from './TraceScrubber'
 import { BreakpointPanel } from '@/components/BreakpointPanel'
 import { TracePullerPanel } from '@/components/TracePullerPanel'
@@ -316,6 +317,108 @@ function ErrorLog({ errors }: ErrorLogProps) {
   )
 }
 
+// ─── Perception Panel ────────────────────────────────────────
+
+interface PerceptionPanelProps {
+  events: TracerEvent[] | undefined
+}
+
+function PerceptionPanel({ events }: PerceptionPanelProps) {
+  const perceptionEvents = useMemo(
+    () => (events ?? []).filter((e) => e.type === 'perception'),
+    [events],
+  )
+
+  const categoryIcons: Record<PerceptionCategory, string> = {
+    'see.face': '👤',
+    'see.object': '📦',
+    'hear.word': '🗣️',
+    'hear.sound': '🔊',
+    'near': '📏',
+    'tilt': '📐',
+    'bump': '💥',
+    'custom': '✨',
+  }
+
+  const categoryColors: Record<PerceptionCategory, string> = {
+    'see.face': '#4ecdc4',
+    'see.object': '#45b7d1',
+    'hear.word': '#f9ca24',
+    'hear.sound': '#f0932b',
+    'near': '#6c5ce7',
+    'tilt': '#a29bfe',
+    'bump': '#ff6b6b',
+    'custom': '#fd79a8',
+  }
+
+  const recentEvents = useMemo(
+    () => perceptionEvents.slice(-50),
+    [perceptionEvents],
+  )
+
+  const categoryCounts = useMemo(() => {
+    const counts: Record<string, number> = {}
+    for (const evt of perceptionEvents) {
+      const cat = evt.label as PerceptionCategory
+      counts[cat] = (counts[cat] ?? 0) + 1
+    }
+    return counts
+  }, [perceptionEvents])
+
+  if (perceptionEvents.length === 0) {
+    return null
+  }
+
+  return (
+    <div className={styles.perceptionPanel}>
+      <div className={styles.perceptionHeader}>
+        <span className={styles.panelIcon}>👁️</span>
+        <span className={styles.panelTitle}>Perception</span>
+        <span className={styles.perceptionCount}>{perceptionEvents.length} events</span>
+      </div>
+
+      {/* Category summary */}
+      <div className={styles.perceptionCategories}>
+        {Object.entries(categoryCounts).map(([cat, count]) => (
+          <span
+            key={cat}
+            className={styles.perceptionCategoryBadge}
+            style={{ backgroundColor: categoryColors[cat as PerceptionCategory] + '33', color: categoryColors[cat as PerceptionCategory] }}
+          >
+            {categoryIcons[cat as PerceptionCategory]} {cat} ×{count}
+          </span>
+        ))}
+      </div>
+
+      {/* Recent events */}
+      <div className={styles.perceptionList}>
+        {recentEvents.map((evt, i) => {
+          const cat = evt.label as PerceptionCategory
+          const color = categoryColors[cat] ?? '#888'
+          const confidence = evt.payload?.confidence as number | undefined
+          return (
+            <div
+              key={i}
+              className={styles.perceptionEvent}
+              style={{ borderLeftColor: color }}
+            >
+              <span className={styles.perceptionTime}>{formatTime(evt.t)}</span>
+              <span className={styles.perceptionIcon}>{categoryIcons[cat]}</span>
+              <span className={styles.perceptionCategory}>{cat}</span>
+              {confidence !== undefined && (
+                <span className={styles.perceptionConfidence} style={{ color }}>
+                  {(confidence * 100).toFixed(0)}%
+                </span>
+              )}
+              <span className={styles.perceptionSource}>[{String(evt.payload?.source ?? '')}]</span>
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 // ─── Main Debug Page ───────────────────────────────────────────
 
 export function DebugPage() {
@@ -460,6 +563,9 @@ export function DebugPage() {
         selfTestResult={selfTestResult}
         selfTestLoading={selfTestLoading}
       />
+
+      {/* Perception Panel */}
+      <PerceptionPanel events={debug.perceptionEvents} />
 
       {/* Main split view */}
       <div className={styles.splitView}>

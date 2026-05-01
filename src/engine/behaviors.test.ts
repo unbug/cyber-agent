@@ -5,6 +5,7 @@ import { createBlackboard } from './types'
 import type { RobotAdapter } from './types'
 
 import './builtins'
+import '../perception/nodes'
 
 const mockAdapter: RobotAdapter = {
   type: 'mock',
@@ -69,8 +70,8 @@ describe('Character behaviors', () => {
     }
   })
 
-  it('getAllBehaviors returns all 68', () => {
-    expect(getAllBehaviors()).toHaveLength(68)
+  it('getAllBehaviors returns all 73', () => {
+    expect(getAllBehaviors()).toHaveLength(73)
   })
 
   it('each behavior tree can hydrate and tick without crashing', () => {

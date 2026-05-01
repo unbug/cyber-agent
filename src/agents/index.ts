@@ -88,6 +88,12 @@ import * as sloth from './sloth'
 import * as narwhal from './narwhal'
 import * as cricket from './cricket'
 import * as bat from './bat'
+// v1.1 perception-driven characters
+import * as shyCat from './shy-cat'
+import * as playfulDog from './playful-dog'
+import * as guardianBot from './guardian-bot'
+import * as musicianBot from './musician-bot'
+import * as curiousBird from './curious-bird'
 
 // ─── Registry ────────────────────────────────────────────────
 
@@ -167,6 +173,12 @@ registerAgent(heron, 'heron')
 registerAgent(otter, 'otter')
 registerAgent(crane, 'crane')
 registerAgent(gorilla, 'gorilla')
+// v1.1 perception-driven characters
+registerAgent(shyCat, 'shy-cat')
+registerAgent(playfulDog, 'playful-dog')
+registerAgent(guardianBot, 'guardian-bot')
+registerAgent(musicianBot, 'musician-bot')
+registerAgent(curiousBird, 'curious-bird')
 registerAgent(manta, 'manta')
 registerAgent(eagle, 'eagle')
 registerAgent(sloth, 'sloth')
@@ -188,7 +200,9 @@ const agentList: Array<{ character: Character }> = [
   bee, hedgehog, flamingo, octopus, tapir,
   lion, cicada, seahorse, gecko, mandrill,
   spider, whale, rhino, heron, otter,
-  crane, gorilla, manta, eagle, sloth, narwhal, cricket, bat
+  crane, gorilla, manta, eagle, sloth, narwhal, cricket, bat,
+  // v1.1 perception-driven characters
+  shyCat, playfulDog, guardianBot, musicianBot, curiousBird
 ]
 
 // ─── Public API ──────────────────────────────────────────────
@@ -214,6 +228,9 @@ export const ADAPTER_INFO: Record<string, { label: string; emoji: string }> = {
   'unitree-go1': { label: 'Unitree Go1/Go2',     emoji: '🐕' },
   'irobot-create3': { label: 'iRobot Create 3',   emoji: '🤖' },
   tello:        { label: 'DJI Tello',             emoji: '🚁' },
+  // v1.1 perception sensors
+  webcam:       { label: 'Webcam (Browser)',      emoji: '📷' },
+  microphone:   { label: 'Microphone (Browser)',  emoji: '🎤' },
 }
 
 /** Get the list of compatible adapter info for a character (for UI display) */
