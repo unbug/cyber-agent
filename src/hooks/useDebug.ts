@@ -15,6 +15,8 @@ import { useRef, useState, useCallback, useEffect } from 'react'
 import { tracer, type TracerEvent } from '@/engine/tracer'
 import type { RuntimeNode, Blackboard } from '@/engine/types'
 import type { SafetyEvent, SafetyState } from '@/engine/safety-supervisor'
+import type { EpisodicMemory } from '@/memory/types'
+import { InMemoryEpisodicStore } from '@/memory/episodic-store'
 
 // ─── Internal state ─────────────────────────────────────────────
 
@@ -45,6 +47,8 @@ interface DebugState {
   eStopActive: boolean
   /** Safety events */
   safetyEvents: SafetyEvent[]
+  /** Episodic memories */
+  memories: EpisodicMemory[]
 }
 
 const MAX_BREADCRUMB = 50
@@ -62,6 +66,12 @@ export function useDebug(): DebugState & {
   updateSafety: (state: SafetyState, eStop: boolean) => void
   /** Add safety event */
   addSafetyEvent: (event: SafetyEvent) => void
+  /** Encode a perception event as an episodic memory */
+  encodeMemory: (event: TracerEvent) => void
+  /** Purge all forgotten (pruned) memories */
+  purgeMemories: () => void
+  /** Simulate forgetting: decay all memories by elapsedMs */
+  simulateForgetting: (elapsedMs: number) => void
   /** Computed tick rate (fps) */
   tickRate: number
   /** Computed avg latency (ms) */
@@ -81,6 +91,7 @@ export function useDebug(): DebugState & {
     safetyState: null,
     eStopActive: false,
     safetyEvents: [],
+    memories: [],
   })
 
   const stateRef = useRef(state)
@@ -113,6 +124,7 @@ export function useDebug(): DebugState & {
       safetyState: null,
       eStopActive: false,
       safetyEvents: [],
+      memories: [],
     })
   }, [])
 
@@ -122,6 +134,89 @@ export function useDebug(): DebugState & {
 
   const addSafetyEvent = useCallback((event: SafetyEvent) => {
     setState(prev => ({ ...prev, safetyEvents: [...prev.safetyEvents, event] }))
+  }, [])
+
+  /** Encode a perception event as an episodic memory */
+  const encodeMemory = useCallback((event: TracerEvent) => {
+    const payload = event.payload as Record<string, unknown> | undefined
+    if (!payload) return
+
+    const category = payload.category as string
+    const source = (payload.source as string) ?? 'unknown'
+    const confidence = (payload.confidence as number) ?? 0.5
+
+    // Infer emotion from perception event
+    let valence = 0
+    let arousal = 0
+    let dominance = 0.5
+
+    if (category === 'see.face') {
+      valence = 0.3
+      arousal = 0.4
+      dominance = 0.3
+    } else if (category === 'hear.word') {
+      valence = 0.5
+      arousal = 0.6
+    } else if (category === 'hear.sound') {
+      valence = 0.2
+      arousal = 0.7
+    } else if (category === 'see.object') {
+      valence = 0.4
+      arousal = 0.5
+    } else if (category === 'near') {
+      valence = -0.2
+      arousal = 0.5
+      dominance = 0.2
+    } else if (category === 'bump') {
+      valence = -0.5
+      arousal = 0.8
+      dominance = 0.3
+    }
+
+    const label = `${category} from ${source}`
+    const salience = confidence
+    const tags = [category]
+    if (category === 'see.object' && payload.class) {
+      tags.push(`object:${String(payload.class)}`)
+    }
+    if (category === 'hear.word' && payload.text) {
+      tags.push(`word:${String(payload.text).toLowerCase()}`)
+    }
+
+    const memory = new InMemoryEpisodicStore().encode({
+      timestamp: event.t,
+      event: { category, payload: payload as Record<string, unknown>, source },
+      emotion: { valence, arousal, dominance },
+      label,
+      salience,
+      tags,
+    })
+
+    setState(prev => ({
+      ...prev,
+      memories: [...prev.memories, memory].slice(-500), // cap at 500
+    }))
+  }, [])
+
+  /** Purge all forgotten (pruned) memories */
+  const purgeMemories = useCallback(() => {
+    setState(prev => ({
+      ...prev,
+      memories: prev.memories.filter((m) => !m.pruned),
+    }))
+  }, [])
+
+  /** Simulate forgetting: decay all memories by elapsedMs */
+  const simulateForgetting = useCallback((elapsedMs: number) => {
+    setState(prev => {
+      const decayed = prev.memories.map((m) => {
+        if (m.pruned) return m
+        const age = Date.now() - m.timestamp
+        const newRelevance = computeRelevanceDebug(age + elapsedMs, m.salience, m.recallCount)
+        return { ...m, relevance: newRelevance }
+      })
+      return { ...prev, memories: decayed }
+    })
   }, [])
 
   // Tracer subscription
@@ -154,6 +249,8 @@ export function useDebug(): DebugState & {
         case 'perception': {
           const perceptionEvents = [...s.perceptionEvents, event].slice(-200)
           setState(prev => ({ ...prev, perceptionEvents }))
+          // Also encode as episodic memory
+          encodeMemory(event)
           break
         }
         case 'error': {
@@ -183,12 +280,18 @@ export function useDebug(): DebugState & {
     reset,
     updateSafety,
     addSafetyEvent,
+    encodeMemory,
+    purgeMemories,
+    simulateForgetting,
   } as DebugState & {
     captureBlackboard: (bb: Blackboard) => void
     updateTree: (tree: RuntimeNode) => void
     reset: () => void
     updateSafety: (state: SafetyState, eStop: boolean) => void
     addSafetyEvent: (event: SafetyEvent) => void
+    encodeMemory: (event: TracerEvent) => void
+    purgeMemories: () => void
+    simulateForgetting: (elapsedMs: number) => void
     tickRate: number
     avgLatency: number
   }
@@ -252,4 +355,24 @@ export function diffBlackboards(
     }
   }
   return diffs
+}
+
+// ─── Forgetting curve helper (for debug simulation) ───────────────
+
+function computeRelevanceDebug(
+  ageMs: number,
+  salience: number,
+  recallCount: number,
+): number {
+  const initialRelevance = 1.0
+  const halfLifeMs = 3_600_000 // 1 hour
+  const minRelevance = 0.01
+  const salienceBoost = 0.5
+
+  const decayFactor = Math.pow(2, -ageMs / halfLifeMs)
+  const baseRelevance = initialRelevance * decayFactor
+  const recallBoost = 1 + recallCount * salienceBoost * 0.1
+  const salienceFactor = 1 + salience * salienceBoost
+
+  return Math.max(minRelevance, baseRelevance * recallBoost * salienceFactor)
 }

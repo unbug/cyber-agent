@@ -979,3 +979,282 @@
   font-family: var(--font-mono);
   font-size: 0.65rem;
 }
+
+/* ─── Memories Panel ─────────────────────────────────────── */
+
+.memoriesPanel {
+  padding: var(--space-3);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  margin-top: var(--space-3);
+}
+
+.memoriesHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.memoriesCount {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-left: auto;
+}
+
+.memoriesStats {
+  display: flex;
+  gap: var(--space-4);
+  margin-bottom: var(--space-2);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--border);
+}
+
+.memoriesStat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.memoriesStatLabel {
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.memoriesStatValue {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Forgetting curve histogram */
+
+.histogram {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin-bottom: var(--space-2);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--border);
+}
+
+.histogramBar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 0.7rem;
+}
+
+.histogramLabel {
+  min-width: 140px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.histogramTrack {
+  flex: 1;
+  height: 8px;
+  background: var(--bg-elevated);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.histogramFill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s;
+}
+
+.histogramCount {
+  min-width: 24px;
+  text-align: right;
+  color: var(--text-tertiary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Search + sort controls */
+
+.memoriesControls {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.memoriesSearch {
+  flex: 1;
+  min-width: 120px;
+  padding: var(--space-1) var(--space-2);
+  font-size: 0.75rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+}
+
+.memoriesSearch::placeholder {
+  color: var(--text-tertiary);
+}
+
+.memoriesSort {
+  display: flex;
+  gap: var(--space-1);
+}
+
+.memoriesSortBtn {
+  padding: var(--space-1) var(--space-2);
+  font-size: 0.7rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.1s;
+}
+
+.memoriesSortBtn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.memoriesSortBtnActive {
+  border-color: #3b82f6;
+  background: #3b82f611;
+  color: #3b82f6;
+}
+
+/* Memory list */
+
+.memoriesList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: var(--space-2);
+}
+
+.memoryItem {
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid #8b5cf6;
+  transition: border-color 0.2s;
+}
+
+.memoryItem:hover {
+  border-left-color: #a78bfa;
+}
+
+.memoryHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-1);
+}
+
+.memoryIcon {
+  font-size: 0.9rem;
+}
+
+.memoryLabel {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.memoryRelevance {
+  font-size: 0.7rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+
+.memoryMeta {
+  display: flex;
+  gap: var(--space-2);
+  font-size: 0.65rem;
+  color: var(--text-tertiary);
+  margin-bottom: var(--space-1);
+}
+
+.memoryCategory {
+  color: #a78bfa;
+  font-family: var(--font-mono);
+}
+
+.memorySource {
+  font-family: var(--font-mono);
+}
+
+.memoryAge {
+  margin-left: auto;
+  font-family: var(--font-mono);
+}
+
+.memoryEmotion {
+  display: flex;
+  gap: var(--space-2);
+  font-size: 0.65rem;
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+  margin-bottom: var(--space-1);
+}
+
+.memoryTags {
+  display: flex;
+  gap: var(--space-1);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-1);
+}
+
+.memoryTag {
+  font-size: 0.6rem;
+  padding: 1px 6px;
+  background: #8b5cf611;
+  border: 1px solid #8b5cf633;
+  border-radius: 99px;
+  color: #a78bfa;
+  font-family: var(--font-mono);
+}
+
+.memoryDetails {
+  display: flex;
+  gap: var(--space-2);
+  font-size: 0.6rem;
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+}
+
+.memoryRecallCount {
+  color: #3b82f6;
+}
+
+.memorySalience {
+  color: #22c55e;
+}
+
+.memoryId {
+  margin-left: auto;
+  color: var(--text-tertiary);
+  opacity: 0.5;
+}
+
+/* Actions */
+
+.memoriesActions {
+  display: flex;
+  gap: var(--space-2);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--border);
+}

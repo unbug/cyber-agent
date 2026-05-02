@@ -17,6 +17,8 @@ import { TraceScrubber } from './TraceScrubber'
 import { BreakpointPanel } from '@/components/BreakpointPanel'
 import { TracePullerPanel } from '@/components/TracePullerPanel'
 import { SafetyEventPanel } from '@/components/SafetyEventPanel'
+import { MemoriesPanel } from './MemoriesPanel'
+import { computeMemoryStats } from '@/memory/episodic-store'
 import styles from './DebugPage.module.css'
 
 // ─── BT Tree Renderer ─────────────────────────────────────────
@@ -566,6 +568,14 @@ export function DebugPage() {
 
       {/* Perception Panel */}
       <PerceptionPanel events={debug.perceptionEvents} />
+
+      {/* Memories Panel */}
+      <MemoriesPanel
+        memories={debug.memories}
+        stats={computeMemoryStats(debug.memories)}
+        onPurge={debug.purgeMemories}
+        onForget={debug.simulateForgetting}
+      />
 
       {/* Main split view */}
       <div className={styles.splitView}>
