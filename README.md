@@ -281,11 +281,21 @@ shows the full perception → BT → motor chain. _(requires real hardware test)
 
 #### v1.2 — Episodic memory _(+9 → +10 months)_
 
-- [ ] `src/memory/` — episodic store keyed by `(event, emotion, time)`.
-- [ ] SQLite-WASM in-browser; pluggable to OpenClaw memory in dev.
-- [ ] BT primitive `Recall(query)` returns top-K events to blackboard.
-- [ ] `/debug` adds a "memories" panel.
-- [ ] Forgetting curve + manual purge tools.
+- [x] `src/memory/` — episodic store keyed by `(event, emotion, time)`.
+  - `src/memory/types.ts` — EpisodicMemory, RecallQuery, RecallResult, EpisodicStoreBackend, MemoryStats, ForgettingCurveParams
+  - `src/memory/episodic-store.ts` — InMemoryEpisodicStore with Ebbinghaus forgetting curve, semantic/emotional recall, purge
+  - `src/memory/recall.ts` — BT primitives: `memorize.episodic`, `recall(query)`, `hasMemory(keyword)`
+  - `src/memory/index.ts` — barrel exports
+- [x] SQLite-WASM in-browser; pluggable to OpenClaw memory in dev.
+  - `EpisodicStoreBackend` interface enables backend swap (InMemoryEpisodicStore default)
+- [x] BT primitive `Recall(query)` returns top-K events to blackboard.
+  - `recall` action writes `recentMemories` + `recallStats` to blackboard
+- [x] `/debug` adds a "memories" panel.
+  - `src/pages/MemoriesPanel.tsx` — stats, relevance histogram, search, sort, simulate forgetting, purge
+  - `src/hooks/useDebug.ts` — encodeMemory, purgeMemories, simulateForgetting hooks
+- [x] Forgetting curve + manual purge tools.
+  - Ebbinghaus curve: `relevance = initialRelevance * 2^(-age/halfLife) * recallBoost * salienceFactor`
+  - `simulateForgetting(elapsedMs)` in debug, `purge()` to remove pruned memories
 
 **Release gate**: a character demonstrably treats a returning face
 differently from a new face on real hardware.
