@@ -309,7 +309,10 @@ Released: 2026-05-10 _(+10 → +12 months)_
       reorders by current affect.
 - [x] Adapter expressions: LED color / sound / motion style modulated by
       VAL (default mappings + per-character override).
-- [ ] `/debug` adds VAL trajectory aligned with timeline.
+- [x] `/debug` adds VAL trajectory aligned with timeline.
+  - `src/pages/VALTimelinePanel.tsx` — unified canvas: VAL curve + perception markers + adapter tx/rx markers on shared time axis
+  - Hover crosshair shows time, VAL state (V/A/D), and event details
+  - `src/pages/VALTimelinePanel.test.tsx` — 8 tests
 - [x] Authoring DSL: `emotion: anxious | playful | stoic` composable.
 
 **Release gate**: blind A/B test (n=30) prefers VAL-biased character over
