@@ -302,13 +302,13 @@ differently from a new face on real hardware.
 
 #### v1.3 — Affect engine (VAL) _(+10 → +12 months)_
 
-- [ ] Per-agent VAL state (Valence / Arousal / Dominance) with decay.
-- [ ] BT priors: nodes declare `bias: { whenArousal: ">0.7" }`; selector
+- [x] Per-agent VAL state (Valence / Arousal / Dominance) with decay.
+- [x] BT priors: nodes declare `bias: { whenArousal: ">0.7" }`; selector
       reorders by current affect.
-- [ ] Adapter expressions: LED color / sound / motion style modulated by
+- [x] Adapter expressions: LED color / sound / motion style modulated by
       VAL (default mappings + per-character override).
 - [ ] `/debug` adds VAL trajectory aligned with timeline.
-- [ ] Authoring DSL: `emotion: anxious | playful | stoic` composable.
+- [x] Authoring DSL: `emotion: anxious | playful | stoic` composable.
 
 **Release gate**: blind A/B test (n=30) prefers VAL-biased character over
 flat baseline ≥70 %.
