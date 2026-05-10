@@ -20,6 +20,7 @@ import { TracePullerPanel } from '@/components/TracePullerPanel'
 import { SafetyEventPanel } from '@/components/SafetyEventPanel'
 import { MemoriesPanel } from './MemoriesPanel'
 import { VALPanel } from './VALPanel'
+import { VALTimelinePanel } from './VALTimelinePanel'
 import { computeMemoryStats } from '@/memory/episodic-store'
 import styles from './DebugPage.module.css'
 
@@ -585,6 +586,15 @@ export function DebugPage() {
         valHistory={debug.valHistory}
         perceptionEvents={debug.perceptionEvents}
         emotionLabel={debug.valState ? valToString(debug.valState) : 'idle'}
+      />
+
+      {/* VAL Trajectory — aligned with perception & adapter timeline */}
+      <VALTimelinePanel
+        valState={debug.valState}
+        valHistory={debug.valHistory}
+        perceptionEvents={debug.perceptionEvents}
+        adapterEvents={debug.adapterEvents}
+        width={900}
       />
 
       {/* Main split view */}

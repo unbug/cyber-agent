@@ -1441,3 +1441,61 @@
   margin-left: auto;
   font-weight: 600;
 }
+
+/* ─── VAL Timeline Panel ─────────────────────────────────────── */
+
+.valTimelinePanel {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.valTimelineHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--border);
+}
+
+.valTimelineIcon {
+  font-size: 1rem;
+}
+
+.valTimelineTitle {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.valTimelineCount {
+  margin-left: auto;
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
+  font-variant-numeric: tabular-nums;
+}
+
+.valTimelineCanvas {
+  display: block;
+  cursor: crosshair;
+}
+
+.valTimelineEmpty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8);
+  gap: var(--space-2);
+}
+
+.valTimelineEmptyIcon {
+  font-size: 2rem;
+  opacity: 0.5;
+}
+
+.valTimelineEmpty p {
+  color: var(--text-tertiary);
+  font-size: 0.85rem;
+}
