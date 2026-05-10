@@ -10,4 +10,5 @@ export const character: Character = {
   personality: ['melodic', 'expressive', 'joyful'],
   difficulty: 'medium',
   compatibleAdapters: ['canvas', 'esp32', 'spike', 'mbot', 'robo-master-v2'],
+  emotionPreset: 'calm',
 }

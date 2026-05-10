@@ -10,4 +10,5 @@ export const character: Character = {
   personality: ['vigilant', 'protective', 'methodical'],
   difficulty: 'medium',
   compatibleAdapters: ['canvas', 'esp32', 'mbot', 'robo-master-v2'],
+  emotionPreset: 'guardian',
 }

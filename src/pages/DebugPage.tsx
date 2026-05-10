@@ -13,11 +13,13 @@ import { tracer, type TracerEvent, type TracerEventType } from '@/engine/tracer'
 import { useDebug, diffBlackboards, type BbDiff } from '@/hooks/useDebug'
 import type { RuntimeNode } from '@/engine/types'
 import type { PerceptionCategory } from '@/perception/types'
+import { valToString } from '@/affect/types'
 import { TraceScrubber } from './TraceScrubber'
 import { BreakpointPanel } from '@/components/BreakpointPanel'
 import { TracePullerPanel } from '@/components/TracePullerPanel'
 import { SafetyEventPanel } from '@/components/SafetyEventPanel'
 import { MemoriesPanel } from './MemoriesPanel'
+import { VALPanel } from './VALPanel'
 import { computeMemoryStats } from '@/memory/episodic-store'
 import styles from './DebugPage.module.css'
 
@@ -575,6 +577,14 @@ export function DebugPage() {
         stats={computeMemoryStats(debug.memories)}
         onPurge={debug.purgeMemories}
         onForget={debug.simulateForgetting}
+      />
+
+      {/* Affect (VAL) Panel */}
+      <VALPanel
+        valState={debug.valState}
+        valHistory={debug.valHistory}
+        perceptionEvents={debug.perceptionEvents}
+        emotionLabel={debug.valState ? valToString(debug.valState) : 'idle'}
       />
 
       {/* Main split view */}

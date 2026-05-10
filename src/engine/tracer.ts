@@ -33,6 +33,7 @@ export type TracerEventType =
   | 'error'
   | 'breakpoint.triggered'
   | 'perception'
+  | 'val.update'
 
 // Re-export breakpoint types for consumers
 export type { Breakpoint, BreakpointKind } from './breakpoints'

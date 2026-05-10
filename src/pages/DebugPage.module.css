@@ -1258,3 +1258,186 @@
   padding-top: var(--space-2);
   border-top: 1px solid var(--border);
 }
+
+/* ─── VAL Panel ─────────────────────────────────────────── */
+
+.valPanel {
+  margin-top: var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.valPanelHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+}
+
+.valPanelIcon {
+  font-size: 1.1rem;
+}
+
+.valPanelTitle {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+}
+
+.valEmotionBadge {
+  margin-left: auto;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-tertiary);
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+}
+
+.valEmotionLabel {
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+}
+
+.valBody {
+  padding: var(--space-3) var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* Gauges */
+
+.valGauges {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-3);
+}
+
+.valGauge {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.valGaugeHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.valGaugeIcon {
+  font-size: 0.9rem;
+}
+
+.valGaugeLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+}
+
+.valGaugeBar {
+  height: 8px;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.valGaugeFill {
+  height: 100%;
+  border-radius: var(--radius-sm);
+  transition: width 0.15s ease;
+}
+
+.valGaugeFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.valGaugeValue {
+  font-size: 0.85rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+
+.valGaugePct {
+  font-size: 0.65rem;
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+}
+
+/* Trajectory */
+
+.valTrajectory {
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2);
+  display: flex;
+  justify-content: center;
+}
+
+.valTrajectoryCanvas {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Event log */
+
+.valEventLog {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.valEventLogTitle {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+}
+
+.valEventLogEmpty {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  font-style: italic;
+}
+
+.valEventList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.valEventItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 0.7rem;
+  font-family: var(--font-mono);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-secondary);
+}
+
+.valEventTime {
+  color: var(--text-tertiary);
+  min-width: 50px;
+}
+
+.valEventCategory {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.valEventConfidence {
+  margin-left: auto;
+  font-weight: 600;
+}

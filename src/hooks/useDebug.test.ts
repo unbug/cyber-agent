@@ -49,6 +49,7 @@ describe('useDebug', () => {
       canvasWidth: 400, canvasHeight: 300,
       x: 100, y: 200, rotation: 45, speed: 2,
       emotion: 'happy', energy: 0.8, excitement: 0.3,
+      valence: 0, arousal: 0.3, dominance: 0.5,
       tick: 10, deltaMs: 16, totalMs: 1600,
     }
 
@@ -237,6 +238,9 @@ function mockBlackboard(): Blackboard {
     rotation: 0,
     speed: 2,
     emotion: 'idle',
+    valence: 0,
+    arousal: 0.3,
+    dominance: 0.5,
     energy: 1,
     excitement: 0,
     tick: 0,

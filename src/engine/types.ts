@@ -35,6 +35,11 @@ export interface Blackboard {
   energy: number      // 0-1
   excitement: number  // 0-1
 
+  // Affect (VAL) — set by ValEngine each tick
+  valence: number     // -1 to +1
+  arousal: number     // 0 to 1
+  dominance: number   // 0 to 1
+
   // Timing
   tick: number
   deltaMs: number
@@ -64,6 +69,9 @@ export function createBlackboard(canvasWidth = 400, canvasHeight = 300): Blackbo
     emotion: 'idle',
     energy: 1,
     excitement: 0,
+    valence: 0,
+    arousal: 0.3,
+    dominance: 0.5,
     tick: 0,
     deltaMs: 0,
     totalMs: 0,
@@ -95,6 +103,10 @@ export interface SequenceDef extends BaseNodeDef {
 
 export interface SelectorDef extends BaseNodeDef {
   type: 'selector'
+  /** Optional single bias dimension for VAL-aware reordering */
+  bias?: { dimension: 'valence' | 'arousal' | 'dominance'; operator: '>' | '<' | '>=' | '<=' | '==' | '!='; threshold: number }
+  /** Optional multiple bias conditions — all must match for high score */
+  biases?: { dimension: 'valence' | 'arousal' | 'dominance'; operator: '>' | '<' | '>=' | '<=' | '==' | '!='; threshold: number }[]
   children: BehaviorNodeDef[]
 }
 

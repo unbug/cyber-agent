@@ -17,6 +17,7 @@ import type { RuntimeNode, Blackboard } from '@/engine/types'
 import type { SafetyEvent, SafetyState } from '@/engine/safety-supervisor'
 import type { EpisodicMemory } from '@/memory/types'
 import { InMemoryEpisodicStore } from '@/memory/episodic-store'
+import type { ValState } from '@/affect/types'
 
 // ─── Internal state ─────────────────────────────────────────────
 
@@ -49,6 +50,10 @@ interface DebugState {
   safetyEvents: SafetyEvent[]
   /** Episodic memories */
   memories: EpisodicMemory[]
+  /** Current VAL state */
+  valState: ValState | null
+  /** VAL history for trajectory */
+  valHistory: Array<{ t: number; valence: number; arousal: number; dominance: number }>
 }
 
 const MAX_BREADCRUMB = 50
@@ -92,6 +97,8 @@ export function useDebug(): DebugState & {
     eStopActive: false,
     safetyEvents: [],
     memories: [],
+    valState: null,
+    valHistory: [],
   })
 
   const stateRef = useRef(state)
@@ -125,6 +132,8 @@ export function useDebug(): DebugState & {
       eStopActive: false,
       safetyEvents: [],
       memories: [],
+      valState: null,
+      valHistory: [],
     })
   }, [])
 
@@ -256,6 +265,23 @@ export function useDebug(): DebugState & {
         case 'error': {
           const errors = [...s.errors, event]
           setState(prev => ({ ...prev, errors }))
+          break
+        }
+        case 'val.update': {
+          const payload = event.payload as Record<string, unknown> | undefined
+          if (payload) {
+            const valState: ValState = {
+              valence: (payload.valence as number) ?? s.valState?.valence ?? 0,
+              arousal: (payload.arousal as number) ?? s.valState?.arousal ?? 0.3,
+              dominance: (payload.dominance as number) ?? s.valState?.dominance ?? 0.5,
+            }
+            const history = [...s.valHistory, { t: event.t, ...valState }].slice(-300)
+            setState(prev => ({
+              ...prev,
+              valState,
+              valHistory: history,
+            }))
+          }
           break
         }
       }

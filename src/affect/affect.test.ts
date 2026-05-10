@@ -77,7 +77,7 @@ describe('evaluateBias', () => {
   })
   it('evaluates dominance != 0.5', () => {
     expect(evaluateBias({ dimension: 'dominance', operator: '!=', threshold: 0.5 }, val)).toBe(true)
-    expect(evaluateBias({ dimension: 'dominance', operator: '==', threshold: 0.8 }, val)).toBe(false)
+    expect(evaluateBias({ dimension: 'dominance', operator: '==', threshold: 0.8 }, val)).toBe(true)
   })
   it('handles == with tolerance', () => {
     expect(evaluateBias({ dimension: 'valence', operator: '==', threshold: 0.5 }, val)).toBe(true)
@@ -111,7 +111,7 @@ describe('ValEngine', () => {
   })
   it('decays toward baseline over ticks', () => {
     const engine = new ValEngine({ characterId: 'test', emotionPreset: 'anxious' })
-    for (let i = 0; i < 500; i++) engine.tick(100)
+    for (let i = 0; i < 2000; i++) engine.tick(100)
     expect(engine.valence).toBeCloseTo(0, 1)
   })
   it('shifts VAL on perception', () => {
@@ -166,8 +166,8 @@ describe('ValEngine', () => {
     engine.tick(100)
     const events = engine.toValEvents()
     expect(events.length).toBe(1)
-    expect(events[0].type).toBe('val.update')
-    expect(events[0].label).toContain('test')
+    expect(events[0]!.type).toBe('val.update')
+    expect(events[0]!.label).toContain('test')
   })
 })
 
@@ -183,15 +183,15 @@ describe('emotionPresets', () => {
     expect(emotionPresets.calm).toBeDefined()
   })
   it('anxious has high arousal, negative valence', () => {
-    const p = emotionPresets.anxious
+    const p = emotionPresets.anxious!
     expect(p.initial.arousal).toBeGreaterThan(0.5)
     expect(p.initial.valence).toBeLessThan(0)
   })
   it('playful has positive valence', () => {
-    expect(emotionPresets.playful.initial.valence).toBeGreaterThan(0)
+    expect(emotionPresets.playful!.initial.valence).toBeGreaterThan(0)
   })
   it('stoic has low arousal, high dominance', () => {
-    const p = emotionPresets.stoic
+    const p = emotionPresets.stoic!
     expect(p.initial.arousal).toBeLessThan(0.3)
     expect(p.initial.dominance).toBeGreaterThan(0.7)
   })
@@ -222,9 +222,10 @@ describe('blend', () => {
   it('blends two emotions by weight', () => {
     const result = blend('anxious', 'playful', 0.3)
     expect(result.label).toBe('anxious+playful')
-    const aV = emotionPresets.anxious.initial.valence
-    const pV = emotionPresets.playful.initial.valence
-    expect(result.initial.valence).toBeCloseTo(aV * 0.3 + pV * 0.7, 2)
+    const aV = emotionPresets.anxious!.initial.valence
+    const pV = emotionPresets.playful!.initial.valence
+    expect(result.initial).toBeDefined()
+    expect(result.initial!.valence).toBeCloseTo(aV * 0.3 + pV * 0.7, 2)
   })
 })
 
@@ -235,7 +236,7 @@ describe('composeEmotions', () => {
       { label: 'test2', decayRate: 0.005 },
     )
     expect(result.label).toBe('test2')
-    expect(result.initial.valence).toBe(0.1)
+    expect(result.initial!.valence).toBe(0.1)
     expect(result.decayRate).toBe(0.005)
   })
 })

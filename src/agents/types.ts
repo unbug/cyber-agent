@@ -9,4 +9,6 @@ export interface Character {
   difficulty: 'easy' | 'medium' | 'hard'
   /** Which robot platforms this character can run on */
   compatibleAdapters: string[]
+  /** Base emotion preset for VAL affect engine */
+  emotionPreset?: string
 }

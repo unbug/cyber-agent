@@ -25,6 +25,7 @@ import { createBlackboard } from './types'
 import { hydrate, tick, resetTree } from './executor'
 import { emitTickStart, emitBbSet } from './tracer'
 import { SafetySupervisor, type SafetyOptions, type SafetyEvent } from './safety-supervisor'
+import { ValEngine, type ValState } from '../affect/engine'
 
 // Ensure all builtins are registered
 import './builtins'
@@ -36,6 +37,8 @@ export interface RunnerSnapshot {
   blackboard: Readonly<Blackboard>
   rootNode: RuntimeNode
   ticksPerSecond: number
+  /** Current VAL state */
+  valState: ValState | null
 }
 
 export interface RunnerOptions {
@@ -59,11 +62,17 @@ export class BehaviorTreeRunner {
   /** Safety supervisor (optional) */
   private safety: SafetySupervisor | null
 
+  /** Affect engine (VAL state) */
+  private valEngine: ValEngine | null
+
   /** Callback invoked after every tick — use for UI updates */
   public onTick: ((snapshot: RunnerSnapshot) => void) | null = null
 
   /** Callback fired when safety event occurs */
   public onSafetyEvent: ((event: SafetyEvent) => void) | null = null
+
+  /** Callback fired when VAL state changes */
+  public onValChange: ((val: ValState) => void) | null = null
 
   constructor(behavior: CharacterBehavior, adapter: RobotAdapterV2, opts?: RunnerOptions) {
     this.root = hydrate(behavior.tree)
@@ -94,6 +103,13 @@ export class BehaviorTreeRunner {
         this.onSafetyEvent?.(event)
       })
     }
+
+    // Create VAL affect engine
+    this.valEngine = new ValEngine({
+      characterId: behavior.characterId,
+      emotionPreset: (behavior as any).emotionPreset as string | undefined,
+      emotion: (behavior as any).emotion as any,
+    })
   }
 
   get state(): RunnerState { return this._state }
@@ -190,7 +206,21 @@ export class BehaviorTreeRunner {
     if (behavior.defaults) {
       Object.assign(this.bb, behavior.defaults)
     }
+    // Recreate VAL engine for new behavior
+    this.valEngine = new ValEngine({
+      characterId: behavior.characterId,
+      emotionPreset: (behavior as any).emotionPreset as string | undefined,
+      emotion: (behavior as any).emotion as any,
+    })
     if (wasRunning) this.start()
+  }
+
+  /**
+   * Feed a perception event into the VAL engine.
+   * Call this when a perception event is received.
+   */
+  onPerception(category: string, confidence: number): void {
+    this.valEngine?.onPerception(category, confidence)
   }
 
   snapshot(): RunnerSnapshot {
@@ -199,6 +229,7 @@ export class BehaviorTreeRunner {
       blackboard: { ...this.bb },
       rootNode: this.root,
       ticksPerSecond: this._tps,
+      valState: this.valEngine?.state ?? null,
     }
   }
 
@@ -245,8 +276,18 @@ export class BehaviorTreeRunner {
     this.bb.tick++
     this.lastTickTime = now
 
-    // Execute behavior tree
-    tick(this.root, this.bb, this.adapter)
+    // Decay VAL toward baseline
+    this.valEngine?.tick(this.bb.deltaMs)
+
+    // Sync VAL to blackboard
+    if (this.valEngine) {
+      this.bb.valence = this.valEngine.valence
+      this.bb.arousal = this.valEngine.arousal
+      this.bb.dominance = this.valEngine.dominance
+    }
+
+    // Execute behavior tree (pass VAL engine for bias reordering)
+    tick(this.root, this.bb, this.adapter, this.valEngine)
 
     // Report heartbeat to safety supervisor
     this.safety?.heartbeat()
@@ -256,9 +297,14 @@ export class BehaviorTreeRunner {
     this.bb.safetyState = this.safety?.state ?? 'ok'
 
     // Emit blackboard snapshots for key fields
-    const bbFields = ['x', 'y', 'rotation', 'speed', 'emotion', 'energy', 'excitement'] as const
+    const bbFields = ['x', 'y', 'rotation', 'speed', 'emotion', 'energy', 'excitement', 'valence', 'arousal', 'dominance'] as const
     for (const field of bbFields) {
       emitBbSet(field, this.bb[field], now)
+    }
+
+    // Notify VAL change listeners
+    if (this.valEngine) {
+      this.onValChange?.(this.valEngine.state)
     }
 
     // TPS counter

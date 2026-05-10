@@ -15,6 +15,8 @@ import type {
   ConditionFn,
 } from './types'
 import { emitTickStart, emitNodeEnter, emitNodeExit, emitActionDispatch } from './tracer'
+import type { ValEngine } from '../affect/engine'
+import { biasMatchScore } from '../affect/types'
 
 // ─── Built-in Action & Condition Registries ───────────────────
 
@@ -70,6 +72,7 @@ export function tick(
   node: RuntimeNode,
   bb: Blackboard,
   adapter: RobotAdapter,
+  valEngine?: ValEngine | null,
 ): NodeStatus {
   const t = performance.now()
   emitTickStart(t)
@@ -78,7 +81,7 @@ export function tick(
   const label = def.name ?? def.type
   emitNodeEnter(label, t)
 
-  const result = dispatchNode(node, bb, adapter)
+  const result = dispatchNode(node, bb, adapter, valEngine)
 
   emitNodeExit(label, result, performance.now())
   return result
@@ -90,22 +93,23 @@ function dispatchNode(
   node: RuntimeNode,
   bb: Blackboard,
   adapter: RobotAdapter,
+  valEngine?: ValEngine | null,
 ): NodeStatus {
   const { def } = node
 
   switch (def.type) {
     case 'sequence':
-      return tickSequence(node, bb, adapter)
+      return tickSequence(node, bb, adapter, valEngine)
     case 'selector':
-      return tickSelector(node, bb, adapter)
+      return tickSelector(node, bb, adapter, valEngine)
     case 'parallel':
-      return tickParallel(node, bb, adapter)
+      return tickParallel(node, bb, adapter, valEngine)
     case 'inverter':
-      return tickInverter(node, bb, adapter)
+      return tickInverter(node, bb, adapter, valEngine)
     case 'repeater':
-      return tickRepeater(node, bb, adapter)
+      return tickRepeater(node, bb, adapter, valEngine)
     case 'cooldown':
-      return tickCooldown(node, bb, adapter)
+      return tickCooldown(node, bb, adapter, valEngine)
     case 'condition':
       return tickCondition(node, bb)
     case 'action':
@@ -120,11 +124,11 @@ function dispatchNode(
 // ─── Composite: Sequence ──────────────────────────────────────
 // Runs children left→right. Fails on first failure. Succeeds when all succeed.
 
-function tickSequence(node: RuntimeNode, bb: Blackboard, adapter: RobotAdapter): NodeStatus {
+function tickSequence(node: RuntimeNode, bb: Blackboard, adapter: RobotAdapter, valEngine?: ValEngine | null): NodeStatus {
   const t = performance.now()
   emitNodeEnter('sequence', t)
   for (const child of node.children) {
-    const result = tick(child, bb, adapter)
+    const result = tick(child, bb, adapter, valEngine)
     if (result === 'running' || result === 'failure') {
       node.status = result
       emitNodeExit('sequence', result, performance.now())
@@ -139,15 +143,41 @@ function tickSequence(node: RuntimeNode, bb: Blackboard, adapter: RobotAdapter):
 // ─── Composite: Selector ──────────────────────────────────────
 // Runs children left→right. Succeeds on first success. Fails when all fail.
 
-function tickSelector(node: RuntimeNode, bb: Blackboard, adapter: RobotAdapter): NodeStatus {
+function tickSelector(node: RuntimeNode, bb: Blackboard, adapter: RobotAdapter, valEngine?: ValEngine | null): NodeStatus {
   const t = performance.now()
   emitNodeEnter('selector', t)
-  for (const child of node.children) {
-    const result = tick(child, bb, adapter)
-    if (result === 'running' || result === 'success') {
-      node.status = result
-      emitNodeExit('selector', result, performance.now())
-      return result
+
+  // VAL-aware reordering: score children by bias match, sort descending
+  const children = node.children
+  const biasDef = (node.def as { bias?: { dimension: string; operator: string; threshold: number } }).bias
+  const biasesDef = (node.def as { biases?: { dimension: string; operator: string; threshold: number }[] }).biases
+  const biases = biasesDef ?? (biasDef ? [biasDef] : null)
+
+  if (valEngine && biases) {
+    const scored = children.map((child, i) => {
+      let score = 0
+      for (const b of biases) {
+        score += biasMatchScore(b as any, valEngine.state)
+      }
+      return { child, score, i }
+    })
+    scored.sort((a, b) => b.score - a.score)
+    for (const { child } of scored) {
+      const result = tick(child, bb, adapter, valEngine)
+      if (result === 'running' || result === 'success') {
+        node.status = result
+        emitNodeExit('selector', result, performance.now())
+        return result
+      }
+    }
+  } else {
+    for (const child of children) {
+      const result = tick(child, bb, adapter, valEngine)
+      if (result === 'running' || result === 'success') {
+        node.status = result
+        emitNodeExit('selector', result, performance.now())
+        return result
+      }
     }
   }
   node.status = 'failure'
@@ -158,7 +188,7 @@ function tickSelector(node: RuntimeNode, bb: Blackboard, adapter: RobotAdapter):
 // ─── Composite: Parallel ──────────────────────────────────────
 // Ticks ALL children every frame. Succeeds when threshold met.
 
-function tickParallel(node: RuntimeNode, bb: Blackboard, adapter: RobotAdapter): NodeStatus {
+function tickParallel(node: RuntimeNode, bb: Blackboard, adapter: RobotAdapter, valEngine?: ValEngine | null): NodeStatus {
   const t = performance.now()
   emitNodeEnter('parallel', t)
   const threshold = (node.def as { successThreshold?: number }).successThreshold ?? node.children.length
@@ -166,7 +196,7 @@ function tickParallel(node: RuntimeNode, bb: Blackboard, adapter: RobotAdapter):
   let failures = 0
 
   for (const child of node.children) {
-    const result = tick(child, bb, adapter)
+    const result = tick(child, bb, adapter, valEngine)
     if (result === 'success') successes++
     if (result === 'failure') failures++
   }
@@ -188,10 +218,10 @@ function tickParallel(node: RuntimeNode, bb: Blackboard, adapter: RobotAdapter):
 
 // ─── Decorator: Inverter ──────────────────────────────────────
 
-function tickInverter(node: RuntimeNode, bb: Blackboard, adapter: RobotAdapter): NodeStatus {
+function tickInverter(node: RuntimeNode, bb: Blackboard, adapter: RobotAdapter, valEngine?: ValEngine | null): NodeStatus {
   const t = performance.now()
   emitNodeEnter('inverter', t)
-  const result = tick(node.children[0]!, bb, adapter)
+  const result = tick(node.children[0]!, bb, adapter, valEngine)
   if (result === 'success') { node.status = 'failure'; emitNodeExit('inverter', 'failure', performance.now()); return 'failure' }
   if (result === 'failure') { node.status = 'success'; emitNodeExit('inverter', 'success', performance.now()); return 'success' }
   node.status = 'running'
@@ -201,7 +231,7 @@ function tickInverter(node: RuntimeNode, bb: Blackboard, adapter: RobotAdapter):
 
 // ─── Decorator: Repeater ──────────────────────────────────────
 
-function tickRepeater(node: RuntimeNode, bb: Blackboard, adapter: RobotAdapter): NodeStatus {
+function tickRepeater(node: RuntimeNode, bb: Blackboard, adapter: RobotAdapter, valEngine?: ValEngine | null): NodeStatus {
   const t = performance.now()
   emitNodeEnter('repeater', t)
   const count = (node.def as { count: number }).count
@@ -213,7 +243,7 @@ function tickRepeater(node: RuntimeNode, bb: Blackboard, adapter: RobotAdapter):
     return 'success'
   }
 
-  const result = tick(node.children[0]!, bb, adapter)
+  const result = tick(node.children[0]!, bb, adapter, valEngine)
   if (result === 'running') {
     node.status = 'running'
     emitNodeExit('repeater', 'running', performance.now())
@@ -236,7 +266,7 @@ function tickRepeater(node: RuntimeNode, bb: Blackboard, adapter: RobotAdapter):
 
 // ─── Decorator: Cooldown ──────────────────────────────────────
 
-function tickCooldown(node: RuntimeNode, bb: Blackboard, adapter: RobotAdapter): NodeStatus {
+function tickCooldown(node: RuntimeNode, bb: Blackboard, adapter: RobotAdapter, valEngine?: ValEngine | null): NodeStatus {
   const t = performance.now()
   emitNodeEnter('cooldown', t)
   const durationMs = (node.def as { durationMs: number }).durationMs
@@ -249,7 +279,7 @@ function tickCooldown(node: RuntimeNode, bb: Blackboard, adapter: RobotAdapter):
     return 'failure'
   }
 
-  const result = tick(node.children[0]!, bb, adapter)
+  const result = tick(node.children[0]!, bb, adapter, valEngine)
   if (result === 'success' || result === 'failure') {
     node.state.lastRunAt = now
   }
