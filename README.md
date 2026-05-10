@@ -300,7 +300,9 @@ shows the full perception → BT → motor chain. _(requires real hardware test)
 **Release gate**: a character demonstrably treats a returning face
 differently from a new face on real hardware.
 
-#### v1.3 — Affect engine (VAL) _(+10 → +12 months)_
+#### v1.3 — Affect engine (VAL)
+
+Released: 2026-05-10 _(+10 → +12 months)_
 
 - [x] Per-agent VAL state (Valence / Arousal / Dominance) with decay.
 - [x] BT priors: nodes declare `bias: { whenArousal: ">0.7" }`; selector
