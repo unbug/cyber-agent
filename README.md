@@ -319,7 +319,8 @@ flat baseline ≥70 %.
 
 The "train cheap, deploy real" milestone.
 
-- [ ] Browser-embedded sim (MuJoCo-WASM or Genesis-web) on `/agent` page.
+- [x] Browser-embedded sim (2D rigid-body physics engine) on `/agent` page.
+  - ⚠️ **experimental** — sim-only, requires real hardware for full validation
 - [ ] One-shot `simulate → record → replay-on-real` workflow.
 - [ ] Domain-randomization sliders (mass, friction, latency, sensor
       noise) wired into the debugger.

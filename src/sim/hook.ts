@@ -21,6 +21,8 @@ export interface SimModeOptions {
   config?: Partial<SimConfig>
   /** Character ID for recording */
   characterId?: string
+  /** Whether to enable sim mode (experimental) */
+  enabled?: boolean
 }
 
 export interface SimModeResult {
