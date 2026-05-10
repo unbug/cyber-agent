@@ -1,13 +1,15 @@
 import { useParams, Link } from 'react-router-dom'
-import { useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowLeft, Play, Square, Pause, Zap, Activity } from 'lucide-react'
+import { ArrowLeft, Play, Square, Pause, Zap, Activity, Layers, Box } from 'lucide-react'
 import { HoverBeam } from '@/components/HoverBeam'
 import { TelemetryDashboard } from '@/components/TelemetryDashboard'
 import { getCharacter, getCompatibleAdapters } from '@/agents'
 import { useBehaviorTree } from '@/hooks/useBehaviorTree'
 import { useTelemetry } from '@/hooks/useTelemetry'
 import { useI18n } from '@/i18n'
+import { SimulatorPanel } from './SimulatorPanel'
+import { useSimMode } from '@/sim'
 import styles from './Agent.module.css'
 
 export function AgentPage() {
@@ -16,6 +18,14 @@ export function AgentPage() {
   const { canvasRef, snapshot, state, start, stop, pause, resume } = useBehaviorTree(id ?? '')
   const { data: telemetryData, addSnapshot } = useTelemetry()
   const { t } = useI18n()
+
+  // ── v2.0: Sim Mode ────────────────────────────────────
+  const simCanvasRef = useRef<HTMLCanvasElement>(null)
+  const [simMode, setSimMode] = useState(false)
+  const sim = useSimMode({
+    canvasRef: simCanvasRef as React.RefObject<HTMLCanvasElement>,
+    characterId: id ?? 'unknown',
+  })
 
   // Feed snapshots to telemetry hook
   useEffect(() => {
@@ -104,30 +114,72 @@ export function AgentPage() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.3, delay: 0.1 }}
           >
-            {/* Canvas scene */}
+            {/* Canvas scene or Simulator */}
             <HoverBeam size="md" colorVariant="colorful" strength={0.68}>
               <div className={styles.section}>
-                <h2 className={styles.sectionTitle}>
-                  <Activity size={18} />
-                  {t('agent.live_preview')}
-                </h2>
-                <div className={styles.canvasWrap}>
-                  <canvas
-                    ref={canvasRef as React.Ref<HTMLCanvasElement>}
-                    className={styles.canvas}
-                  />
-                  {!isRunning && !isPaused && (
-                    <div className={styles.canvasOverlay}>
-                      <button className={styles.playOverlay} onClick={start}>
-                        <Play size={32} />
-                        <span>{t('agent.start_bt')}</span>
-                      </button>
-                    </div>
+                <div className={styles.sectionTitle}>
+                  {simMode ? (
+                    <>
+                      <Box size={18} />
+                      {t('agent.sim_mode')}
+                    </>
+                  ) : (
+                    <>
+                      <Activity size={18} />
+                      {t('agent.live_preview')}
+                    </>
                   )}
-                  <div className={styles.canvasHint}>
-                    {t('agent.canvas_hint')}
-                  </div>
+                  <button
+                    className={styles.simToggle}
+                    onClick={() => setSimMode(!simMode)}
+                    title={simMode ? 'Switch to live preview' : 'Switch to simulator'}
+                  >
+                    <Layers size={14} />
+                    {simMode ? 'Live' : 'Sim'}
+                  </button>
                 </div>
+                {simMode ? (
+                  <SimulatorPanel
+                    simActive={sim.simActive}
+                    isRecording={sim.isRecording}
+                    isReplaying={sim.isReplaying}
+                    simTime={sim.simTime}
+                    stepCount={sim.stepCount}
+                    fps={sim.fps}
+                    onStartSim={sim.startSim}
+                    onStopSim={sim.stopSim}
+                    onStartRecord={sim.startRecording}
+                    onStopRecord={sim.stopRecording}
+                    onStartReplay={sim.startReplay}
+                    onPauseReplay={sim.pauseReplay}
+                    onStepReplay={sim.stepReplay}
+                    onScrubReplay={sim.scrubReplay}
+                    onSetSpeed={sim.setReplaySpeed}
+                    onExport={sim.exportRecording}
+                    onImport={sim.importRun}
+                    canvasRef={simCanvasRef}
+                  />
+                ) : (
+                  <>
+                    <div className={styles.canvasWrap}>
+                      <canvas
+                        ref={canvasRef as React.Ref<HTMLCanvasElement>}
+                        className={styles.canvas}
+                      />
+                      {!isRunning && !isPaused && (
+                        <div className={styles.canvasOverlay}>
+                          <button className={styles.playOverlay} onClick={start}>
+                            <Play size={32} />
+                            <span>{t('agent.start_bt')}</span>
+                          </button>
+                        </div>
+                      )}
+                      <div className={styles.canvasHint}>
+                        {t('agent.canvas_hint')}
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             </HoverBeam>
 

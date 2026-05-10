@@ -91,6 +91,7 @@
     "adapters": "Compatible Adapters",
     "tags": "Tags",
     "live_preview": "Live Preview",
+    "sim_mode": "Simulator",
     "start_bt": "Start Behavior Tree",
     "canvas_hint": "Move your mouse over the canvas to interact",
     "controls": "Controls"
