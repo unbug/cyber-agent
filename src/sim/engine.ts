@@ -15,6 +15,8 @@ import {
   SimConfig,
   DEFAULT_SIM_CONFIG,
   SimCommand,
+  DomainRandomization,
+  DEFAULT_RANDOMIZATION,
 } from './types'
 
 export class SimEngine {
@@ -22,12 +24,14 @@ export class SimEngine {
   private _config: SimConfig
   private simTime: number
   private stepCounter: number
+  private _randomization: DomainRandomization
 
   constructor(config?: Partial<SimConfig>) {
     this._config = { ...DEFAULT_SIM_CONFIG, ...config }
     this.bodies = new Map()
     this.simTime = 0
     this.stepCounter = 0
+    this._randomization = { ...DEFAULT_RANDOMIZATION }
   }
 
   // ── Lifecycle ────────────────────────────────────────────
@@ -44,6 +48,20 @@ export class SimEngine {
 
   setConfig(patch: Partial<SimConfig>): void {
     this._config = { ...this._config, ...patch }
+  }
+
+  // ── Domain randomization ────────────────────────────────
+
+  get randomization(): DomainRandomization {
+    return this._randomization
+  }
+
+  setRandomization(r: Partial<DomainRandomization>): void {
+    this._randomization = { ...this._randomization, ...r }
+  }
+
+  resetRandomization(): void {
+    this._randomization = { ...DEFAULT_RANDOMIZATION }
   }
 
   // ── Body management ─────────────────────────────────────
@@ -90,10 +108,16 @@ export class SimEngine {
       this.applyCommand(cmd, dt)
     }
 
+    // Apply domain randomization to body mass
+    this.applyMassRandomization()
+
     // Integrate all bodies
     for (const body of this.bodies.values()) {
       this.integrate(body, dt)
     }
+
+    // Apply sensor noise to body positions
+    this.applySensorNoise()
 
     // Collision detection (if enabled)
     if (this._config.collisions) {
@@ -201,6 +225,29 @@ export class SimEngine {
 
     // Update orientation
     body.orientation += body.angVel * dt
+  }
+
+  // ── Domain randomization helpers ────────────────────────
+
+  private applyMassRandomization(): void {
+    const r = this._randomization
+    if (r.mass.current !== 1.0) {
+      for (const body of this.bodies.values()) {
+        body.mass = body.mass * (r.mass.current / (body._baseMass ?? body.mass))
+        if (!body._baseMass) body._baseMass = body.mass
+      }
+    }
+  }
+
+  private applySensorNoise(): void {
+    const r = this._randomization
+    if (r.sensorNoise.current > 0) {
+      for (const body of this.bodies.values()) {
+        const noise = r.sensorNoise.current
+        body.pos.x += (Math.random() - 0.5) * 2 * noise
+        body.pos.y += (Math.random() - 0.5) * 2 * noise
+      }
+    }
   }
 
   // ── Collision detection ─────────────────────────────────

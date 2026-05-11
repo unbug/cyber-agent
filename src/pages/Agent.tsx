@@ -27,6 +27,11 @@ export function AgentPage() {
     characterId: id ?? 'unknown',
   })
 
+  // Feed randomization to SimulatorPanel
+  const simPanelRandomization = sim.randomization
+  const simPanelOnRandomizationChange = sim.setRandomization
+  const simPanelOnRandomizationReset = sim.resetRandomization
+
   // Feed snapshots to telemetry hook
   useEffect(() => {
     addSnapshot(snapshot)
@@ -158,6 +163,9 @@ export function AgentPage() {
                     onExport={sim.exportRecording}
                     onImport={sim.importRun}
                     canvasRef={simCanvasRef}
+                    randomization={simPanelRandomization}
+                    onRandomizationChange={simPanelOnRandomizationChange}
+                    onRandomizationReset={simPanelOnRandomizationReset}
                   />
                 ) : (
                   <>

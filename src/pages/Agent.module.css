@@ -477,3 +477,106 @@
   color: var(--text-primary);
   background: var(--bg-base);
 }
+
+/* ── Domain Randomization Panel ────────────────────────── */
+
+.drPanel {
+  padding: var(--space-3) var(--space-4) var(--space-4);
+  border-top: 1px solid var(--border);
+}
+
+.drHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-2);
+}
+
+.drTitle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.drResetBtn {
+  font-size: 0.625rem;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.drResetBtn:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.drResetBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.drRow {
+  display: grid;
+  grid-template-columns: 20px 72px 1fr 56px 80px;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) 0;
+}
+
+.drIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+}
+
+.drLabel {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.drSlider {
+  width: 100%;
+  height: 4px;
+  accent-color: var(--accent);
+}
+
+.drValue {
+  font-size: 0.6875rem;
+  font-family: monospace;
+  color: var(--accent);
+  text-align: right;
+}
+
+.drUnit {
+  font-size: 0.5625rem;
+  color: var(--text-muted);
+  margin-left: 2px;
+}
+
+.drRange {
+  font-size: 0.5625rem;
+  color: var(--text-muted);
+  font-family: monospace;
+}
+
+.drWarning {
+  margin-top: var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  background: rgba(234, 179, 8, 0.08);
+  border: 1px solid rgba(234, 179, 8, 0.2);
+  font-size: 0.625rem;
+  color: #eab308;
+  text-align: center;
+}

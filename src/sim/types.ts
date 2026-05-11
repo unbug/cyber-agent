@@ -40,6 +40,8 @@ export interface SimBody {
   radius: number
   /** Mass (kg) */
   mass: number
+  /** Internal: base mass for randomization (not serialized) */
+  _baseMass?: number
   /** Linear damping coefficient (0 = no damping, 1 = full) */
   linearDamping: number
   /** Angular damping coefficient */
@@ -119,6 +121,30 @@ export const DEFAULT_SIM_CONFIG: SimConfig = {
   trailMax: 50,
   collisions: true,
   clampBounds: true,
+}
+
+/**
+ * Domain randomization parameters.
+ * Used to inject variation into the simulator for sim→real transfer research.
+ * Each slider in the debugger maps to one field.
+ */
+export interface DomainRandomization {
+  /** Randomize body mass: multiplier range [min, max]. 1 = no randomization */
+  mass: { min: number; max: number; current: number }
+  /** Randomize linear friction (damping): offset range. 0 = no randomization */
+  friction: { min: number; max: number; current: number }
+  /** Randomize command latency in ms: range [min, max] */
+  latency: { min: number; max: number; current: number }
+  /** Randomize sensor noise (position perturbation in px): range [min, max] */
+  sensorNoise: { min: number; max: number; current: number }
+}
+
+/** Default domain randomization (all zeroed = no randomization) */
+export const DEFAULT_RANDOMIZATION: DomainRandomization = {
+  mass: { min: 0.5, max: 2.0, current: 1.0 },
+  friction: { min: -0.05, max: 0.05, current: 0.0 },
+  latency: { min: 0, max: 100, current: 0 },
+  sensorNoise: { min: 0, max: 10, current: 0 },
 }
 
 /** Simulation state for replay */

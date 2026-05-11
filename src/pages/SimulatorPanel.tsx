@@ -15,6 +15,8 @@ import {
   Download,
   Upload,
 } from 'lucide-react'
+import { DomainRandomizationPanel } from './DomainRandomizationPanel'
+import { DomainRandomization } from '@/sim/types'
 import styles from './Agent.module.css'
 
 interface SimulatorPanelProps {
@@ -54,6 +56,12 @@ interface SimulatorPanelProps {
   onImport: (json: string) => void
   /** Canvas ref */
   canvasRef: React.RefObject<HTMLCanvasElement>
+  /** Current domain randomization params */
+  randomization?: DomainRandomization
+  /** Update domain randomization */
+  onRandomizationChange?: (r: Partial<DomainRandomization>) => void
+  /** Reset domain randomization */
+  onRandomizationReset?: () => void
 }
 
 export function SimulatorPanel(props: SimulatorPanelProps) {
@@ -76,6 +84,9 @@ export function SimulatorPanel(props: SimulatorPanelProps) {
     onExport,
     onImport,
     canvasRef,
+    randomization,
+    onRandomizationChange,
+    onRandomizationReset,
   } = props
 
   const handleExport = () => {
@@ -223,6 +234,15 @@ export function SimulatorPanel(props: SimulatorPanelProps) {
         <span>steps={stepCount}</span>
         <span>fps={fps}</span>
       </div>
+
+      {/* Domain Randomization */}
+      {randomization && onRandomizationChange && onRandomizationReset && (
+        <DomainRandomizationPanel
+          randomization={randomization}
+          onChange={onRandomizationChange}
+          onReset={onRandomizationReset}
+        />
+      )}
     </div>
   )
 }

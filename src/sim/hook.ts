@@ -13,7 +13,7 @@ import { SimRecorder } from './recorder'
 import { SimReplay } from './replay'
 import { SimCanvasRenderer } from './renderer'
 import { Sim2RealReplay, ReplayConfig } from './sim2real'
-import { SimBody, SimConfig, SimRun } from './types'
+import { SimBody, SimConfig, SimRun, DomainRandomization, DEFAULT_RANDOMIZATION } from './types'
 import type { RobotAdapter } from '../engine/types'
 
 export interface SimModeOptions {
@@ -70,6 +70,12 @@ export interface SimModeResult {
   exportRecording: () => string
   /** Import a recorded run */
   importRun: (json: string) => void
+  /** Current domain randomization params */
+  randomization: DomainRandomization
+  /** Update domain randomization */
+  setRandomization: (r: Partial<DomainRandomization>) => void
+  /** Reset domain randomization to defaults */
+  resetRandomization: () => void
 }
 
 export function useSimMode(opts: SimModeOptions): SimModeResult {
@@ -95,6 +101,9 @@ export function useSimMode(opts: SimModeOptions): SimModeResult {
   const [simTime, setSimTime] = useState(0)
   const [stepCount, setStepCount] = useState(0)
   const [fps, setFps] = useState(0)
+  const [randomization, setRandomizationState] = useState<DomainRandomization>(() => ({
+    ...DEFAULT_RANDOMIZATION,
+  }))
 
   // Initialize simulator
   const initSim = useCallback(() => {
@@ -303,6 +312,18 @@ export function useSimMode(opts: SimModeOptions): SimModeResult {
     setIsReplayingOnReal(false)
   }, [])
 
+  const resetRandomization = useCallback(() => {
+    const engine = engineRef.current
+    if (engine) engine.resetRandomization()
+    setRandomizationState({ ...DEFAULT_RANDOMIZATION })
+  }, [])
+
+  const setRandomization = useCallback((r: Partial<DomainRandomization>) => {
+    const engine = engineRef.current
+    if (engine) engine.setRandomization(r)
+    setRandomizationState((prev) => ({ ...prev, ...r }))
+  }, [])
+
   // Cleanup
   useEffect(() => {
     return () => {
@@ -334,5 +355,8 @@ export function useSimMode(opts: SimModeOptions): SimModeResult {
     setReplaySpeed,
     exportRecording,
     importRun,
+    randomization,
+    setRandomization,
+    resetRandomization,
   }
 }
