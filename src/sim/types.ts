@@ -60,6 +60,8 @@ export interface SimStep {
   simTime: number
   /** All bodies after this step */
   bodies: SimBody[]
+  /** Commands issued this step (from BT → sim) */
+  commands: SimCommand[]
 }
 
 /** A recorded simulation run */

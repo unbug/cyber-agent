@@ -120,6 +120,7 @@ export class SimEngine {
       t,
       simTime: this.simTime,
       bodies: this.getBodies(),
+      commands,
     }
   }
 

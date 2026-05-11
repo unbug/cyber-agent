@@ -316,6 +316,7 @@ describe('SimRecorder', () => {
         t: Date.now(),
         simTime: i * 16,
         bodies: [],
+        commands: [],
       })
     }
     const run = recorder.stop()
@@ -330,6 +331,7 @@ describe('SimRecorder', () => {
         t: Date.now(),
         simTime: i * 16,
         bodies: [],
+        commands: [],
       })
     }
     const json = recorder.exportJSON()
@@ -361,6 +363,7 @@ describe('SimReplay', () => {
       t: Date.now(),
       simTime: i * 16,
       bodies: [],
+        commands: [],
     }))
     replay.load({ steps: mockSteps })
     expect(replay.stepCount).toBe(10)
@@ -371,6 +374,7 @@ describe('SimReplay', () => {
       t: Date.now(),
       simTime: i * 16,
       bodies: [],
+        commands: [],
     }))
     replay.load({ steps: mockSteps })
 
@@ -386,6 +390,7 @@ describe('SimReplay', () => {
       t: Date.now(),
       simTime: i * 16,
       bodies: [],
+        commands: [],
     }))
     replay.load({ steps: mockSteps })
 
@@ -401,6 +406,7 @@ describe('SimReplay', () => {
       t: Date.now(),
       simTime: i * 16,
       bodies: [],
+        commands: [],
     }))
     replay.load({ steps: mockSteps })
 
@@ -441,6 +447,7 @@ describe('SimReplay', () => {
       t: Date.now(),
       simTime: 0,
       bodies: [mockBody],
+      commands: [],
     }]
     replay.load({ steps: mockSteps })
     replay.stepForward()

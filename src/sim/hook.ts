@@ -12,7 +12,9 @@ import { SimEngine } from './engine'
 import { SimRecorder } from './recorder'
 import { SimReplay } from './replay'
 import { SimCanvasRenderer } from './renderer'
+import { Sim2RealReplay, ReplayConfig } from './sim2real'
 import { SimBody, SimConfig, SimRun } from './types'
+import type { RobotAdapter } from '../engine/types'
 
 export interface SimModeOptions {
   /** Canvas element ref */
@@ -30,8 +32,10 @@ export interface SimModeResult {
   simActive: boolean
   /** Whether currently recording */
   isRecording: boolean
-  /** Whether currently replaying */
+  /** Whether currently replaying (sim replay) */
   isReplaying: boolean
+  /** Whether currently replaying on real hardware */
+  isReplayingOnReal: boolean
   /** Simulation time in ms */
   simTime: number
   /** Step count */
@@ -46,6 +50,12 @@ export interface SimModeResult {
   startRecording: () => void
   /** Stop recording and get the run */
   stopRecording: () => SimRun | null
+  /** Export recording as .cybersim (cybertrace-compatible) */
+  exportCyberSim: () => string
+  /** Replay recorded run on a real adapter */
+  replayOnReal: (adapter: RobotAdapter, config?: Partial<ReplayConfig>) => Promise<void>
+  /** Abort replay-on-real */
+  abortReplayOnReal: () => void
   /** Start replay from recorded run */
   startReplay: () => void
   /** Pause replay */
@@ -69,6 +79,7 @@ export function useSimMode(opts: SimModeOptions): SimModeResult {
   const recorderRef = useRef<SimRecorder | null>(null)
   const replayRef = useRef<SimReplay | null>(null)
   const rendererRef = useRef<SimCanvasRenderer | null>(null)
+  const sim2realRef = useRef<Sim2RealReplay | null>(null)
   const animFrameRef = useRef<number>(0)
   const lastTimeRef = useRef<number>(0)
   const fpsCounterRef = useRef<{ frames: number; lastTime: number; fps: number }>({
@@ -80,6 +91,7 @@ export function useSimMode(opts: SimModeOptions): SimModeResult {
   const [simActive, setSimActive] = useState(false)
   const [isRecording, setIsRecording] = useState(false)
   const [isReplaying, setIsReplaying] = useState(false)
+  const [isReplayingOnReal, setIsReplayingOnReal] = useState(false)
   const [simTime, setSimTime] = useState(0)
   const [stepCount, setStepCount] = useState(0)
   const [fps, setFps] = useState(0)
@@ -252,6 +264,45 @@ export function useSimMode(opts: SimModeOptions): SimModeResult {
     setIsReplaying(true)
   }, [])
 
+  /** Export recording as .cybersim (cybertrace-compatible format) */
+  const exportCyberSim = useCallback(() => {
+    const rec = recorderRef.current
+    if (!rec) return ''
+    return rec.exportCyberSim()
+  }, [])
+
+  /** Replay recorded run on a real adapter */
+  const replayOnReal = useCallback(
+    async (adapter: RobotAdapter, config?: Partial<ReplayConfig>) => {
+      const rec = recorderRef.current
+      const run = rec?.run
+      if (!run || run.steps.length === 0) return
+
+      setIsReplayingOnReal(true)
+      const replayer = new Sim2RealReplay(adapter, {
+        ...config,
+        onComplete: () => {
+          setIsReplayingOnReal(false)
+          config?.onComplete?.()
+        },
+        onError: (err) => {
+          console.error('[Sim2Real] Replay error:', err)
+          setIsReplayingOnReal(false)
+          config?.onError?.(err)
+        },
+      })
+      sim2realRef.current = replayer
+      await replayer.play(run, config)
+    },
+    [],
+  )
+
+  /** Abort replay-on-real */
+  const abortReplayOnReal = useCallback(() => {
+    sim2realRef.current?.abort()
+    setIsReplayingOnReal(false)
+  }, [])
+
   // Cleanup
   useEffect(() => {
     return () => {
@@ -265,6 +316,7 @@ export function useSimMode(opts: SimModeOptions): SimModeResult {
     simActive,
     isRecording,
     isReplaying,
+    isReplayingOnReal,
     simTime,
     stepCount,
     fps,
@@ -272,6 +324,9 @@ export function useSimMode(opts: SimModeOptions): SimModeResult {
     stopSim,
     startRecording,
     stopRecording,
+    exportCyberSim,
+    replayOnReal,
+    abortReplayOnReal,
     startReplay,
     pauseReplay,
     stepReplay,
