@@ -329,8 +329,13 @@ The "train cheap, deploy real" milestone.
   - `exportCyberSim`/`importCyberSim` — `.cybersim` format with `$schema: cybersim/v1` header
   - `useSimMode.replayOnReal(adapter, config)` + `abortReplayOnReal()` hook APIs
   - HIL checklist: `docs/hil/sim2real/CHECKLIST.md`
-- [ ] Domain-randomization sliders (mass, friction, latency, sensor
+- [x] Domain-randomization sliders (mass, friction, latency, sensor
       noise) wired into the debugger.
+  - `src/pages/DomainRandomizationPanel.tsx` — mass, friction, latency, sensor-noise sliders
+  - `src/sim/engine.ts` — `applyMassRandomization()` + `applySensorNoise()` helpers
+  - `useSimMode` exposes `randomization` / `setRandomization` / `resetRandomization`
+  - 15 unit tests (7 engine + 8 component)
+  - `experimental` — sim-only, requires real hardware for transfer validation
 - [ ] `dataset/` — record episodes in `.cybertrace`-compatible format,
       optional one-click upload to HuggingFace Hub.
 - [ ] Bench `bench/sim2real.json` — 10 canonical behaviors, ≥90 %
