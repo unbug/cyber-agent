@@ -324,7 +324,11 @@ The "train cheap, deploy real" milestone.
 
 - [x] Browser-embedded sim (2D rigid-body physics engine) on `/agent` page.
   - ⚠️ **experimental** — sim-only, requires real hardware for full validation
-- [ ] One-shot `simulate → record → replay-on-real` workflow.
+- [x] One-shot `simulate → record → replay-on-real` workflow.
+  - `Sim2RealReplay` — maps sim commands (move/rotate/stop/gesture/led/sound/emergency_stop) to adapter payloads
+  - `exportCyberSim`/`importCyberSim` — `.cybersim` format with `$schema: cybersim/v1` header
+  - `useSimMode.replayOnReal(adapter, config)` + `abortReplayOnReal()` hook APIs
+  - HIL checklist: `docs/hil/sim2real/CHECKLIST.md`
 - [ ] Domain-randomization sliders (mass, friction, latency, sensor
       noise) wired into the debugger.
 - [ ] `dataset/` — record episodes in `.cybertrace`-compatible format,
