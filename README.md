@@ -364,11 +364,11 @@ unchanged on a real RoboMaster; published bench numbers hold.
 > An MVP is being prototyped during Q2 W7-W8 as an experimental flag —
 > see [TODO-Q2-2026.md](TODO-Q2-2026.md).
 
-- [ ] Shared blackboard / pub-sub bus over WebSocket (host elects).
+- [x] Shared blackboard / pub-sub bus over WebSocket (host elects).
 - [ ] Social BT primitives: `BroadcastEmotion`, `Negotiate`, `Mirror`,
       `RoleSwap`, `findNearestAgent`, `greet`, `follow`, `flee`,
       `emitSignal` / `onSignal`.
-- [ ] `World` + `SpatialIndex` + `MultiExecutor` (deterministic, seeded
+- [x] `World` + `SpatialIndex` + `MultiExecutor` (deterministic, seeded
       RNG, 100% replay parity).
 - [ ] Scene library: playground / park / campus / schoolyard with POIs
       (slide, swing, sandbox, classroom door, …); Tiled importer.
