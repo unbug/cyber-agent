@@ -58,3 +58,25 @@ export { SpatialIndex } from './spatial-index'
 export type { SpatialPoint, SpatialQueryResult, SpatialIndexConfig } from './spatial-index'
 export { MultiExecutor } from './multi-executor'
 export type { AgentContext, MultiExecutorConfig } from './multi-executor'
+
+// Scene library (v2.1)
+export {
+  sceneRegistry,
+  getScene,
+  getSceneIds,
+  getAllScenes,
+  validateScene,
+  requireScene,
+  importTiledMap,
+  createDefaultScene,
+} from './scenes'
+export type {
+  Scene,
+  ScenePOI,
+  SpawnPoint,
+  SceneRegistry,
+  PoiType,
+  SceneId,
+  TiledMap,
+  ImportOptions,
+} from './scenes'
