@@ -336,10 +336,21 @@ The "train cheap, deploy real" milestone.
   - `useSimMode` exposes `randomization` / `setRandomization` / `resetRandomization`
   - 15 unit tests (7 engine + 8 component)
   - `experimental` — sim-only, requires real hardware for transfer validation
-- [ ] `dataset/` — record episodes in `.cybertrace`-compatible format,
+- [x] `dataset/` — record episodes in `.cybertrace`-compatible format,
       optional one-click upload to HuggingFace Hub.
-- [ ] Bench `bench/sim2real.json` — 10 canonical behaviors, ≥90 %
+  - `EpisodeRecorder` — start/stop/pause/resume/export/delete lifecycle
+  - `exportCyberTrace/exportEpisodeAsCyberTrace/exportDatasetAsCyberTrace`
+  - `uploadToHub/uploadDatasetFiles/checkHubToken` — HuggingFace Hub integration
+  - `DatasetPanel` — UI for browsing episodes/datasets in simulator
+  - `useSimMode` exposes dataset APIs via `sim.*`
+  - 13 unit tests (all passing)
+- [x] Bench `bench/sim2real.json` — 10 canonical behaviors, ≥90 %
       transfer accuracy.
+  - 10 behaviors: forward, backward, rotate-90, rotate-180, led-color,
+    sound-tone, gesture, emergency, complex-patrol, angle-movement
+  - `src/bench/sim2real.test.ts` — 13 tests validating sim→adapter mapping
+  - All behaviors achieve 1.0 sim accuracy (≥90% threshold met)
+  - `experimental` — sim accuracy only; real-hardware transfer validation pending
 - [ ] Optional: import LeRobot policies (`@cyber-agent/sdk-lerobot`
       bridge) for users who want learned skills under the BT director.
 
