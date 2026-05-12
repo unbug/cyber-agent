@@ -1,0 +1,447 @@
+/* v2.0 — DatasetPanel styles */
+
+.panel {
+  background: var(--bg-surface, #1a1a2e);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+  border-radius: 12px;
+  overflow: hidden;
+  font-size: 13px;
+  color: var(--text-primary, #e0e0e0);
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--bg-elevated, #16213e);
+  border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+}
+
+.title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary, #e0e0e0);
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  color: var(--text-secondary, #888);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.closeBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary, #e0e0e0);
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+}
+
+.tab {
+  flex: 1;
+  padding: 10px 16px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-secondary, #888);
+  cursor: pointer;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+
+.tab:hover {
+  color: var(--text-primary, #e0e0e0);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.tabActive {
+  color: #6366f1;
+  border-bottom-color: #6366f1;
+  background: rgba(99, 102, 241, 0.05);
+}
+
+/* Tab content */
+.tabContent {
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 32px 16px;
+  color: var(--text-secondary, #666);
+}
+
+.hint {
+  font-size: 12px;
+  margin-top: 4px;
+  opacity: 0.7;
+}
+
+/* Episode list */
+.episodeList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.episodeItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+}
+
+.episodeItem:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: var(--border-color, rgba(255, 255, 255, 0.08));
+}
+
+.episodeItem.selected {
+  background: rgba(99, 102, 241, 0.1);
+  border-color: rgba(99, 102, 241, 0.3);
+}
+
+.episodeInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.episodeName {
+  font-weight: 500;
+  color: var(--text-primary, #e0e0e0);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.episodeMeta {
+  font-size: 11px;
+  color: var(--text-secondary, #888);
+}
+
+.episodeActions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.tagList {
+  display: flex;
+  gap: 2px;
+  margin-right: 8px;
+}
+
+.tag {
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 8px;
+  background: rgba(99, 102, 241, 0.15);
+  color: #818cf8;
+  border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+.actionBtn {
+  background: none;
+  border: none;
+  color: var(--text-secondary, #888);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.actionBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary, #e0e0e0);
+}
+
+.deleteBtn:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+/* Dataset list */
+.datasetList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.datasetItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+}
+
+.datasetItem:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: var(--border-color, rgba(255, 255, 255, 0.08));
+}
+
+.datasetItem.selected {
+  background: rgba(99, 102, 241, 0.1);
+  border-color: rgba(99, 102, 241, 0.3);
+}
+
+.datasetInfo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.datasetIcon {
+  color: #6366f1;
+  flex-shrink: 0;
+}
+
+.datasetName {
+  font-weight: 500;
+  color: var(--text-primary, #e0e0e0);
+}
+
+.datasetMeta {
+  font-size: 11px;
+  color: var(--text-secondary, #888);
+  margin-left: 8px;
+}
+
+.datasetActions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+/* Export section */
+.exportSection {
+  border-top: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+  padding: 12px 16px;
+}
+
+.exportHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.exportTitle {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary, #e0e0e0);
+}
+
+.exportBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  background: rgba(99, 102, 241, 0.1);
+  color: #818cf8;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.15s ease;
+}
+
+.exportBtn:hover {
+  background: rgba(99, 102, 241, 0.2);
+  border-color: rgba(99, 102, 241, 0.5);
+}
+
+/* HuggingFace Hub section */
+.hubSection {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.hubHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.hubIcon {
+  color: #f59e0b;
+}
+
+.hubTitle {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary, #e0e0e0);
+}
+
+.hubInputs {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.fieldLabel {
+  display: block;
+  font-size: 11px;
+  color: var(--text-secondary, #888);
+  margin-bottom: 4px;
+}
+
+.tokenField {
+  display: flex;
+  flex-direction: column;
+}
+
+.tokenInput {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tokenInputField {
+  flex: 1;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  background: rgba(0, 0, 0, 0.3);
+  color: var(--text-primary, #e0e0e0);
+  font-size: 12px;
+  font-family: monospace;
+}
+
+.tokenInputField:focus {
+  outline: none;
+  border-color: #6366f1;
+}
+
+.tokenToggle {
+  background: none;
+  border: none;
+  color: var(--text-secondary, #888);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+}
+
+.tokenToggle:hover {
+  color: var(--text-primary, #e0e0e0);
+}
+
+.checkBtn {
+  background: none;
+  border: none;
+  color: var(--text-secondary, #888);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.checkBtn.valid {
+  color: #22c55e;
+}
+
+.checkBtn.invalid {
+  color: #ef4444;
+}
+
+.repoField {
+  display: flex;
+  flex-direction: column;
+}
+
+.repoInput {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  background: rgba(0, 0, 0, 0.3);
+  color: var(--text-primary, #e0e0e0);
+  font-size: 12px;
+}
+
+.repoInput:focus {
+  outline: none;
+  border-color: #6366f1;
+}
+
+.uploadBtn {
+  width: 100%;
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.15s ease;
+}
+
+.uploadBtn:hover:not(:disabled) {
+  background: rgba(245, 158, 11, 0.2);
+  border-color: rgba(245, 158, 11, 0.5);
+}
+
+.uploadBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.uploadBtn.uploading {
+  opacity: 0.7;
+}
+
+.uploadResult {
+  margin-top: 8px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.uploadResult.success {
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  color: #22c55e;
+}
+
+.uploadResult.error {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+}

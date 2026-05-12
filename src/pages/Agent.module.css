@@ -580,3 +580,13 @@
   color: #eab308;
   text-align: center;
 }
+
+/* ── Dataset Panel (v2.0 checkbox 4) ─────────────────── */
+
+.datasetPanelWrapper {
+  margin-top: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}

@@ -1,0 +1,198 @@
+{
+  "$schema": "cyberagent/bench/v1",
+  "version": 1,
+  "description": "Canonical sim→real transfer accuracy benchmarks for CyberAgent v2.0",
+  "simulator": {
+    "platform": "browser-sim",
+    "physics": "2D rigid-body",
+    "tickRate": 60
+  },
+  "evaluation": {
+    "metric": "command_accuracy",
+    "threshold": 0.9,
+    "description": "≥90% of sim commands must map to correct adapter commands on real hardware"
+  },
+  "behaviors": [
+    {
+      "id": "01-forward",
+      "name": "Forward dash",
+      "description": "Move straight forward for 3 seconds",
+      "sim_commands": [
+        { "type": "move", "payload": { "direction": "forward", "speed": 0.8 }, "duration_ms": 3000 },
+        { "type": "stop", "payload": {}, "duration_ms": 0 }
+      ],
+      "expected_adapter": [
+        { "type": "move", "payload_keys": ["speed", "direction"] },
+        { "type": "stop", "payload_keys": [] }
+      ],
+      "sim_accuracy": 1.0,
+      "real_accuracy": null,
+      "notes": "Baseline motion — highest transfer reliability"
+    },
+    {
+      "id": "02-backward",
+      "name": "Backward retreat",
+      "description": "Move backward for 2 seconds",
+      "sim_commands": [
+        { "type": "move", "payload": { "direction": "backward", "speed": 0.5 }, "duration_ms": 2000 },
+        { "type": "stop", "payload": {}, "duration_ms": 0 }
+      ],
+      "expected_adapter": [
+        { "type": "move", "payload_keys": ["speed", "direction"] },
+        { "type": "stop", "payload_keys": [] }
+      ],
+      "sim_accuracy": 1.0,
+      "real_accuracy": null,
+      "notes": "Reverse motion"
+    },
+    {
+      "id": "03-rotate-90",
+      "name": "90° right turn",
+      "description": "Rotate 90 degrees clockwise",
+      "sim_commands": [
+        { "type": "rotate", "payload": { "angle": 90, "speed": 1.0 }, "duration_ms": 1500 },
+        { "type": "stop", "payload": {}, "duration_ms": 0 }
+      ],
+      "expected_adapter": [
+        { "type": "rotate", "payload_keys": ["angle", "speed"] },
+        { "type": "stop", "payload_keys": [] }
+      ],
+      "sim_accuracy": 1.0,
+      "real_accuracy": null,
+      "notes": "Rotation with speed control"
+    },
+    {
+      "id": "04-rotate-180",
+      "name": "180° about-face",
+      "description": "Rotate 180 degrees",
+      "sim_commands": [
+        { "type": "rotate", "payload": { "angle": 180, "speed": 1.5 }, "duration_ms": 2500 },
+        { "type": "stop", "payload": {}, "duration_ms": 0 }
+      ],
+      "expected_adapter": [
+        { "type": "rotate", "payload_keys": ["angle", "speed"] },
+        { "type": "stop", "payload_keys": [] }
+      ],
+      "sim_accuracy": 1.0,
+      "real_accuracy": null,
+      "notes": "Larger rotation — tests angle clamping"
+    },
+    {
+      "id": "05-led-color",
+      "name": "LED color burst",
+      "description": "Set LED to red, then green, then blue",
+      "sim_commands": [
+        { "type": "led", "payload": { "r": 255, "g": 0, "b": 0 }, "duration_ms": 500 },
+        { "type": "led", "payload": { "r": 0, "g": 255, "b": 0 }, "duration_ms": 500 },
+        { "type": "led", "payload": { "r": 0, "g": 0, "b": 255 }, "duration_ms": 500 },
+        { "type": "led", "payload": { "r": 0, "g": 0, "b": 0 }, "duration_ms": 0 }
+      ],
+      "expected_adapter": [
+        { "type": "led", "payload_keys": ["r", "g", "b"] },
+        { "type": "led", "payload_keys": ["r", "g", "b"] },
+        { "type": "led", "payload_keys": ["r", "g", "b"] },
+        { "type": "led", "payload_keys": ["r", "g", "b"] }
+      ],
+      "sim_accuracy": 1.0,
+      "real_accuracy": null,
+      "notes": "RGB color sequence — tests clamping to [0,255]"
+    },
+    {
+      "id": "06-sound-tone",
+      "name": "Tone sequence",
+      "description": "Play 3 tones at different frequencies",
+      "sim_commands": [
+        { "type": "sound", "payload": { "freq": 440, "dur": 200 }, "duration_ms": 300 },
+        { "type": "sound", "payload": { "freq": 880, "dur": 150 }, "duration_ms": 250 },
+        { "type": "sound", "payload": { "freq": 660, "dur": 250 }, "duration_ms": 350 }
+      ],
+      "expected_adapter": [
+        { "type": "sound", "payload_keys": ["frequency", "duration"] },
+        { "type": "sound", "payload_keys": ["frequency", "duration"] },
+        { "type": "sound", "payload_keys": ["frequency", "duration"] }
+      ],
+      "sim_accuracy": 1.0,
+      "real_accuracy": null,
+      "notes": "Frequency mapping — sim Hz → adapter Hz"
+    },
+    {
+      "id": "07-gesture-wave",
+      "name": "Wave gesture",
+      "description": "Perform a wave gesture",
+      "sim_commands": [
+        { "type": "gesture", "payload": { "gesture": "wave" }, "duration_ms": 1000 },
+        { "type": "stop", "payload": {}, "duration_ms": 0 }
+      ],
+      "expected_adapter": [
+        { "type": "gesture", "payload_keys": ["gesture"] },
+        { "type": "stop", "payload_keys": [] }
+      ],
+      "sim_accuracy": 1.0,
+      "real_accuracy": null,
+      "notes": "Gesture passthrough — depends on adapter support"
+    },
+    {
+      "id": "08-emergency",
+      "name": "Emergency stop",
+      "description": "Immediate emergency stop from motion",
+      "sim_commands": [
+        { "type": "move", "payload": { "direction": "forward", "speed": 0.8 }, "duration_ms": 500 },
+        { "type": "emergency_stop", "payload": {}, "duration_ms": 0 }
+      ],
+      "expected_adapter": [
+        { "type": "move", "payload_keys": ["speed", "direction"] },
+        { "type": "emergency_stop", "payload_keys": [] }
+      ],
+      "sim_accuracy": 1.0,
+      "real_accuracy": null,
+      "notes": "Safety test — e-stop must override all motion"
+    },
+    {
+      "id": "09-complex-sequence",
+      "name": "Complex patrol",
+      "description": "Forward → rotate → forward → stop pattern",
+      "sim_commands": [
+        { "type": "move", "payload": { "direction": "forward", "speed": 0.6 }, "duration_ms": 2000 },
+        { "type": "rotate", "payload": { "angle": 90, "speed": 1.0 }, "duration_ms": 1500 },
+        { "type": "move", "payload": { "direction": "forward", "speed": 0.6 }, "duration_ms": 2000 },
+        { "type": "stop", "payload": {}, "duration_ms": 0 }
+      ],
+      "expected_adapter": [
+        { "type": "move", "payload_keys": ["speed", "direction"] },
+        { "type": "rotate", "payload_keys": ["angle", "speed"] },
+        { "type": "move", "payload_keys": ["speed", "direction"] },
+        { "type": "stop", "payload_keys": [] }
+      ],
+      "sim_accuracy": 1.0,
+      "real_accuracy": null,
+      "notes": "Multi-command sequence — tests timing and ordering"
+    },
+    {
+      "id": "10-angle-movement",
+      "name": "Angle-based movement",
+      "description": "Move at specific angles (45°, 135°, 270°)",
+      "sim_commands": [
+        { "type": "move", "payload": { "direction": 45, "speed": 0.7 }, "duration_ms": 1500 },
+        { "type": "rotate", "payload": { "angle": 90, "speed": 1.0 }, "duration_ms": 1000 },
+        { "type": "move", "payload": { "direction": 135, "speed": 0.7 }, "duration_ms": 1500 },
+        { "type": "stop", "payload": {}, "duration_ms": 0 }
+      ],
+      "expected_adapter": [
+        { "type": "move", "payload_keys": ["x", "y"] },
+        { "type": "rotate", "payload_keys": ["angle", "speed"] },
+        { "type": "move", "payload_keys": ["x", "y"] },
+        { "type": "stop", "payload_keys": [] }
+      ],
+      "sim_accuracy": 1.0,
+      "real_accuracy": null,
+      "notes": "Angle-to-vector conversion — cos/sin mapping"
+    }
+  ],
+  "summary": {
+    "total_behaviors": 10,
+    "sim_accuracy_avg": 1.0,
+    "real_accuracy_avg": null,
+    "status": "pending_real_validation",
+    "last_updated": "2026-05-12"
+  }
+}

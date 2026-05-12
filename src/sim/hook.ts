@@ -15,6 +15,8 @@ import { SimCanvasRenderer } from './renderer'
 import { Sim2RealReplay, ReplayConfig } from './sim2real'
 import { SimBody, SimConfig, SimRun, DomainRandomization, DEFAULT_RANDOMIZATION } from './types'
 import type { RobotAdapter } from '../engine/types'
+import { EpisodeRecorder } from '../dataset/recorder'
+import type { EpisodeMeta, Dataset } from '../dataset/recorder'
 
 export interface SimModeOptions {
   /** Canvas element ref */
@@ -76,6 +78,31 @@ export interface SimModeResult {
   setRandomization: (r: Partial<DomainRandomization>) => void
   /** Reset domain randomization to defaults */
   resetRandomization: () => void
+  // ── Dataset (v2.0 checkbox 4) ─────────────────────────
+  /** Whether dataset panel is visible */
+  datasetPanelVisible: boolean
+  /** Toggle dataset panel visibility */
+  setDatasetPanelVisible: (v: boolean) => void
+  /** All episodes from the dataset recorder */
+  episodes: EpisodeMeta[]
+  /** All datasets from the dataset recorder */
+  datasets: Map<string, Dataset>
+  /** Export current recording as .cybertrace */
+  exportCyberTrace: () => string
+  /** Export a specific episode as .cybertrace */
+  exportEpisodeCyberTrace: (episodeId: string) => string
+  /** Export a dataset as .cybertrace */
+  exportDatasetCyberTrace: (datasetName: string) => string
+  /** Delete an episode */
+  deleteEpisode: (episodeId: string) => void
+  /** Delete a dataset */
+  deleteDataset: (datasetName: string) => void
+  /** Current dataset name (used when starting a new episode) */
+  currentDatasetName: string
+  /** Set current dataset name */
+  setCurrentDatasetName: (name: string) => void
+  /** Close dataset panel */
+  onCloseDataset: () => void
 }
 
 export function useSimMode(opts: SimModeOptions): SimModeResult {
@@ -83,6 +110,7 @@ export function useSimMode(opts: SimModeOptions): SimModeResult {
 
   const engineRef = useRef<SimEngine | null>(null)
   const recorderRef = useRef<SimRecorder | null>(null)
+  const episodeRecorderRef = useRef<EpisodeRecorder | null>(null)
   const replayRef = useRef<SimReplay | null>(null)
   const rendererRef = useRef<SimCanvasRenderer | null>(null)
   const sim2realRef = useRef<Sim2RealReplay | null>(null)
@@ -105,6 +133,10 @@ export function useSimMode(opts: SimModeOptions): SimModeResult {
     ...DEFAULT_RANDOMIZATION,
   }))
 
+  // ── Dataset state (v2.0 checkbox 4) ───────────────────
+  const [datasetPanelVisible, setDatasetPanelVisible] = useState(false)
+  const [currentDatasetName, setCurrentDatasetName] = useState('default')
+
   // Initialize simulator
   const initSim = useCallback(() => {
     if (!canvasRef.current) return
@@ -121,6 +153,7 @@ export function useSimMode(opts: SimModeOptions): SimModeResult {
 
     engineRef.current = engine
     recorderRef.current = recorder
+    episodeRecorderRef.current = new EpisodeRecorder(engine)
     replayRef.current = replay
     rendererRef.current = renderer
 
@@ -177,6 +210,12 @@ export function useSimMode(opts: SimModeOptions): SimModeResult {
       recorder.recordStep(step)
     }
 
+    // Also feed the episode recorder
+    const episodeRecorder = episodeRecorderRef.current
+    if (episodeRecorder && episodeRecorder.isRecording) {
+      episodeRecorder.recordStep(step)
+    }
+
     // Render
     renderer.clear()
     renderer.drawGrid()
@@ -214,13 +253,26 @@ export function useSimMode(opts: SimModeOptions): SimModeResult {
     if (!rec) return
     rec.start(characterId ?? 'unknown')
     setIsRecording(true)
-  }, [characterId])
+
+    // Also start an episode on the dataset recorder (v2.0 checkbox 4)
+    const epRecorder = episodeRecorderRef.current
+    if (epRecorder && !epRecorder.isRecording) {
+      epRecorder.startEpisode(characterId ?? 'unknown', currentDatasetName)
+    }
+  }, [characterId, currentDatasetName])
 
   const stopRecording = useCallback(() => {
     const rec = recorderRef.current
     if (!rec) return null
     const run = rec.stop()
     setIsRecording(false)
+
+    // Stop the episode on the dataset recorder (v2.0 checkbox 4)
+    const epRecorder = episodeRecorderRef.current
+    if (epRecorder && epRecorder.isRecording) {
+      epRecorder.stopEpisode()
+    }
+
     return run
   }, [])
 
@@ -358,5 +410,39 @@ export function useSimMode(opts: SimModeOptions): SimModeResult {
     randomization,
     setRandomization,
     resetRandomization,
+    // ── Dataset (v2.0 checkbox 4) ───────────────────────
+    datasetPanelVisible,
+    setDatasetPanelVisible,
+    onCloseDataset: useCallback(() => setDatasetPanelVisible(false), [setDatasetPanelVisible]),
+    episodes: (() => {
+      const er = episodeRecorderRef.current
+      return er ? er.episodes : []
+    })(),
+    datasets: (() => {
+      const er = episodeRecorderRef.current
+      return er ? er.datasets : new Map()
+    })(),
+    exportCyberTrace: () => {
+      const er = episodeRecorderRef.current
+      return er ? er.exportCyberTrace() : ''
+    },
+    exportEpisodeCyberTrace: (episodeId: string) => {
+      const er = episodeRecorderRef.current
+      return er ? er.exportEpisodeAsCyberTrace(episodeId) : ''
+    },
+    exportDatasetCyberTrace: (datasetName: string) => {
+      const er = episodeRecorderRef.current
+      return er ? er.exportDatasetAsCyberTrace(datasetName) : ''
+    },
+    deleteEpisode: (episodeId: string) => {
+      const er = episodeRecorderRef.current
+      if (er) er.deleteEpisode(episodeId)
+    },
+    deleteDataset: (datasetName: string) => {
+      const er = episodeRecorderRef.current
+      if (er) er.deleteDataset(datasetName)
+    },
+    currentDatasetName,
+    setCurrentDatasetName,
   }
 }

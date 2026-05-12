@@ -14,54 +14,47 @@ import {
   FastForward,
   Download,
   Upload,
+  FolderOpen,
 } from 'lucide-react'
 import { DomainRandomizationPanel } from './DomainRandomizationPanel'
 import { DomainRandomization } from '@/sim/types'
+import { DatasetPanel } from '@/dataset'
+import type { EpisodeMeta, Dataset } from '@/dataset/recorder'
 import styles from './Agent.module.css'
 
 interface SimulatorPanelProps {
-  /** Whether simulation is active */
   simActive: boolean
-  /** Whether recording */
   isRecording: boolean
-  /** Whether replaying */
   isReplaying: boolean
-  /** Simulation time in ms */
   simTime: number
-  /** Step count */
   stepCount: number
-  /** FPS */
   fps: number
-  /** Start simulation */
   onStartSim: () => void
-  /** Stop simulation */
   onStopSim: () => void
-  /** Start recording */
   onStartRecord: () => void
-  /** Stop recording */
   onStopRecord: () => void
-  /** Start replay */
   onStartReplay: () => void
-  /** Pause replay */
   onPauseReplay: () => void
-  /** Step replay */
   onStepReplay: () => void
-  /** Scrub replay */
   onScrubReplay: (index: number) => void
-  /** Set replay speed */
   onSetSpeed: (speed: number) => void
-  /** Export recording */
   onExport: () => string
-  /** Import recording */
   onImport: (json: string) => void
-  /** Canvas ref */
   canvasRef: React.RefObject<HTMLCanvasElement>
-  /** Current domain randomization params */
   randomization?: DomainRandomization
-  /** Update domain randomization */
   onRandomizationChange?: (r: Partial<DomainRandomization>) => void
-  /** Reset domain randomization */
   onRandomizationReset?: () => void
+  // ── Dataset (v2.0 checkbox 4) ───────────────────────
+  datasetVisible?: boolean
+  onToggleDataset?: (visible: boolean) => void
+  episodes?: EpisodeMeta[]
+  datasets?: Map<string, Dataset>
+  onExportCyberTrace?: () => string
+  onExportEpisodeCyberTrace?: (episodeId: string) => string
+  onExportDatasetCyberTrace?: (datasetName: string) => string
+  onDeleteEpisode?: (episodeId: string) => void
+  onDeleteDataset?: (datasetName: string) => void
+  onCloseDataset?: () => void
 }
 
 export function SimulatorPanel(props: SimulatorPanelProps) {
@@ -87,6 +80,16 @@ export function SimulatorPanel(props: SimulatorPanelProps) {
     randomization,
     onRandomizationChange,
     onRandomizationReset,
+    datasetVisible,
+    onToggleDataset,
+    episodes,
+    datasets,
+    onExportCyberTrace,
+    onExportEpisodeCyberTrace,
+    onExportDatasetCyberTrace,
+    onDeleteEpisode,
+    onDeleteDataset,
+    onCloseDataset,
   } = props
 
   const handleExport = () => {
@@ -110,138 +113,157 @@ export function SimulatorPanel(props: SimulatorPanelProps) {
     reader.readAsText(file)
   }
 
+  const hasDataset =
+    datasetVisible &&
+    onToggleDataset &&
+    episodes &&
+    datasets &&
+    onExportCyberTrace &&
+    onExportEpisodeCyberTrace &&
+    onExportDatasetCyberTrace &&
+    onDeleteEpisode &&
+    onDeleteDataset &&
+    onCloseDataset
+
   return (
-    <div className={styles.simPanel}>
-      {/* Simulation canvas */}
-      <div className={styles.simCanvasContainer}>
-        <canvas
-          ref={canvasRef as React.RefObject<HTMLCanvasElement>}
-          className={styles.simCanvas}
-          width={800}
-          height={600}
-        />
-        {!simActive && !isReplaying && (
-          <div className={styles.simOverlay}>
-            <p>Simulation ready</p>
-            <button className={styles.simStartBtn} onClick={onStartSim}>
-              <Play size={16} /> Start Sim
+    <div>
+      <div className={styles.simPanel}>
+        <div className={styles.simCanvasContainer}>
+          <canvas
+            ref={canvasRef as React.RefObject<HTMLCanvasElement>}
+            className={styles.simCanvas}
+            width={800}
+            height={600}
+          />
+          {!simActive && !isReplaying && (
+            <div className={styles.simOverlay}>
+              <p>Simulation ready</p>
+              <button className={styles.simStartBtn} onClick={onStartSim}>
+                <Play size={16} /> Start Sim
+              </button>
+            </div>
+          )}
+        </div>
+
+        <div className={styles.simControls}>
+          <div className={styles.simControlGroup}>
+            <span className={styles.simGroupLabel}>Sim</span>
+            <button
+              className={`${styles.simBtn} ${simActive ? styles.simBtnActive : ''}`}
+              onClick={onStartSim}
+              disabled={simActive || isReplaying}
+            >
+              <Play size={14} />
+            </button>
+            <button
+              className={`${styles.simBtn} ${!simActive && !isReplaying ? styles.simBtnActive : ''}`}
+              onClick={onStopSim}
+              disabled={!simActive}
+            >
+              <Square size={14} />
             </button>
           </div>
+
+          <div className={styles.simControlGroup}>
+            <span className={styles.simGroupLabel}>Record</span>
+            <button
+              className={`${styles.simBtn} ${isRecording ? styles.simBtnRecording : ''}`}
+              onClick={isRecording ? onStopRecord : onStartRecord}
+              disabled={!simActive}
+            >
+              <CircleDot size={14} />
+            </button>
+            <button
+              className={styles.simBtn}
+              onClick={handleExport}
+              disabled={!simActive}
+            >
+              <Download size={14} />
+            </button>
+            <label className={styles.simBtn}>
+              <Upload size={14} />
+              <input
+                type="file"
+                accept=".json"
+                style={{ display: 'none' }}
+                onChange={handleImport}
+              />
+            </label>
+          </div>
+
+          <div className={styles.simControlGroup}>
+            <span className={styles.simGroupLabel}>Replay</span>
+            <button
+              className={styles.simBtn}
+              onClick={isReplaying ? onPauseReplay : onStartReplay}
+              disabled={!simActive}
+            >
+              <Play size={14} />
+            </button>
+            <button className={styles.simBtn} onClick={onStepReplay} disabled={!simActive}>
+              <FastForward size={14} />
+            </button>
+            <button className={styles.simBtn} onClick={() => onScrubReplay(0)} disabled={!simActive}>
+              <RotateCcw size={14} />
+            </button>
+          </div>
+
+          <div className={styles.simControlGroup}>
+            <span className={styles.simGroupLabel}>Speed</span>
+            <input
+              type="range"
+              min="0.1"
+              max="5"
+              step="0.1"
+              defaultValue="1"
+              onChange={(e) => onSetSpeed(parseFloat(e.target.value))}
+              className={styles.simSpeedSlider}
+            />
+            <span className={styles.simSpeedValue}>1x</span>
+          </div>
+
+          {onToggleDataset && (
+            <div className={styles.simControlGroup}>
+              <span className={styles.simGroupLabel}>Dataset</span>
+              <button
+                className={`${styles.simBtn} ${datasetVisible ? styles.simBtnActive : ''}`}
+                onClick={() => onToggleDataset?.(!datasetVisible)}
+              >
+                <FolderOpen size={14} />
+              </button>
+            </div>
+          )}
+        </div>
+
+        <div className={styles.simStats}>
+          <span>t={(simTime / 1000).toFixed(1)}s</span>
+          <span>steps={stepCount}</span>
+          <span>fps={fps}</span>
+        </div>
+
+        {randomization && onRandomizationChange && onRandomizationReset && (
+          <DomainRandomizationPanel
+            randomization={randomization}
+            onChange={onRandomizationChange}
+            onReset={onRandomizationReset}
+          />
         )}
       </div>
 
-      {/* Controls */}
-      <div className={styles.simControls}>
-        {/* Sim controls */}
-        <div className={styles.simControlGroup}>
-          <span className={styles.simGroupLabel}>Sim</span>
-          <button
-            className={`${styles.simBtn} ${simActive ? styles.simBtnActive : ''}`}
-            onClick={onStartSim}
-            disabled={simActive || isReplaying}
-            title="Start simulation"
-          >
-            <Play size={14} />
-          </button>
-          <button
-            className={`${styles.simBtn} ${!simActive && !isReplaying ? styles.simBtnActive : ''}`}
-            onClick={onStopSim}
-            disabled={!simActive}
-            title="Stop simulation"
-          >
-            <Square size={14} />
-          </button>
-        </div>
-
-        {/* Recording controls */}
-        <div className={styles.simControlGroup}>
-          <span className={styles.simGroupLabel}>Record</span>
-          <button
-            className={`${styles.simBtn} ${isRecording ? styles.simBtnRecording : ''}`}
-            onClick={isRecording ? onStopRecord : onStartRecord}
-            disabled={!simActive}
-            title={isRecording ? 'Stop recording' : 'Start recording'}
-          >
-            <CircleDot size={14} />
-          </button>
-          <button
-            className={styles.simBtn}
-            onClick={handleExport}
-            disabled={!simActive}
-            title="Export recording"
-          >
-            <Download size={14} />
-          </button>
-          <label className={styles.simBtn}>
-            <Upload size={14} />
-            <input
-              type="file"
-              accept=".json"
-              style={{ display: 'none' }}
-              onChange={handleImport}
-            />
-          </label>
-        </div>
-
-        {/* Replay controls */}
-        <div className={styles.simControlGroup}>
-          <span className={styles.simGroupLabel}>Replay</span>
-          <button
-            className={styles.simBtn}
-            onClick={isReplaying ? onPauseReplay : onStartReplay}
-            disabled={!simActive}
-            title={isReplaying ? 'Pause replay' : 'Start replay'}
-          >
-            <Play size={14} />
-          </button>
-          <button
-            className={styles.simBtn}
-            onClick={onStepReplay}
-            disabled={!simActive}
-            title="Step forward"
-          >
-            <FastForward size={14} />
-          </button>
-          <button
-            className={styles.simBtn}
-            onClick={() => onScrubReplay(0)}
-            disabled={!simActive}
-            title="Reset replay"
-          >
-            <RotateCcw size={14} />
-          </button>
-        </div>
-
-        {/* Speed control */}
-        <div className={styles.simControlGroup}>
-          <span className={styles.simGroupLabel}>Speed</span>
-          <input
-            type="range"
-            min="0.1"
-            max="5"
-            step="0.1"
-            defaultValue="1"
-            onChange={(e) => onSetSpeed(parseFloat(e.target.value))}
-            className={styles.simSpeedSlider}
+      {hasDataset && (
+        <div className={styles.datasetPanelWrapper}>
+          <DatasetPanel
+            visible={datasetVisible}
+            datasets={datasets}
+            episodes={episodes}
+            onExportCyberTrace={onExportCyberTrace}
+            onExportEpisode={onExportEpisodeCyberTrace}
+            onExportDataset={onExportDatasetCyberTrace}
+            onDeleteEpisode={onDeleteEpisode}
+            onDeleteDataset={onDeleteDataset}
+            onClose={onCloseDataset}
           />
-          <span className={styles.simSpeedValue}>1x</span>
         </div>
-      </div>
-
-      {/* Stats */}
-      <div className={styles.simStats}>
-        <span>t={(simTime / 1000).toFixed(1)}s</span>
-        <span>steps={stepCount}</span>
-        <span>fps={fps}</span>
-      </div>
-
-      {/* Domain Randomization */}
-      {randomization && onRandomizationChange && onRandomizationReset && (
-        <DomainRandomizationPanel
-          randomization={randomization}
-          onChange={onRandomizationChange}
-          onReset={onRandomizationReset}
-        />
       )}
     </div>
   )

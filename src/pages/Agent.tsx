@@ -2,6 +2,7 @@ import { useParams, Link } from 'react-router-dom'
 import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowLeft, Play, Square, Pause, Zap, Activity, Layers, Box } from 'lucide-react'
+import type { EpisodeMeta, Dataset } from '@/dataset/recorder'
 import { HoverBeam } from '@/components/HoverBeam'
 import { TelemetryDashboard } from '@/components/TelemetryDashboard'
 import { getCharacter, getCompatibleAdapters } from '@/agents'
@@ -31,6 +32,18 @@ export function AgentPage() {
   const simPanelRandomization = sim.randomization
   const simPanelOnRandomizationChange = sim.setRandomization
   const simPanelOnRandomizationReset = sim.resetRandomization
+
+  // Feed dataset state to SimulatorPanel (v2.0 checkbox 4)
+  const simPanelDatasetVisible = sim.datasetPanelVisible
+  const simPanelOnToggleDataset = sim.setDatasetPanelVisible
+  const simPanelEpisodes = sim.episodes
+  const simPanelDatasets = sim.datasets
+  const simPanelExportCyberTrace = sim.exportCyberTrace
+  const simPanelExportEpisodeCyberTrace = sim.exportEpisodeCyberTrace
+  const simPanelExportDatasetCyberTrace = sim.exportDatasetCyberTrace
+  const simPanelDeleteEpisode = sim.deleteEpisode
+  const simPanelDeleteDataset = sim.deleteDataset
+  const simPanelOnCloseDataset: () => void = () => sim.setDatasetPanelVisible(false)
 
   // Feed snapshots to telemetry hook
   useEffect(() => {
@@ -166,6 +179,17 @@ export function AgentPage() {
                     randomization={simPanelRandomization}
                     onRandomizationChange={simPanelOnRandomizationChange}
                     onRandomizationReset={simPanelOnRandomizationReset}
+                    // ── Dataset (v2.0 checkbox 4) ─────────────
+                    datasetVisible={simPanelDatasetVisible}
+                    onToggleDataset={simPanelOnToggleDataset}
+                    episodes={simPanelEpisodes as EpisodeMeta[]}
+                    datasets={simPanelDatasets as Map<string, Dataset>}
+                    onExportCyberTrace={simPanelExportCyberTrace}
+                    onExportEpisodeCyberTrace={simPanelExportEpisodeCyberTrace}
+                    onExportDatasetCyberTrace={simPanelExportDatasetCyberTrace}
+                    onDeleteEpisode={simPanelDeleteEpisode}
+                    onDeleteDataset={simPanelDeleteDataset}
+                    onCloseDataset={simPanelOnCloseDataset}
                   />
                 ) : (
                   <>
