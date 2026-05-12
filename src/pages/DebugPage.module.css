@@ -1806,6 +1806,103 @@
   font-size: 0.85rem;
 }
 
+/* ─── Social Events Panel ─────────────────────────────────── */
+
+.socialPanel {
+  padding: var(--space-3);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  margin-top: var(--space-3);
+}
+
+.socialHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.socialCount {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-left: auto;
+}
+
+.socialTypes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin-bottom: var(--space-2);
+}
+
+.socialTypeBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+
+.socialList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.socialEvent {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 4px 8px;
+  font-size: 0.75rem;
+  border-left: 3px solid transparent;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  background: var(--bg-surface-2);
+}
+
+.socialTime {
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  min-width: 55px;
+}
+
+.socialIcon {
+  font-size: 0.9rem;
+}
+
+.socialType {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.socialSource {
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+}
+
+.socialTarget {
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+}
+
+.socialPayload {
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* ─── Compare Toggle Button ─────────────────────────────────── */
 
 .compareToggleBtn {

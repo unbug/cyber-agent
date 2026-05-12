@@ -14,6 +14,8 @@ const mockState = {
   blackboard: null,
   prevBlackboard: null,
   adapterEvents: [],
+  perceptionEvents: [],
+  socialEvents: [],
   tickTimes: [],
   errors: [],
   totalEvents: 0,
@@ -23,6 +25,12 @@ const mockState = {
   captureBlackboard: vi.fn(),
   updateTree: vi.fn(),
   reset: vi.fn(),
+  safetyState: null,
+  eStopActive: false,
+  safetyEvents: [],
+  memories: [],
+  valState: null,
+  valHistory: [],
 }
 
 function renderWithRouter(ui: React.ReactElement) {

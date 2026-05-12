@@ -22,6 +22,7 @@ import { MemoriesPanel } from './MemoriesPanel'
 import { VALPanel } from './VALPanel'
 import { VALTimelinePanel } from './VALTimelinePanel'
 import { SimRealComparePanel } from './SimRealComparePanel'
+import { SocialEventsPanel } from './SocialEventsPanel'
 import { computeMemoryStats } from '@/memory/episodic-store'
 import styles from './DebugPage.module.css'
 
@@ -584,6 +585,9 @@ export function DebugPage() {
 
       {/* Perception Panel */}
       <PerceptionPanel events={debug.perceptionEvents} />
+
+      {/* Social Events Panel (multi-agent) */}
+      <SocialEventsPanel events={debug.socialEvents} />
 
       {/* Memories Panel */}
       <MemoriesPanel

@@ -365,9 +365,14 @@ unchanged on a real RoboMaster; published bench numbers hold.
 > see [TODO-Q2-2026.md](TODO-Q2-2026.md).
 
 - [x] Shared blackboard / pub-sub bus over WebSocket (host elects).
-- [ ] Social BT primitives: `BroadcastEmotion`, `Negotiate`, `Mirror`,
+- [x] Social BT primitives: `BroadcastEmotion`, `Negotiate`, `Mirror`,
       `RoleSwap`, `findNearestAgent`, `greet`, `follow`, `flee`,
       `emitSignal` / `onSignal`.
+      - `src/engine/builtins-multi.ts` — 5 conditions + 10 actions
+      - `src/pages/SocialEventsPanel.tsx` — debug panel for social events
+      - `src/engine/tracer.ts` — `social.event` tracer event type
+      - `src/hooks/useDebug.ts` — `socialEvents` state + event subscription
+      - 35 unit tests (`builtins-multi.test.ts`)
 - [x] `World` + `SpatialIndex` + `MultiExecutor` (deterministic, seeded
       RNG, 100% replay parity).
 - [ ] Scene library: playground / park / campus / schoolyard with POIs

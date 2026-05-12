@@ -34,6 +34,7 @@ export type TracerEventType =
   | 'breakpoint.triggered'
   | 'perception'
   | 'val.update'
+  | 'social.event'
 
 // Re-export breakpoint types for consumers
 export type { Breakpoint, BreakpointKind } from './breakpoints'
@@ -267,6 +268,34 @@ export function emitPerceptionEvent(event: {
     payload: {
       source: event.source,
       confidence: event.confidence,
+      ...event.payload,
+    },
+  })
+}
+
+// ─── Social Events (multi-agent) ───────────────────────────────
+
+export interface SocialEvent {
+  /** Event subtype: greet, flee, follow, signal, broadcast, mirror, roleSwap, negotiate */
+  type: string
+  /** Source agent ID */
+  source: string
+  /** Target agent ID (if applicable) */
+  target?: string
+  /** Event payload */
+  payload: Record<string, unknown>
+  /** Timestamp */
+  timestamp: number
+}
+
+export function emitSocialEvent(event: SocialEvent) {
+  tracer.emit({
+    t: event.timestamp,
+    type: 'social.event',
+    label: event.type,
+    payload: {
+      source: event.source,
+      target: event.target,
       ...event.payload,
     },
   })

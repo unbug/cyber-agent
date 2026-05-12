@@ -8,6 +8,9 @@
 import { registerAction, registerCondition } from './executor'
 import type { Blackboard, NodeStatus } from './types'
 
+// Multi-agent social primitives (v2.1)
+import './builtins-multi'
+
 // ═══════════════════════════════════════════════════════════════
 //  CONDITIONS
 // ═══════════════════════════════════════════════════════════════

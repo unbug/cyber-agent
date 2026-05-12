@@ -34,6 +34,8 @@ interface DebugState {
   adapterEvents: TracerEvent[]
   /** Perception events */
   perceptionEvents: TracerEvent[]
+  /** Social events (multi-agent) */
+  socialEvents: TracerEvent[]
   /** Tick timestamps for rate calculation */
   tickTimes: number[]
   /** Error events */
@@ -89,6 +91,7 @@ export function useDebug(): DebugState & {
     prevBlackboard: null,
     adapterEvents: [],
     perceptionEvents: [],
+    socialEvents: [],
     tickTimes: [],
     errors: [],
     totalEvents: 0,
@@ -124,6 +127,7 @@ export function useDebug(): DebugState & {
       prevBlackboard: null,
       adapterEvents: [],
       perceptionEvents: [],
+      socialEvents: [],
       tickTimes: [],
       errors: [],
       totalEvents: 0,
@@ -262,6 +266,11 @@ export function useDebug(): DebugState & {
           encodeMemory(event)
           break
         }
+        case 'social.event': {
+          const socialEvents = [...s.socialEvents, event].slice(-200)
+          setState(prev => ({ ...prev, socialEvents }))
+          break
+        }
         case 'error': {
           const errors = [...s.errors, event]
           setState(prev => ({ ...prev, errors }))
@@ -299,6 +308,7 @@ export function useDebug(): DebugState & {
   return {
     ...state,
     perceptionEvents: state.perceptionEvents,
+    socialEvents: state.socialEvents,
     tickRate,
     avgLatency,
     captureBlackboard,
