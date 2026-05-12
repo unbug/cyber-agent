@@ -21,6 +21,7 @@ import { SafetyEventPanel } from '@/components/SafetyEventPanel'
 import { MemoriesPanel } from './MemoriesPanel'
 import { VALPanel } from './VALPanel'
 import { VALTimelinePanel } from './VALTimelinePanel'
+import { SimRealComparePanel } from './SimRealComparePanel'
 import { computeMemoryStats } from '@/memory/episodic-store'
 import styles from './DebugPage.module.css'
 
@@ -439,6 +440,7 @@ export function DebugPage() {
     checks: Array<{ name: string; ok: boolean; message: string }>
   } | null>(null)
   const [selfTestLoading, setSelfTestLoading] = useState(false)
+  const [showCompare, setShowCompare] = useState(false)
 
   // Collect active nodes from tree
   const activeNodes = useMemo(() => {
@@ -547,6 +549,17 @@ export function DebugPage() {
           setScrubberTraceData({ header: data.header, events })
         }}
       />
+
+      {/* Sim ↔ Real Trace Comparison */}
+      {showCompare && (
+        <SimRealComparePanel toleranceMs={50} />
+      )}
+      <button
+        className={styles.compareToggleBtn}
+        onClick={() => setShowCompare(!showCompare)}
+      >
+        {showCompare ? '▲ Hide' : '▼ Sim↔Real Compare'}
+      </button>
 
       {/* Safety Supervisor */}
       <SafetyEventPanel

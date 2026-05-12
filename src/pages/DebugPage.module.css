@@ -1442,6 +1442,312 @@
   font-weight: 600;
 }
 
+/* ─── Sim↔Real Compare Panel ─────────────────────────────────── */
+
+.comparePanel {
+  padding: var(--space-3);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.compareHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.compareTitle {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.compareClearBtn {
+  padding: var(--space-1) var(--space-2);
+  font-size: 0.7rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+  margin-left: auto;
+}
+
+.compareClearBtn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+/* Upload area */
+
+.compareUploads {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+
+.compareUpload {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  text-align: center;
+}
+
+.compareUpload:hover {
+  border-color: var(--border-hover);
+  background: var(--bg-elevated);
+}
+
+.compareUploadIcon {
+  font-size: 1.5rem;
+  opacity: 0.6;
+}
+
+.compareUploadLabel {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.compareUploadHint {
+  font-size: 0.65rem;
+  color: var(--text-tertiary);
+}
+
+/* Statistics cards */
+
+.compareStats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: var(--space-2);
+}
+
+.compareStatCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.compareStatLabel {
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.compareStatValue {
+  font-size: 1.1rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+}
+
+.compareStatGood {
+  color: #22c55e;
+}
+
+.compareStatWarn {
+  color: #eab308;
+}
+
+.compareStatBad {
+  color: #ef4444;
+}
+
+/* Timeline */
+
+.compareTimeline {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-2) 0;
+}
+
+.compareTimelineRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.compareTimelineLabel {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  min-width: 80px;
+}
+
+.compareTimelineTrack {
+  flex: 1;
+  position: relative;
+  background: var(--bg-elevated);
+  border-radius: var(--radius-sm);
+  overflow: visible;
+}
+
+.compareTimelineDot {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+/* Diff table */
+
+.compareDiffTable {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.compareDiffHeader {
+  display: grid;
+  grid-template-columns: 50px 90px 1fr 1fr 1fr;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--border);
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.compareDiffBody {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.compareDiffRow {
+  display: grid;
+  grid-template-columns: 50px 90px 1fr 1fr 1fr;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  font-size: 0.7rem;
+  font-family: var(--font-mono);
+  border-bottom: 1px solid var(--border);
+  transition: background 0.1s;
+}
+
+.compareDiffRow:hover {
+  background: var(--bg-hover);
+}
+
+.compareDiffMatch {
+  border-left: 3px solid #22c55e;
+}
+
+.compareDiffMismatch {
+  border-left: 3px solid #ef4444;
+}
+
+.compareDiffCol {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.compareDiffPayload {
+  color: var(--text-tertiary);
+  font-size: 0.6rem;
+  margin-left: var(--space-1);
+}
+
+.compareDiffFieldCount {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.compareDiffField {
+  font-size: 0.6rem;
+  color: #ef4444;
+  white-space: normal;
+}
+
+.compareDiffMatchText {
+  color: #22c55e;
+  font-size: 0.8rem;
+}
+
+.compareDiffMore {
+  padding: var(--space-2);
+  text-align: center;
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
+  font-style: italic;
+}
+
+/* Raw data toggle */
+
+.compareRawToggle {
+  padding: var(--space-1) var(--space-3);
+  font-size: 0.7rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+  align-self: flex-start;
+}
+
+.compareRawToggle:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.compareRaw {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+}
+
+.compareRawSection {
+  padding: var(--space-2);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.compareRawSection h4 {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-1);
+}
+
+.compareRawSection pre {
+  font-size: 0.65rem;
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+  white-space: pre-wrap;
+  word-break: break-all;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
 /* ─── VAL Timeline Panel ─────────────────────────────────────── */
 
 .valTimelinePanel {
@@ -1498,4 +1804,24 @@
 .valTimelineEmpty p {
   color: var(--text-tertiary);
   font-size: 0.85rem;
+}
+
+/* ─── Compare Toggle Button ─────────────────────────────────── */
+
+.compareToggleBtn {
+  padding: var(--space-1) var(--space-3);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  align-self: flex-start;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.compareToggleBtn:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-hover);
 }

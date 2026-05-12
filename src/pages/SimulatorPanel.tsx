@@ -15,6 +15,7 @@ import {
   Download,
   Upload,
   FolderOpen,
+  Copy,
 } from 'lucide-react'
 import { DomainRandomizationPanel } from './DomainRandomizationPanel'
 import { DomainRandomization } from '@/sim/types'
@@ -40,6 +41,7 @@ interface SimulatorPanelProps {
   onSetSpeed: (speed: number) => void
   onExport: () => string
   onImport: (json: string) => void
+  onCopyTrace?: () => void
   canvasRef: React.RefObject<HTMLCanvasElement>
   randomization?: DomainRandomization
   onRandomizationChange?: (r: Partial<DomainRandomization>) => void
@@ -76,6 +78,7 @@ export function SimulatorPanel(props: SimulatorPanelProps) {
     onSetSpeed,
     onExport,
     onImport,
+    onCopyTrace,
     canvasRef,
     randomization,
     onRandomizationChange,
@@ -205,6 +208,25 @@ export function SimulatorPanel(props: SimulatorPanelProps) {
             </button>
             <button className={styles.simBtn} onClick={() => onScrubReplay(0)} disabled={!simActive}>
               <RotateCcw size={14} />
+            </button>
+          </div>
+
+          <div className={styles.simControlGroup}>
+            <span className={styles.simGroupLabel}>Compare</span>
+            <button
+              className={styles.simBtn}
+              onClick={() => {
+                const trace = onExport()
+                if (onCopyTrace && trace) {
+                  navigator.clipboard.writeText(trace).then(() => {
+                    onCopyTrace()
+                  })
+                }
+              }}
+              disabled={!simActive}
+              title="Copy trace to clipboard for Sim↔Real comparison"
+            >
+              <Copy size={14} />
             </button>
           </div>
 

@@ -175,6 +175,9 @@ export function AgentPage() {
                     onSetSpeed={sim.setReplaySpeed}
                     onExport={sim.exportRecording}
                     onImport={sim.importRun}
+                    onCopyTrace={() => {
+                      /* trace copied to clipboard — user pastes into /debug Sim↔Real compare */
+                    }}
                     canvasRef={simCanvasRef}
                     randomization={simPanelRandomization}
                     onRandomizationChange={simPanelOnRandomizationChange}
