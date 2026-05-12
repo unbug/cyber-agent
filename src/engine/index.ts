@@ -50,3 +50,11 @@ export { getBehavior, getAllBehaviors } from '../agents'
 // Safety Supervisor
 export { SafetySupervisor } from './safety-supervisor'
 export type { SafetyEvent, SafetyState, SafetyPolicy, SafetyOptions } from './safety-supervisor'
+
+// Multi-agent infrastructure (v2.1)
+export { World, EventBus, subscribeToWorld } from './world'
+export type { BusEvent, WorldAgent, WorldConfig } from './world'
+export { SpatialIndex } from './spatial-index'
+export type { SpatialPoint, SpatialQueryResult, SpatialIndexConfig } from './spatial-index'
+export { MultiExecutor } from './multi-executor'
+export type { AgentContext, MultiExecutorConfig } from './multi-executor'
