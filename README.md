@@ -382,7 +382,7 @@ unchanged on a real RoboMaster; published bench numbers hold.
   - `importTiledMap()` — Tiled JSON map → Scene with objmap/bgtiles/spawns layers
   - `validateScene()` / `requireScene()` — validation helpers
   - 23 unit tests
-- [ ] `/playground` page: drag agents from Gallery into a scene, freeze /
+- [x] `/playground` page: drag agents from Gallery into a scene, freeze /
       replay / share-link a session.
 - [ ] N-track timeline + agent diff in `/debug`.
 - [ ] `MultiBroadcastAdapter` — fan-out commands to N physical robots
