@@ -375,8 +375,13 @@ unchanged on a real RoboMaster; published bench numbers hold.
       - 35 unit tests (`builtins-multi.test.ts`)
 - [x] `World` + `SpatialIndex` + `MultiExecutor` (deterministic, seeded
       RNG, 100% replay parity).
-- [ ] Scene library: playground / park / campus / schoolyard with POIs
+- [x] Scene library: playground / park / campus / schoolyard with POIs
       (slide, swing, sandbox, classroom door, …); Tiled importer.
+  - `src/engine/scenes/` — types, registry, importer
+  - 4 scenes: playground (13 POIs), park (16 POIs), campus (26 POIs), schoolyard (20 POIs)
+  - `importTiledMap()` — Tiled JSON map → Scene with objmap/bgtiles/spawns layers
+  - `validateScene()` / `requireScene()` — validation helpers
+  - 23 unit tests
 - [ ] `/playground` page: drag agents from Gallery into a scene, freeze /
       replay / share-link a session.
 - [ ] N-track timeline + agent diff in `/debug`.
