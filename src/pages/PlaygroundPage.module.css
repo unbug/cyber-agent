@@ -1,0 +1,135 @@
+/* PlaygroundPage — full-page playground layout */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--bg-canvas);
+}
+
+.body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Palette sidebar */
+.palette {
+  width: 220px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+/* Canvas area */
+.canvasWrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+.canvasContainer {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Drop zone overlay */
+.dropZone {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+}
+
+/* Empty state */
+.emptyState {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.emptyEmoji {
+  font-size: 64px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.emptyTitle {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: 0 0 8px;
+}
+
+.emptyDesc {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 0;
+  text-align: center;
+  max-width: 280px;
+}
+
+/* Agent list */
+.agentList {
+  display: flex;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--bg-surface);
+  border-top: 1px solid var(--border-subtle);
+  flex-wrap: wrap;
+  overflow-x: auto;
+  min-height: 36px;
+}
+
+.agentChip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 16px;
+  background: var(--bg-surface-active);
+  border: 1px solid var(--border-subtle);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.agentChipEmoji {
+  font-size: 14px;
+}
+
+.agentChipName {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.agentChipPos {
+  color: var(--text-muted);
+  font-size: 10px;
+}
+
+.removeBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+  padding: 0;
+}
+
+.removeBtn:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}

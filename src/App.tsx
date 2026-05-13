@@ -7,6 +7,7 @@ import { DocsPage } from './pages/Docs'
 import { ChallengePage } from './pages/ChallengePage'
 import { MarketplacePage } from './pages/MarketplacePage'
 import { DebugPage } from './pages/DebugPage'
+import { PlaygroundPage } from './pages/PlaygroundPage'
 import CharacterEditor from './pages/CharacterEditor'
 import BTGraphEditor from './pages/BTGraphEditor'
 import { useState } from 'react'
@@ -27,6 +28,7 @@ export function App() {
         <Route path="/editor/new" element={<CharacterEditor />} />
         <Route path="/editor/create" element={<CharacterEditor />} />
         <Route path="/editor" element={<BTGraphEditorPage />} />
+        <Route path="/playground" element={<PlaygroundPage />} />
       </Route>
     </Routes>
   )
