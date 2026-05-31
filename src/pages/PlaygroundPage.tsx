@@ -8,7 +8,7 @@
  *   Bottom: agent list with remove buttons
  */
 
-import { useRef, useCallback, useEffect } from 'react'
+import { useRef, useCallback, useEffect, useState } from 'react'
 import { usePlayground } from '@/hooks/usePlayground'
 import { PlaygroundCanvas } from '@/pages/PlaygroundCanvas'
 import { PlaygroundPalette } from '@/pages/PlaygroundPalette'
@@ -34,6 +34,27 @@ export function PlaygroundPage() {
   } = usePlayground()
 
   const canvasContainerRef = useRef<HTMLDivElement>(null)
+  const [demoToast, setDemoToast] = useState<string | null>(null)
+
+  // ── Demo handler ──
+  const handleLoadDemo = useCallback(async () => {
+    // Reset first
+    reset()
+
+    // Spawn cat and dog
+    const scene = getScene(state.sceneId)
+    if (!scene) return
+    const { width, height } = scene.bounds
+
+    // Use addAgent which handles all lifecycle
+    const catAgent = addAgent('demo-cat', width * 0.2, height * 0.7)
+    const dogAgent = addAgent('demo-dog', width * 0.8, height * 0.3)
+
+    if (catAgent && dogAgent) {
+      setDemoToast('🐱🐶 Cat-Dog demo loaded!')
+      setTimeout(() => setDemoToast(null), 3000)
+    }
+  }, [reset, addAgent, state.sceneId])
 
   // ── Canvas drop handler ──
   const handleCanvasDropInternal = useCallback(
@@ -119,6 +140,7 @@ export function PlaygroundPage() {
         onReset={reset}
         agentCount={state.agents.length}
         onShare={share}
+        onLoadDemo={handleLoadDemo}
       />
 
       <div className={styles.body}>
@@ -197,6 +219,13 @@ export function PlaygroundPage() {
           )}
         </div>
       </div>
+
+      {/* Demo toast */}
+      {demoToast && (
+        <div className={styles.demoToast}>
+          {demoToast}
+        </div>
+      )}
     </div>
   )
 }

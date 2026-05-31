@@ -95,6 +95,9 @@ import * as guardianBot from './guardian-bot'
 import * as musicianBot from './musician-bot'
 import * as curiousBird from './curious-bird'
 
+// v2.1 cat-dog demo (social BT primitives)
+import * as catDogDemo from './cat-dog-demo/character'
+
 // ─── Registry ────────────────────────────────────────────────
 
 const characterMap = new Map<string, Character>()
@@ -186,6 +189,10 @@ registerAgent(narwhal, 'narwhal')
 registerAgent(cricket, 'cricket')
 registerAgent(bat, 'bat')
 
+// v2.1 cat-dog demo (social BT primitives)
+registerAgent(catDogDemo.cat, 'demo-cat')
+registerAgent(catDogDemo.dog, 'demo-dog')
+
 const agentList: Array<{ character: Character }> = [
   loyalDog, curiousCat, guardDino, danceBot, zenTurtle,
   scoutEagle, wsDemo, robotHelper,
@@ -202,7 +209,9 @@ const agentList: Array<{ character: Character }> = [
   spider, whale, rhino, heron, otter,
   crane, gorilla, manta, eagle, sloth, narwhal, cricket, bat,
   // v1.1 perception-driven characters
-  shyCat, playfulDog, guardianBot, musicianBot, curiousBird
+  shyCat, playfulDog, guardianBot, musicianBot, curiousBird,
+  // v2.1 cat-dog demo
+  catDogDemo.cat, catDogDemo.dog
 ]
 
 // ─── Public API ──────────────────────────────────────────────

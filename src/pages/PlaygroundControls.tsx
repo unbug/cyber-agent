@@ -23,6 +23,8 @@ interface PlaygroundControlsProps {
   agentCount: number
   /** Share current playground state as a URL */
   onShare: () => void
+  /** Load the cat-dog demo */
+  onLoadDemo?: () => void
 }
 
 export function PlaygroundControls({
@@ -33,6 +35,7 @@ export function PlaygroundControls({
   onReset,
   agentCount,
   onShare,
+  onLoadDemo,
 }: PlaygroundControlsProps) {
   const [showPicker, setShowPicker] = useState(false)
 
@@ -106,6 +109,19 @@ export function PlaygroundControls({
             <span>Share</span>
           </button>
         </HoverBeam>
+
+        {onLoadDemo && (
+          <HoverBeam size="line" colorVariant="mono" strength={0.35}>
+            <button
+              className={styles.ctrlBtn}
+              onClick={onLoadDemo}
+              title="Load cat-dog demo (social BT primitives)"
+            >
+              <span className={styles.demoIcon}>🐱🐶</span>
+              <span>Demo</span>
+            </button>
+          </HoverBeam>
+        )}
       </div>
 
       {/* Agent count */}
