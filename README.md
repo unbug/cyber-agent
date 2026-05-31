@@ -400,7 +400,13 @@ unchanged on a real RoboMaster; published bench numbers hold.
   - Self-test with structured report
   - `docs/hil/multi-broadcast/CHECKLIST.md` — HIL checklist
   - 20 unit tests (`multi-broadcast.test.ts`)
-- [ ] Two-robot demo (cat × dog) with believable interaction shipped.
+- [x] **Two-robot demo (cat × dog) with believable interaction**
+  - `src/agents/cat-dog-demo/` — demo characters + behaviors
+  - `demo-cat`: shy cat (flee, mirror, broadcast calm)
+  - `demo-dog`: playful dog (seek, greet, back off)
+  - Leverages social BT primitives: `isCloseTo`, `isFarFrom`, `flee`, `mirror`, `broadcastEmotion`, `findNearestAgent`, `greet`
+  - 'Demo' button in playground toolbar for one-click load
+  - Characters registered in gallery under 'companion' category
 - [ ] 3+ robots, 30-minute soak, no cross-talk drops.
 
 **Release gate**: 3-robot soak test green; one community-recorded
