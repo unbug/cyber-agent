@@ -18,6 +18,18 @@ import { emitTickStart, emitNodeEnter, emitNodeExit, emitActionDispatch } from '
 import type { ValEngine } from '../affect/engine'
 import { biasMatchScore } from '../affect/types'
 
+// ─── Agent context for multi-agent tracing ─────────────────────
+let _agentContext: string | undefined = undefined
+
+/** Set the current agent context for tracer events */
+export function setAgentContext(agentId: string | undefined): void {
+  _agentContext = agentId
+}
+
+function _agent(): string | undefined {
+  return _agentContext
+}
+
 // ─── Built-in Action & Condition Registries ───────────────────
 
 const actionRegistry = new Map<string, ActionFn>()
@@ -75,15 +87,15 @@ export function tick(
   valEngine?: ValEngine | null,
 ): NodeStatus {
   const t = performance.now()
-  emitTickStart(t)
+  emitTickStart(t, _agent())
 
   const { def } = node
   const label = def.name ?? def.type
-  emitNodeEnter(label, t)
+  emitNodeEnter(label, t, _agent())
 
   const result = dispatchNode(node, bb, adapter, valEngine)
 
-  emitNodeExit(label, result, performance.now())
+  emitNodeExit(label, result, performance.now(), _agent())
   return result
 }
 
@@ -126,17 +138,17 @@ function dispatchNode(
 
 function tickSequence(node: RuntimeNode, bb: Blackboard, adapter: RobotAdapter, valEngine?: ValEngine | null): NodeStatus {
   const t = performance.now()
-  emitNodeEnter('sequence', t)
+  emitNodeEnter('sequence', t, _agent())
   for (const child of node.children) {
     const result = tick(child, bb, adapter, valEngine)
     if (result === 'running' || result === 'failure') {
       node.status = result
-      emitNodeExit('sequence', result, performance.now())
+      emitNodeExit('sequence', result, performance.now(), _agent())
       return result
     }
   }
   node.status = 'success'
-  emitNodeExit('sequence', 'success', performance.now())
+  emitNodeExit('sequence', 'success', performance.now(), _agent())
   return 'success'
 }
 
@@ -145,7 +157,7 @@ function tickSequence(node: RuntimeNode, bb: Blackboard, adapter: RobotAdapter, 
 
 function tickSelector(node: RuntimeNode, bb: Blackboard, adapter: RobotAdapter, valEngine?: ValEngine | null): NodeStatus {
   const t = performance.now()
-  emitNodeEnter('selector', t)
+  emitNodeEnter('selector', t, _agent())
 
   // VAL-aware reordering: score children by bias match, sort descending
   const children = node.children
@@ -175,13 +187,13 @@ function tickSelector(node: RuntimeNode, bb: Blackboard, adapter: RobotAdapter, 
       const result = tick(child, bb, adapter, valEngine)
       if (result === 'running' || result === 'success') {
         node.status = result
-        emitNodeExit('selector', result, performance.now())
+        emitNodeExit('selector', result, performance.now(), _agent())
         return result
       }
     }
   }
   node.status = 'failure'
-  emitNodeExit('selector', 'failure', performance.now())
+  emitNodeExit('selector', 'failure', performance.now(), _agent())
   return 'failure'
 }
 
@@ -190,7 +202,7 @@ function tickSelector(node: RuntimeNode, bb: Blackboard, adapter: RobotAdapter, 
 
 function tickParallel(node: RuntimeNode, bb: Blackboard, adapter: RobotAdapter, valEngine?: ValEngine | null): NodeStatus {
   const t = performance.now()
-  emitNodeEnter('parallel', t)
+  emitNodeEnter('parallel', t, _agent())
   const threshold = (node.def as { successThreshold?: number }).successThreshold ?? node.children.length
   let successes = 0
   let failures = 0
@@ -203,16 +215,16 @@ function tickParallel(node: RuntimeNode, bb: Blackboard, adapter: RobotAdapter, 
 
   if (successes >= threshold) {
     node.status = 'success'
-    emitNodeExit('parallel', 'success', performance.now())
+    emitNodeExit('parallel', 'success', performance.now(), _agent())
     return 'success'
   }
   if (failures > node.children.length - threshold) {
     node.status = 'failure'
-    emitNodeExit('parallel', 'failure', performance.now())
+    emitNodeExit('parallel', 'failure', performance.now(), _agent())
     return 'failure'
   }
   node.status = 'running'
-  emitNodeExit('parallel', 'running', performance.now())
+  emitNodeExit('parallel', 'running', performance.now(), _agent())
   return 'running'
 }
 
@@ -220,12 +232,12 @@ function tickParallel(node: RuntimeNode, bb: Blackboard, adapter: RobotAdapter, 
 
 function tickInverter(node: RuntimeNode, bb: Blackboard, adapter: RobotAdapter, valEngine?: ValEngine | null): NodeStatus {
   const t = performance.now()
-  emitNodeEnter('inverter', t)
+  emitNodeEnter('inverter', t, _agent())
   const result = tick(node.children[0]!, bb, adapter, valEngine)
-  if (result === 'success') { node.status = 'failure'; emitNodeExit('inverter', 'failure', performance.now()); return 'failure' }
-  if (result === 'failure') { node.status = 'success'; emitNodeExit('inverter', 'success', performance.now()); return 'success' }
+  if (result === 'success') { node.status = 'failure'; emitNodeExit('inverter', 'failure', performance.now(), _agent()); return 'failure' }
+  if (result === 'failure') { node.status = 'success'; emitNodeExit('inverter', 'success', performance.now(), _agent()); return 'success' }
   node.status = 'running'
-  emitNodeExit('inverter', 'running', performance.now())
+  emitNodeExit('inverter', 'running', performance.now(), _agent())
   return 'running'
 }
 
@@ -233,20 +245,20 @@ function tickInverter(node: RuntimeNode, bb: Blackboard, adapter: RobotAdapter, 
 
 function tickRepeater(node: RuntimeNode, bb: Blackboard, adapter: RobotAdapter, valEngine?: ValEngine | null): NodeStatus {
   const t = performance.now()
-  emitNodeEnter('repeater', t)
+  emitNodeEnter('repeater', t, _agent())
   const count = (node.def as { count: number }).count
   const current = (node.state.iteration as number) ?? 0
 
   if (count !== -1 && current >= count) {
     node.status = 'success'
-    emitNodeExit('repeater', 'success', performance.now())
+    emitNodeExit('repeater', 'success', performance.now(), _agent())
     return 'success'
   }
 
   const result = tick(node.children[0]!, bb, adapter, valEngine)
   if (result === 'running') {
     node.status = 'running'
-    emitNodeExit('repeater', 'running', performance.now())
+    emitNodeExit('repeater', 'running', performance.now(), _agent())
     return 'running'
   }
 
@@ -256,11 +268,11 @@ function tickRepeater(node: RuntimeNode, bb: Blackboard, adapter: RobotAdapter, 
 
   if (count !== -1 && current + 1 >= count) {
     node.status = 'success'
-    emitNodeExit('repeater', 'success', performance.now())
+    emitNodeExit('repeater', 'success', performance.now(), _agent())
     return 'success'
   }
   node.status = 'running'
-  emitNodeExit('repeater', 'running', performance.now())
+  emitNodeExit('repeater', 'running', performance.now(), _agent())
   return 'running'
 }
 
@@ -268,14 +280,14 @@ function tickRepeater(node: RuntimeNode, bb: Blackboard, adapter: RobotAdapter, 
 
 function tickCooldown(node: RuntimeNode, bb: Blackboard, adapter: RobotAdapter, valEngine?: ValEngine | null): NodeStatus {
   const t = performance.now()
-  emitNodeEnter('cooldown', t)
+  emitNodeEnter('cooldown', t, _agent())
   const durationMs = (node.def as { durationMs: number }).durationMs
   const lastRun = (node.state.lastRunAt as number) ?? 0
   const now = bb.totalMs
 
   if (now - lastRun < durationMs) {
     node.status = 'failure'
-    emitNodeExit('cooldown', 'failure', performance.now())
+    emitNodeExit('cooldown', 'failure', performance.now(), _agent())
     return 'failure'
   }
 
@@ -284,7 +296,7 @@ function tickCooldown(node: RuntimeNode, bb: Blackboard, adapter: RobotAdapter, 
     node.state.lastRunAt = now
   }
   node.status = result
-  emitNodeExit('cooldown', result, performance.now())
+  emitNodeExit('cooldown', result, performance.now(), _agent())
   return result
 }
 
@@ -308,7 +320,7 @@ function tickCondition(node: RuntimeNode, bb: Blackboard): NodeStatus {
 function tickAction(node: RuntimeNode, bb: Blackboard, adapter: RobotAdapter): NodeStatus {
   const def = node.def as { action: string; args?: Record<string, unknown> }
   const t = performance.now()
-  emitActionDispatch(def.action, t)
+  emitActionDispatch(def.action, t, _agent())
   const fn = actionRegistry.get(def.action)
   if (!fn) {
     console.warn(`[BT] Unknown action: ${def.action}`)

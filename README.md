@@ -384,7 +384,12 @@ unchanged on a real RoboMaster; published bench numbers hold.
   - 23 unit tests
 - [x] `/playground` page: drag agents from Gallery into a scene, freeze /
       replay / share-link a session.
-- [ ] N-track timeline + agent diff in `/debug`.
+- [x] N-track timeline + agent diff in `/debug`.
+  - `src/pages/MultiAgentTimelinePanel.tsx` — N-track canvas timeline with hover crosshair
+  - `src/pages/AgentDiffPanel.tsx` — blackboard diff across agents
+  - `src/hooks/useMultiAgentDebug.ts` — per-agent debug state aggregation
+  - 7 unit tests (MultiAgentTimelinePanel + AgentDiffPanel)
+  - Wired into `/debug` page via `useMultiAgentDebug`
 - [ ] `MultiBroadcastAdapter` — fan-out commands to N physical robots
       with NTP-style time sync (≤5 ms drift) and global e-stop.
 - [ ] Two-robot demo (cat × dog) with believable interaction shipped.

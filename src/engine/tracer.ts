@@ -48,6 +48,8 @@ export interface TracerEvent {
   label: string
   /** Optional payload keyed by event type */
   payload?: Record<string, unknown>
+  /** Optional agent ID for multi-agent tracing */
+  agentId?: string
 }
 
 // ─── Ring Buffer ──────────────────────────────────────────────────
@@ -98,7 +100,7 @@ type EventCallback = (event: TracerEvent) => void
 
 // ─── Tracer (singleton) ───────────────────────────────────────────
 
-class Tracer {
+export class Tracer {
   private ring = new RingBuffer()
   private listeners = new Set<EventCallback>()
   _enabled = true
@@ -164,6 +166,12 @@ class Tracer {
     this.ring = new RingBuffer()
   }
 
+  /** Clear events and remove all subscriptions (for testing) */
+  reset() {
+    this.ring = new RingBuffer()
+    this.listeners.clear()
+  }
+
   /** Persist current events to IndexedDB under key `cyberagent-trace` */
   async persistToIndexedDB(): Promise<void> {
     try {
@@ -220,36 +228,36 @@ export const tracer = new Tracer()
 
 // ─── Convenience helpers ──────────────────────────────────────────
 
-export function emitTickStart(t: number) {
-  tracer.emit({ t, type: 'tick.start', label: 'tick.start', payload: {} })
+export function emitTickStart(t: number, agentId?: string) {
+  tracer.emit({ t, type: 'tick.start', label: 'tick.start', payload: {}, agentId })
 }
 
-export function emitNodeEnter(nodeName: string, t: number) {
-  tracer.emit({ t, type: 'node.enter', label: nodeName, payload: {} })
+export function emitNodeEnter(nodeName: string, t: number, agentId?: string) {
+  tracer.emit({ t, type: 'node.enter', label: nodeName, payload: {}, agentId })
 }
 
-export function emitNodeExit(nodeName: string, status: string, t: number) {
-  tracer.emit({ t, type: 'node.exit', label: nodeName, payload: { status } })
+export function emitNodeExit(nodeName: string, status: string, t: number, agentId?: string) {
+  tracer.emit({ t, type: 'node.exit', label: nodeName, payload: { status }, agentId })
 }
 
-export function emitActionDispatch(actionName: string, t: number) {
-  tracer.emit({ t, type: 'action.dispatch', label: actionName, payload: {} })
+export function emitActionDispatch(actionName: string, t: number, agentId?: string) {
+  tracer.emit({ t, type: 'action.dispatch', label: actionName, payload: {}, agentId })
 }
 
-export function emitBbSet(field: string, value: unknown, t: number) {
-  tracer.emit({ t, type: 'bb.set', label: field, payload: { value } })
+export function emitBbSet(field: string, value: unknown, t: number, agentId?: string) {
+  tracer.emit({ t, type: 'bb.set', label: field, payload: { value }, agentId })
 }
 
-export function emitAdapterTx(command: string, t: number) {
-  tracer.emit({ t, type: 'adapter.tx', label: command, payload: {} })
+export function emitAdapterTx(command: string, t: number, agentId?: string) {
+  tracer.emit({ t, type: 'adapter.tx', label: command, payload: {}, agentId })
 }
 
-export function emitAdapterRx(payload: Record<string, unknown>, t: number) {
-  tracer.emit({ t, type: 'adapter.rx', label: 'telemetry', payload })
+export function emitAdapterRx(payload: Record<string, unknown>, t: number, agentId?: string) {
+  tracer.emit({ t, type: 'adapter.rx', label: 'telemetry', payload, agentId })
 }
 
-export function emitError(message: string, t: number) {
-  tracer.emit({ t, type: 'error', label: 'error', payload: { message } })
+export function emitError(message: string, t: number, agentId?: string) {
+  tracer.emit({ t, type: 'error', label: 'error', payload: { message }, agentId })
 }
 
 // ─── Perception Events ─────────────────────────────────────────────

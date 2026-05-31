@@ -23,6 +23,9 @@ import { VALPanel } from './VALPanel'
 import { VALTimelinePanel } from './VALTimelinePanel'
 import { SimRealComparePanel } from './SimRealComparePanel'
 import { SocialEventsPanel } from './SocialEventsPanel'
+import { MultiAgentTimelinePanel } from './MultiAgentTimelinePanel'
+import { AgentDiffPanel } from './AgentDiffPanel'
+import { useMultiAgentDebug } from '@/hooks/useMultiAgentDebug'
 import { computeMemoryStats } from '@/memory/episodic-store'
 import styles from './DebugPage.module.css'
 
@@ -588,6 +591,24 @@ export function DebugPage() {
 
       {/* Social Events Panel (multi-agent) */}
       <SocialEventsPanel events={debug.socialEvents} />
+
+      {/* Multi-Agent Debug Panels */}
+      {(() => {
+        const multiDebug = useMultiAgentDebug()
+        return (
+          <>
+            {multiDebug.agents.length > 0 && multiDebug.totalEvents > 0 && (
+              <MultiAgentTimelinePanel
+                agents={multiDebug.agents}
+                timeWindowMs={30000}
+              />
+            )}
+            {multiDebug.agents.length >= 2 && (
+              <AgentDiffPanel agents={multiDebug.agents} />
+            )}
+          </>
+        )
+      })()}
 
       {/* Memories Panel */}
       <MemoriesPanel

@@ -9,6 +9,7 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './src'),
       '@cyber-agent/sdk/trace': path.resolve(__dirname, './sdk/src/trace/schema.ts'),
+      '@cyber-agent/sdk/adapter/contract': path.resolve(__dirname, './sdk/src/adapter/contract.ts'),
     },
   },
   build: {

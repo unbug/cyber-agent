@@ -11,7 +11,7 @@
  */
 
 import type { RuntimeNode, Blackboard } from './types'
-import { tick as btTick, resetTree } from './executor'
+import { tick as btTick, resetTree, setAgentContext } from './executor'
 import type { World } from './world'
 import type { ValEngine } from '../affect/engine'
 
@@ -174,6 +174,9 @@ export class MultiExecutor {
    * Tick one agent and update the world's spatial index.
    */
   private _tickAgent(ctx: AgentContext): 'success' | 'failure' | 'running' {
+    // Set agent context for tracer events
+    setAgentContext(ctx.agentId)
+
     // Sync agent position from blackboard to world
     const worldAgent = this._world.getAgent(ctx.agentId)
     if (worldAgent) {
@@ -183,6 +186,9 @@ export class MultiExecutor {
 
     // Tick the behavior tree
     const status = btTick(ctx.tree, ctx.blackboard, null as any, this._valEngine)
+
+    // Clear agent context
+    setAgentContext(undefined)
     ctx.lastStatus = status
 
     // Emit action events to the world bus
