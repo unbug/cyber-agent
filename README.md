@@ -390,8 +390,16 @@ unchanged on a real RoboMaster; published bench numbers hold.
   - `src/hooks/useMultiAgentDebug.ts` — per-agent debug state aggregation
   - 7 unit tests (MultiAgentTimelinePanel + AgentDiffPanel)
   - Wired into `/debug` page via `useMultiAgentDebug`
-- [ ] `MultiBroadcastAdapter` — fan-out commands to N physical robots
+- [x] `MultiBroadcastAdapter` — fan-out commands to N physical robots
       with NTP-style time sync (≤5 ms drift) and global e-stop.
+  - `src/adapters/multi-broadcast.ts` — `MultiBroadcastAdapter` implementing `RobotAdapterV2`
+  - Command fan-out to all connected adapters
+  - NTP-style time sync with drift tracking (≤5 ms threshold)
+  - Global e-stop propagation to all robots
+  - Per-robot health monitoring (connection, latency, heartbeat)
+  - Self-test with structured report
+  - `docs/hil/multi-broadcast/CHECKLIST.md` — HIL checklist
+  - 20 unit tests (`multi-broadcast.test.ts`)
 - [ ] Two-robot demo (cat × dog) with believable interaction shipped.
 - [ ] 3+ robots, 30-minute soak, no cross-talk drops.
 
