@@ -35,6 +35,10 @@ export type TracerEventType =
   | 'perception'
   | 'val.update'
   | 'social.event'
+  | 'policy.invoke'
+  | 'policy.success'
+  | 'policy.failure'
+  | 'policy.low_confidence'
 
 // Re-export breakpoint types for consumers
 export type { Breakpoint, BreakpointKind } from './breakpoints'
@@ -306,5 +310,44 @@ export function emitSocialEvent(event: SocialEvent) {
       target: event.target,
       ...event.payload,
     },
+  })
+}
+
+// ─── Policy Events (v2.2) ─────────────────────────────────────
+
+export interface PolicyEvent {
+  /** Policy model ID */
+  modelId: string
+  /** Action vector returned by the policy (or null on failure) */
+  actionVector: number[] | null
+  /** Confidence score (0-1) */
+  confidence: number
+  /** Inference latency in ms */
+  latencyMs: number
+  /** Optional error message */
+  error?: string
+  /** Timestamp */
+  timestamp: number
+}
+
+export function emitPolicyEvent(event: PolicyEvent) {
+  const type: TracerEventType = event.actionVector
+    ? event.confidence > 0
+      ? 'policy.success'
+      : 'policy.failure'
+    : 'policy.failure'
+
+  tracer.emit({
+    t: event.timestamp,
+    type,
+    label: event.modelId,
+    payload: {
+      modelId: event.modelId,
+      actionVector: event.actionVector,
+      confidence: event.confidence,
+      latencyMs: event.latencyMs,
+      ...(event.error ? { error: event.error } : {}),
+    },
+    agentId: undefined,
   })
 }

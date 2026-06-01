@@ -27,6 +27,7 @@ import { MultiAgentTimelinePanel } from './MultiAgentTimelinePanel'
 import { AgentDiffPanel } from './AgentDiffPanel'
 import { CrossTalkPanel } from './CrossTalkPanel'
 import { PerformancePanel } from './PerformancePanel'
+import { PolicyPanel } from './PolicyPanel'
 import { useMultiAgentDebug } from '@/hooks/useMultiAgentDebug'
 import { computeMemoryStats } from '@/memory/episodic-store'
 import styles from './DebugPage.module.css'
@@ -619,6 +620,9 @@ export function DebugPage() {
 
       {/* Social Events Panel (multi-agent) */}
       <SocialEventsPanel events={debug.socialEvents} />
+
+      {/* Policy Inference Panel (v2.2) */}
+      <PolicyPanel />
 
       {/* Multi-Agent Debug Panels */}
       {(() => {

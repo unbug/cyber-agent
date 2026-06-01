@@ -1,0 +1,268 @@
+/* PolicyPanel — Debug panel for VLA / diffusion policy events (v2.2) */
+
+/* ─── Panel Container ───────────────────────────────────────────── */
+
+.policy-panel {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* ─── Header ────────────────────────────────────────────────────── */
+
+.policy-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.policy-panel-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.policy-panel-stats {
+  display: flex;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.policy-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.policy-stat-label {
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.policy-stat-value {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.policy-stat-warning {
+  color: #ef4444 !important;
+}
+
+.policy-panel-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* ─── Select ────────────────────────────────────────────────────── */
+
+.policy-select {
+  padding: var(--space-1) var(--space-2);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.policy-select:hover {
+  border-color: var(--border-hover);
+}
+
+/* ─── Checkbox ──────────────────────────────────────────────────── */
+
+.policy-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  user-select: none;
+}
+
+.policy-checkbox input {
+  cursor: pointer;
+}
+
+/* ─── Button ────────────────────────────────────────────────────── */
+
+.policy-btn {
+  padding: var(--space-1) var(--space-2);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.policy-btn:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-hover);
+}
+
+.policy-btn-clear {
+  color: #ef4444;
+}
+
+/* ─── Canvas ────────────────────────────────────────────────────── */
+
+.policy-canvas {
+  width: 100%;
+  height: 200px;
+  border-radius: var(--radius-md);
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border);
+}
+
+/* ─── Latest Result ─────────────────────────────────────────────── */
+
+.policy-latest {
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+}
+
+.policy-latest-header {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-2);
+}
+
+.policy-latest-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--space-2);
+}
+
+.policy-latest-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.policy-latest-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+}
+
+.policy-latest-value {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+  word-break: break-all;
+}
+
+.policy-success {
+  color: #22c55e !important;
+}
+
+.policy-fail {
+  color: #ef4444 !important;
+}
+
+.policy-action-vector {
+  font-family: monospace;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+/* ─── Event Log ─────────────────────────────────────────────────── */
+
+.policy-event-log {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.policy-event-log-header {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-1);
+}
+
+.policy-event-log-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.policy-event-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 4px var(--space-2);
+  border-radius: var(--radius-sm);
+  font-size: 0.7rem;
+  font-family: monospace;
+  background: var(--bg-elevated);
+  border: 1px solid transparent;
+}
+
+.policy-event-success {
+  border-left: 3px solid #22c55e;
+}
+
+.policy-event-fail {
+  border-left: 3px solid #ef4444;
+}
+
+.policy-event-time {
+  color: var(--text-tertiary);
+  min-width: 60px;
+}
+
+.policy-event-model {
+  color: #8b5cf6;
+  font-weight: 600;
+  min-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.policy-event-confidence {
+  color: var(--text-primary);
+  font-weight: 600;
+  min-width: 50px;
+}
+
+.policy-event-latency {
+  color: var(--text-secondary);
+  min-width: 55px;
+}
+
+.policy-event-error {
+  color: #ef4444;
+  font-size: 0.65rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
