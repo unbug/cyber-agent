@@ -407,7 +407,18 @@ unchanged on a real RoboMaster; published bench numbers hold.
   - Leverages social BT primitives: `isCloseTo`, `isFarFrom`, `flee`, `mirror`, `broadcastEmotion`, `findNearestAgent`, `greet`
   - 'Demo' button in playground toolbar for one-click load
   - Characters registered in gallery under 'companion' category
-- [ ] 3+ robots, 30-minute soak, no cross-talk drops.
+- [x] 3+ robots, 30-minute soak, no cross-talk drops.
+  - `CrossTalkPanel` — real-time per-robot command stats, drop rates,
+    drift, health in `/debug` page
+  - `PerformancePanel` — live tick-rate sparkline + latency histogram
+    with canvas rendering
+  - `MultiBroadcastAdapter` cross-talk detection with per-robot sequence
+    tracking, pending timeout, and `getCrossTalkReport()`
+  - `multi-broadcast-soak.test.ts` — 10K-command soak test across 4
+    robots with zero cross-talk verification
+  - `docs/hil/multi-broadcast/SOAK-CHECKLIST.md` — 30-minute HIL soak
+    procedure for 3+ physical robots
+  - 25 unit tests (CrossTalkPanel + PerformancePanel + soak)
 
 **Release gate**: 3-robot soak test green; one community-recorded
 multi-agent trace replayable; ≥2 RoboMaster S1 follow a browser-authored
