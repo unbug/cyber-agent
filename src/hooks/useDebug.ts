@@ -18,6 +18,8 @@ import type { SafetyEvent, SafetyState } from '@/engine/safety-supervisor'
 import type { EpisodicMemory } from '@/memory/types'
 import { InMemoryEpisodicStore } from '@/memory/episodic-store'
 import type { ValState } from '@/affect/types'
+import type { CrossTalkReport } from '@/pages/CrossTalkPanel'
+import type { PerformanceEntry } from '@/pages/PerformancePanel'
 
 // ─── Internal state ─────────────────────────────────────────────
 
@@ -56,11 +58,24 @@ interface DebugState {
   valState: ValState | null
   /** VAL history for trajectory */
   valHistory: Array<{ t: number; valence: number; arousal: number; dominance: number }>
+  /** Cross-talk detection report (multi-agent) */
+  crossTalkReport: CrossTalkReport | null
+  /** Current clock drift (ms) */
+  drift: number
+  /** Whether drift is within bounds */
+  driftOk: boolean
+  /** Number of connected robots */
+  robotCount: number
+  /** Performance data for PerformancePanel */
+  perfData: PerformanceEntry[]
+  /** Reset cross-talk counters */
+  resetCrossTalk: () => void
 }
 
 const MAX_BREADCRUMB = 50
 const MAX_ADAPTER_EVENTS = 200
 const MAX_TICK_TIMES = 120
+const TICK_HISTORY = 120
 
 export function useDebug(): DebugState & {
   /** Force a blackboard snapshot */
@@ -102,6 +117,12 @@ export function useDebug(): DebugState & {
     memories: [],
     valState: null,
     valHistory: [],
+    crossTalkReport: null,
+    drift: 0,
+    driftOk: true,
+    robotCount: 0,
+    perfData: [],
+    resetCrossTalk: () => {},
   })
 
   const stateRef = useRef(state)
@@ -138,6 +159,12 @@ export function useDebug(): DebugState & {
       memories: [],
       valState: null,
       valHistory: [],
+      crossTalkReport: null,
+      drift: 0,
+      driftOk: true,
+      robotCount: 0,
+      perfData: [],
+      resetCrossTalk: () => {},
     })
   }, [])
 
@@ -232,6 +259,31 @@ export function useDebug(): DebugState & {
     })
   }, [])
 
+  /** Update cross-talk report from MultiBroadcastAdapter */
+  const updateCrossTalk = useCallback(
+    (report: CrossTalkReport | null, drift: number, driftOk: boolean, robotCount: number) => {
+      setState(prev => ({
+        ...prev,
+        crossTalkReport: report,
+        drift,
+        driftOk,
+        robotCount,
+      }))
+    },
+    [],
+  )
+
+  /** Reset cross-talk counters */
+  const resetCrossTalk = useCallback(() => {
+    setState(prev => ({
+      ...prev,
+      crossTalkReport: null,
+      drift: 0,
+      driftOk: true,
+      robotCount: 0,
+    }))
+  }, [])
+
   // Tracer subscription
   useEffect(() => {
     const unsubscribe = tracer.subscribe((event: TracerEvent) => {
@@ -240,7 +292,10 @@ export function useDebug(): DebugState & {
       switch (event.type) {
         case 'tick.start': {
           const tickTimes = [...s.tickTimes, event.t].slice(-MAX_TICK_TIMES)
-          setState(prev => ({ ...prev, tickTimes }))
+          const tickRate = tickTimes.length >= 2 ? computeTickRate([...tickTimes]) : 0
+          const latency = s.breadcrumb.length >= 2 ? computeAvgLatency(s.breadcrumb) : 0
+          const perfData = [...s.perfData, { tickRate, latencyMs: latency, t: event.t }].slice(-TICK_HISTORY)
+          setState(prev => ({ ...prev, tickTimes, perfData }))
           break
         }
         case 'node.enter':
@@ -311,6 +366,7 @@ export function useDebug(): DebugState & {
     socialEvents: state.socialEvents,
     tickRate,
     avgLatency,
+    perfData: state.perfData,
     captureBlackboard,
     updateTree,
     reset,
@@ -319,6 +375,8 @@ export function useDebug(): DebugState & {
     encodeMemory,
     purgeMemories,
     simulateForgetting,
+    updateCrossTalk,
+    resetCrossTalk,
   } as DebugState & {
     captureBlackboard: (bb: Blackboard) => void
     updateTree: (tree: RuntimeNode) => void
@@ -328,6 +386,8 @@ export function useDebug(): DebugState & {
     encodeMemory: (event: TracerEvent) => void
     purgeMemories: () => void
     simulateForgetting: (elapsedMs: number) => void
+    updateCrossTalk: (report: CrossTalkReport | null, drift: number, driftOk: boolean, robotCount: number) => void
+    resetCrossTalk: () => void
     tickRate: number
     avgLatency: number
   }

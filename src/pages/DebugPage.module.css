@@ -1903,6 +1903,221 @@
   white-space: nowrap;
 }
 
+/* ─── Performance Panel ───────────────────────────────────── */
+
+.perfPanel {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.perfHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-elevated);
+}
+
+.perfStats {
+  display: flex;
+  gap: var(--space-3);
+  margin-left: auto;
+}
+
+.perfStatItem {
+  font-size: 0.65rem;
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+}
+
+.perfStatItem strong {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.perfBody {
+  position: relative;
+}
+
+.perfCanvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  cursor: crosshair;
+}
+
+.perfEmpty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8);
+  gap: var(--space-2);
+  color: var(--text-tertiary);
+}
+
+.perfEmptyIcon {
+  font-size: 2rem;
+  opacity: 0.5;
+}
+
+.perfHover {
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-1) var(--space-3);
+  background: var(--bg-elevated);
+  border-top: 1px solid var(--border);
+  font-size: 0.65rem;
+  font-family: var(--font-mono);
+}
+
+.perfHoverTime {
+  color: var(--text-tertiary);
+}
+
+.perfHoverMetric {
+  display: flex;
+  gap: var(--space-1);
+}
+
+.perfHoverLabel {
+  color: var(--text-tertiary);
+}
+
+/* ─── Cross-Talk Monitor ──────────────────────────────────── */
+
+.crossTalkStatus {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  border: 1px solid;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.crossTalkIcon {
+  font-size: 1.1rem;
+}
+
+.crossTalkLabel {
+  font-family: var(--font-mono);
+  letter-spacing: 0.05em;
+}
+
+.crossTalkBadge {
+  padding: 1px 6px;
+  border-radius: 99px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.crossTalkBadgeEstop {
+  background: #ef444422;
+  color: #ef4444;
+  border: 1px solid #ef444444;
+}
+
+.crossTalkBadgeCritical {
+  background: #ef444422;
+  color: #ef4444;
+  border: 1px solid #ef444444;
+}
+
+.crossTalkSummary {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--space-2);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.crossTalkStat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.crossTalkStatLabel {
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.crossTalkStatValue {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.crossTalkTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.7rem;
+  margin: var(--space-2) 0;
+}
+
+.crossTalkTh {
+  text-align: left;
+  padding: var(--space-1) var(--space-2);
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.6rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.crossTalkTd {
+  padding: var(--space-1) var(--space-2);
+  font-family: var(--font-mono);
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+
+.crossTalkEmpty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-6);
+  color: var(--text-tertiary);
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+.crossTalkEmptyIcon {
+  font-size: 2rem;
+  opacity: 0.5;
+}
+
+.btnSmall {
+  padding: var(--space-1) var(--space-3);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.btnSmall:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-hover);
+}
+
 /* ─── Compare Toggle Button ─────────────────────────────────── */
 
 .compareToggleBtn {

@@ -25,6 +25,8 @@ import { SimRealComparePanel } from './SimRealComparePanel'
 import { SocialEventsPanel } from './SocialEventsPanel'
 import { MultiAgentTimelinePanel } from './MultiAgentTimelinePanel'
 import { AgentDiffPanel } from './AgentDiffPanel'
+import { CrossTalkPanel } from './CrossTalkPanel'
+import { PerformancePanel } from './PerformancePanel'
 import { useMultiAgentDebug } from '@/hooks/useMultiAgentDebug'
 import { computeMemoryStats } from '@/memory/episodic-store'
 import styles from './DebugPage.module.css'
@@ -445,6 +447,7 @@ export function DebugPage() {
   } | null>(null)
   const [selfTestLoading, setSelfTestLoading] = useState(false)
   const [showCompare, setShowCompare] = useState(false)
+  const [showCrossTalk, setShowCrossTalk] = useState(false)
 
   // Collect active nodes from tree
   const activeNodes = useMemo(() => {
@@ -515,6 +518,13 @@ export function DebugPage() {
         </div>
       </div>
 
+      {/* Performance Panel */}
+      <PerformancePanel
+        data={debug.perfData}
+        width={800}
+        height={180}
+      />
+
       {/* Error log */}
       {showErrors && <ErrorLog errors={debug.errors} />}
       {debug.errors.length > 0 && (
@@ -563,6 +573,24 @@ export function DebugPage() {
         onClick={() => setShowCompare(!showCompare)}
       >
         {showCompare ? '▲ Hide' : '▼ Sim↔Real Compare'}
+      </button>
+
+      {/* Multi-Broadcast Cross-Talk Monitor */}
+      {showCrossTalk && (
+        <CrossTalkPanel
+          report={debug.crossTalkReport}
+          drift={debug.drift}
+          driftOk={debug.driftOk}
+          eStopActive={debug.eStopActive}
+          robotCount={debug.robotCount}
+          onReset={debug.resetCrossTalk}
+        />
+      )}
+      <button
+        className={styles.compareToggleBtn}
+        onClick={() => setShowCrossTalk(!showCrossTalk)}
+      >
+        {showCrossTalk ? '▲ Hide' : '▼ Cross-Talk Monitor'}
       </button>
 
       {/* Safety Supervisor */}

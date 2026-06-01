@@ -83,6 +83,54 @@ interface TimeSyncState {
 const MAX_ALLOWED_DRIFT_MS = 5
 const SYNC_INTERVAL_MS = 5000
 
+// ─── Cross-talk detection ────────────────────────────────────
+
+/** Per-robot command sequence tracking for cross-talk detection */
+interface CommandSeq {
+  /** Robot ID */
+  id: string
+  /** Last received (acked) sequence count */
+  lastSeq: number
+  /** Total commands sent to this robot (uncapped counter) */
+  totalSent: number
+  /** Commands sent (for replay/debug, capped at _sentBuffer) */
+  sent: Array<{ seq: number; cmd: RobotCommand; ts: number }>
+  /** Expected telemetry responses per robot */
+  pending: Map<number, { cmd: RobotCommand; ts: number }>
+  /** Dropped commands (no telemetry ack within timeout) */
+  drops: number
+  /** Maximum pending buffer size */
+  maxPending: number
+}
+
+const DEFAULT_PENDING_TIMEOUT_MS = 500
+const DEFAULT_MAX_PENDING = 100
+const DEFAULT_SENT_BUFFER = 1000
+
+/** Cross-talk detection report */
+export interface CrossTalkReport {
+  /** Overall cross-talk status */
+  status: 'clean' | 'warning' | 'critical'
+  /** Total commands sent across all robots */
+  totalSent: number
+  /** Total commands received by their target robot */
+  totalReceived: number
+  /** Total commands dropped (no telemetry ack) */
+  totalDrops: number
+  /** Per-robot stats */
+  perRobot: Array<{
+    id: string
+    sent: number
+    received: number
+    drops: number
+    dropRate: number
+  }>
+  /** Whether any robot has a drop rate above threshold */
+  hasCriticalRobot: boolean
+  /** Critical robot IDs (drop rate > 5%) */
+  criticalRobots: string[]
+}
+
 // ─── MultiBroadcastAdapter ────────────────────────────────────
 
 export class MultiBroadcastAdapter implements RobotAdapterV2 {
@@ -101,6 +149,14 @@ export class MultiBroadcastAdapter implements RobotAdapterV2 {
   private _syncTimer: ReturnType<typeof setInterval> | null = null
   private _drift = 0
   private _lastEStop = false
+  private _seq = 0
+  private _commandSeq = new Map<string, CommandSeq>()
+  private _totalSent = 0
+  private _totalReceived = 0
+  private _totalDrops = 0
+  private _pendingTimeoutMs = DEFAULT_PENDING_TIMEOUT_MS
+  private _maxPending = DEFAULT_MAX_PENDING
+  private _sentBuffer = DEFAULT_SENT_BUFFER
 
   /** Add a robot adapter by ID */
   addAdapter(id: string, adapter: RobotAdapterV2): void {
@@ -235,10 +291,13 @@ export class MultiBroadcastAdapter implements RobotAdapterV2 {
 
   /** Send command to ALL connected robots */
   sendCommand(cmd: RobotCommand): void {
-    for (const [id] of this.adapters) {
+    for (const [id, adapter] of this.adapters) {
       const health = this.healthMap.get(id)
       if (health?.connected) {
-        this.adapters.get(id)!.sendCommand(cmd)
+        // Record for cross-talk detection
+        this.recordCommandSent(id, cmd)
+        // Fan out the command
+        adapter.sendCommand(cmd)
       }
     }
   }
@@ -392,5 +451,150 @@ export class MultiBroadcastAdapter implements RobotAdapterV2 {
     this.healthMap.clear()
     this.syncStates.clear()
     this.telemetryListeners.length = 0
+  }
+
+  // ─── Cross-talk detection ───────────────────────────────────
+
+  /** Get cross-talk detection report */
+  getCrossTalkReport(): CrossTalkReport {
+    // First, prune expired pending commands
+    for (const [, seq] of this._commandSeq) {
+      this.prunePending(seq)
+    }
+
+    const perRobot: CrossTalkReport['perRobot'] = []
+    let totalSent = 0
+    let totalReceived = 0
+    let totalDrops = 0
+    const criticalRobots: string[] = []
+
+    for (const [id, seq] of this._commandSeq) {
+      const sent = seq.totalSent
+      const received = seq.lastSeq
+      const drops = seq.drops
+      const dropRate = sent > 0 ? drops / sent : 0
+
+      perRobot.push({
+        id,
+        sent,
+        received,
+        drops,
+        dropRate: Math.round(dropRate * 10000) / 100,
+      })
+
+      totalSent += sent
+      totalReceived += received
+      totalDrops += drops
+
+      if (dropRate > 0.05) {
+        criticalRobots.push(id)
+      }
+    }
+
+    // Also count global _totalSent/_totalReceived if available
+    const effectiveSent = totalSent > 0 ? totalSent : this._totalSent
+    const effectiveReceived = totalReceived > 0 ? totalReceived : this._totalReceived
+    const effectiveDrops = totalDrops > 0 ? totalDrops : this._totalDrops
+
+    const hasCritical = criticalRobots.length > 0
+    const status = hasCritical ? 'critical' : (effectiveDrops > 0 ? 'warning' : 'clean')
+
+    return {
+      status,
+      totalSent: effectiveSent,
+      totalReceived: effectiveReceived,
+      totalDrops: effectiveDrops,
+      perRobot: perRobot.sort((a, b) => b.dropRate - a.dropRate),
+      hasCriticalRobot: hasCritical,
+      criticalRobots,
+    }
+  }
+
+  /** Reset cross-talk counters */
+  resetCrossTalk(): void {
+    this._commandSeq.clear()
+    this._totalSent = 0
+    this._totalReceived = 0
+    this._totalDrops = 0
+  }
+
+  /** Set pending command timeout (ms) — default 500ms */
+  setPendingTimeout(ms: number): void {
+    this._pendingTimeoutMs = ms
+  }
+
+  /** Set max pending buffer per robot — default 100 */
+  setMaxPending(n: number): void {
+    this._maxPending = n
+  }
+
+  /** Get a CommandSeq for a robot, creating one if needed */
+  getSeq(id: string): CommandSeq {
+    let seq = this._commandSeq.get(id)
+    if (!seq) {
+      seq = {
+        id,
+        lastSeq: 0,
+        totalSent: 0,
+        sent: [],
+        pending: new Map(),
+        drops: 0,
+        maxPending: this._maxPending,
+      }
+      this._commandSeq.set(id, seq)
+    }
+    return seq
+  }
+
+  /** Prune expired pending commands from a robot's buffer */
+  private prunePending(seq: CommandSeq): void {
+    const now = performance.now()
+    const toRemove: number[] = []
+
+    for (const [seqNum, entry] of seq.pending) {
+      if (now - entry.ts > this._pendingTimeoutMs) {
+        toRemove.push(seqNum)
+      }
+    }
+
+    for (const seqNum of toRemove) {
+      seq.pending.delete(seqNum)
+      seq.drops++
+      this._totalDrops++
+    }
+  }
+
+  /** Record a telemetry ack for a sent command */
+  recordTelemetryAck(robotId: string, cmdSeq: number): void {
+    const seq = this._commandSeq.get(robotId)
+    if (!seq) return
+
+    const pending = seq.pending.get(cmdSeq)
+    if (pending) {
+      seq.pending.delete(cmdSeq)
+      seq.lastSeq++
+      this._totalReceived++
+    }
+  }
+
+  /** Record a command sent to a specific robot (for cross-talk tracking) */
+  recordCommandSent(robotId: string, cmd: RobotCommand): void {
+    const seq = this.getSeq(robotId)
+    const seqNum = ++this._seq
+    const ts = performance.now()
+
+    // Increment total sent counter
+    seq.totalSent++
+
+    // Add to pending
+    seq.pending.set(seqNum, { cmd, ts })
+
+    // Trim sent buffer (for replay/debug only)
+    if (seq.sent.length >= this._sentBuffer) {
+      seq.sent.shift()
+    }
+    seq.sent.push({ seq: seqNum, cmd, ts })
+
+    this._totalSent++
   }
 }
