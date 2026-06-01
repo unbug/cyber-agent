@@ -428,9 +428,16 @@ playground session with <10 cm / <100 ms sim→physical error.
 
 Make CyberAgent the orchestration layer over modern policies.
 
-- [ ] Action node `RunPolicy(<HF model id>, observation_spec)` — calls a
+- [x] Action node `RunPolicy(<HF model id>, observation_spec)` — calls a
       VLA / diffusion policy for one motion primitive.
-- [ ] `WhenPolicyConfident` selector branch.
+  - `src/engine/policy.ts` — `PolicyConfig` / `ObservationSpec` / `ActionSpec` / `PolicyResult` types
+  - `PolicyClient` interface with `RestPolicyClient`, `SimPolicyClient`, `MockPolicyClient` implementations
+  - `runPolicyAction()` — BT action node: extracts observations from blackboard, calls policy, maps action vector to commands
+  - `applyPolicyAction()` — action vector → nested robot command payload
+  - `registerPolicyNodes()` — registers `runPolicy` + `whenPolicyConfident` with BT engine
+  - `src/engine/policy.test.ts` — 25 tests (registry, clients, mappings, action node, condition)
+  - `experimental` — sim-only; real-hardware transfer validation pending
+- [x] `WhenPolicyConfident` selector branch.
 - [ ] Reference integration: Pi0 / SmolVLA / GR00T via LeRobot bridge.
 - [ ] `/debug` shows policy input frames + action vector alongside BT.
 - [ ] Cookbook: how to ship a learned skill inside a hand-authored
