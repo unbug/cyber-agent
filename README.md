@@ -138,9 +138,17 @@ Released: 2026-04-26
 
 A debugger you can hand to a contributor.
 
-- [ ] `/debug` page split-view: BT graph (current node highlighted, last
+- [x] `/debug` page split-view: BT graph (current node highlighted, last
       50-node breadcrumb) ｜ actuator timeline ｜ blackboard inspector.
-- [ ] Live tick-rate / latency widgets.
+  - `src/pages/DebugPage.tsx` — split-view with BT tree panel, actuator timeline, blackboard inspector
+  - `TreeNode` — recursive BT renderer with active node highlighting, type-color coding, status dots
+  - `Breadcrumb` — last N node-enter events as breadcrumb trail
+  - `ActuatorTimeline` — TX/RX event streams with time-stamped messages
+  - `BlackboardInspector` — field listing with diff highlighting via `diffBlackboards`
+- [x] Live tick-rate / latency widgets.
+  - `PerformancePanel` — live tick-rate sparkline + latency histogram
+  - Top stats bar: tick rate (fps), avg latency (ms), event count
+  - Tick-rate warning threshold at 8 fps (below = yellow)
 - [x] Diff highlighting on every blackboard write (`src/hooks/useDebug.ts` → `diffBlackboards`).
 - [x] Capability discovery — read `adapter.capabilities()` and grey out
       incompatible BT nodes in the editor.
