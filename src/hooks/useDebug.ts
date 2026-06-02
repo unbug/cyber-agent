@@ -20,6 +20,7 @@ import { InMemoryEpisodicStore } from '@/memory/episodic-store'
 import type { ValState } from '@/affect/types'
 import type { CrossTalkReport } from '@/pages/CrossTalkPanel'
 import type { PerformanceEntry } from '@/pages/PerformancePanel'
+import type { PolicyResult } from '@/engine/policy'
 
 // ─── Internal state ─────────────────────────────────────────────
 
@@ -70,6 +71,10 @@ interface DebugState {
   perfData: PerformanceEntry[]
   /** Reset cross-talk counters */
   resetCrossTalk: () => void
+  /** Policy inference results (last 100) */
+  policyResults: PolicyResult[]
+  /** Policy invocation events for timeline */
+  policyEvents: TracerEvent[]
 }
 
 const MAX_BREADCRUMB = 50
@@ -123,6 +128,8 @@ export function useDebug(): DebugState & {
     robotCount: 0,
     perfData: [],
     resetCrossTalk: () => {},
+    policyResults: [],
+    policyEvents: [],
   })
 
   const stateRef = useRef(state)
@@ -165,6 +172,8 @@ export function useDebug(): DebugState & {
       robotCount: 0,
       perfData: [],
       resetCrossTalk: () => {},
+      policyResults: [],
+      policyEvents: [],
     })
   }, [])
 
@@ -331,6 +340,28 @@ export function useDebug(): DebugState & {
           setState(prev => ({ ...prev, errors }))
           break
         }
+        case 'policy.invoke':
+        case 'policy.success':
+        case 'policy.failure':
+        case 'policy.low_confidence': {
+          const payload = event.payload as Record<string, unknown> | undefined
+          if (payload) {
+            const actionVector = Array.isArray(payload.actionVector)
+              ? payload.actionVector as number[]
+              : null
+            const policyResult: PolicyResult = {
+              modelId: (payload.modelId as string) ?? event.label,
+              actionVector: actionVector ?? [],
+              confidence: (payload.confidence as number) ?? 0,
+              latencyMs: (payload.latencyMs as number) ?? 0,
+              timestamp: event.t,
+            }
+            const results = [...s.policyResults, policyResult].slice(-100)
+            const policyEvents = [...s.policyEvents, event].slice(-200)
+            setState(prev => ({ ...prev, policyResults: results, policyEvents }))
+          }
+          break
+        }
         case 'val.update': {
           const payload = event.payload as Record<string, unknown> | undefined
           if (payload) {
@@ -367,6 +398,8 @@ export function useDebug(): DebugState & {
     tickRate,
     avgLatency,
     perfData: state.perfData,
+    policyResults: state.policyResults,
+    policyEvents: state.policyEvents,
     captureBlackboard,
     updateTree,
     reset,

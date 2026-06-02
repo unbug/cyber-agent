@@ -28,6 +28,7 @@ import { AgentDiffPanel } from './AgentDiffPanel'
 import { CrossTalkPanel } from './CrossTalkPanel'
 import { PerformancePanel } from './PerformancePanel'
 import { PolicyPanel } from './PolicyPanel'
+import { PolicyInputPanel } from './PolicyInputPanel'
 import { useMultiAgentDebug } from '@/hooks/useMultiAgentDebug'
 import { computeMemoryStats } from '@/memory/episodic-store'
 import styles from './DebugPage.module.css'
@@ -623,6 +624,14 @@ export function DebugPage() {
 
       {/* Policy Inference Panel (v2.2) */}
       <PolicyPanel />
+
+      {/* Policy Input Frames — alongside BT tree (v2.2 checkbox 4) */}
+      <PolicyInputPanel
+        policyResults={debug.policyResults}
+        policyEvents={debug.policyEvents}
+        width={700}
+        height={280}
+      />
 
       {/* Multi-Agent Debug Panels */}
       {(() => {
