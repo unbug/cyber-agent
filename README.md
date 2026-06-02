@@ -448,8 +448,20 @@ Make CyberAgent the orchestration layer over modern policies.
   - 22 unit tests
   - ⚠️ `experimental` — sim-only; real-hardware transfer validation pending
 - [ ] `/debug` shows policy input frames + action vector alongside BT.
-- [ ] Cookbook: how to ship a learned skill inside a hand-authored
+- [x] Cookbook: how to ship a learned skill inside a hand-authored
       character.
+  - `docs/cookbook/v2.2/hybrid-character-cookbook.md` — comprehensive guide
+    - Architecture overview: BT as director, policy as action node
+    - Sample VLA-Hybrid Guardian character with interleaved BT + policy
+    - Pi0 / SmolVLA / GR00T config examples with observation/action specs
+    - LeRobot bridge setup (Python server + browser client + camera capture)
+    - Debugging tips (PolicyInputPanel, tracer events, blackboard fields)
+    - Safety considerations and interleaving strategy
+  - `src/agents/vla-hybrid-guardian/` — sample hybrid character
+    - `character.ts` — VLA-Hybrid Guardian (guard category, experimental)
+    - `behavior.ts` — BT with whenPolicyConfident → runPolicy → rule patrol
+    - `index.ts` — barrel export
+  - Registered in `src/agents/index.ts` gallery and character map
 
 **Release gate**: one published character that interleaves authored BT
 behavior with a learned VLA primitive on real hardware.
