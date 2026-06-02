@@ -447,7 +447,12 @@ Make CyberAgent the orchestration layer over modern policies.
   - `docs/hil/lerobot-bridge/CHECKLIST.md` — HIL verification checklist
   - 22 unit tests
   - ⚠️ `experimental` — sim-only; real-hardware transfer validation pending
-- [ ] `/debug` shows policy input frames + action vector alongside BT.
+- [x] `/debug` shows policy input frames + action vector alongside BT.
+  - `src/pages/PolicyInputPanel.tsx` — observation grid + action bar chart + confidence indicator
+  - Frame selector slider for inspecting historical policy invocations
+  - Triggered-by source node attribution
+  - `src/pages/PolicyInputPanel.module.css` — panel styling
+  - Wired into `/debug` page via `useDebug` policy events
 - [x] Cookbook: how to ship a learned skill inside a hand-authored
       character.
   - `docs/cookbook/v2.2/hybrid-character-cookbook.md` — comprehensive guide

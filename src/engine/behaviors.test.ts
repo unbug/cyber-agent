@@ -70,8 +70,8 @@ describe('Character behaviors', () => {
     }
   })
 
-  it('getAllBehaviors returns all 73', () => {
-    expect(getAllBehaviors()).toHaveLength(73)
+  it('getAllBehaviors returns all 74', () => {
+    expect(getAllBehaviors()).toHaveLength(74)
   })
 
   it('each behavior tree can hydrate and tick without crashing', () => {
