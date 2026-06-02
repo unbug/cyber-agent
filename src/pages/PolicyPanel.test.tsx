@@ -5,7 +5,7 @@
  * without relying on canvas rendering in jsdom.
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { tracer, type TracerEvent } from '@/engine/tracer'
 
 describe('PolicyPanel data flow', () => {
@@ -30,10 +30,10 @@ describe('PolicyPanel data flow', () => {
 
     unsub()
     expect(events.length).toBe(1)
-    expect(events[0].type).toBe('policy.invoke')
-    expect(events[0].label).toBe('test/model')
-    expect(events[0].payload?.modelId).toBe('test/model')
-    expect(events[0].payload?.confidence).toBe(0.8)
+    expect(events[0]?.type).toBe('policy.invoke')
+    expect(events[0]?.label).toBe('test/model')
+    expect(events[0]?.payload?.modelId).toBe('test/model')
+    expect(events[0]?.payload?.confidence).toBe(0.8)
   })
 
   it('emits policy.success event', () => {
@@ -49,7 +49,7 @@ describe('PolicyPanel data flow', () => {
 
     unsub()
     expect(events.length).toBe(1)
-    expect(events[0].type).toBe('policy.success')
+    expect(events[0]?.type).toBe('policy.success')
   })
 
   it('emits policy.failure event', () => {
@@ -65,8 +65,8 @@ describe('PolicyPanel data flow', () => {
 
     unsub()
     expect(events.length).toBe(1)
-    expect(events[0].type).toBe('policy.failure')
-    expect(events[0].payload?.error).toBe('timeout')
+    expect(events[0]?.type).toBe('policy.failure')
+    expect(events[0]?.payload?.error).toBe('timeout')
   })
 
   it('emits policy.low_confidence event', () => {
@@ -82,7 +82,7 @@ describe('PolicyPanel data flow', () => {
 
     unsub()
     expect(events.length).toBe(1)
-    expect(events[0].type).toBe('policy.low_confidence')
+    expect(events[0]?.type).toBe('policy.low_confidence')
   })
 
   it('aggregates multiple policy events correctly', () => {
@@ -101,7 +101,7 @@ describe('PolicyPanel data flow', () => {
 
     unsub()
     expect(events.length).toBe(3)
-    expect(events.every(e => e.type === 'policy.success')).toBe(true)
+    expect(events.every((e) => e.type === 'policy.success')).toBe(true)
   })
 
   it('does not emit non-policy events', () => {
@@ -117,7 +117,7 @@ describe('PolicyPanel data flow', () => {
 
     unsub()
     expect(events.length).toBe(1)
-    expect(events[0].type).toBe('tick.start')
-    expect(events[0].type).not.toBe('policy.invoke')
+    expect(events[0]?.type).toBe('tick.start')
+    expect(events[0]?.type).not.toBe('policy.invoke')
   })
 })

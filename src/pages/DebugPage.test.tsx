@@ -67,7 +67,7 @@ describe('DebugPage', () => {
     renderWithRouter(<DebugPage />)
     expect(screen.getByText('10.5 fps')).toBeInTheDocument()
     expect(screen.getByText('1.23 ms')).toBeInTheDocument()
-    expect(screen.getByText('Events')).toBeInTheDocument()
+    expect(screen.getByText('Events', { selector: '.statLabel' })).toBeInTheDocument()
   })
 
   it('shows controls', () => {

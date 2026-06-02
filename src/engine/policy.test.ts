@@ -316,8 +316,8 @@ describe('runPolicyAction', async () => {
     })
 
     // Mock fetch to simulate RestPolicyClient success
-    const originalFetch = global.fetch
-    global.fetch = vi.fn().mockResolvedValue({
+    const originalFetch = (window as any).fetch
+    ;(window as any).fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: () => Promise.resolve([10, 20, 15, 5]),
     })
@@ -335,13 +335,13 @@ describe('runPolicyAction', async () => {
     await new Promise(resolve => setTimeout(resolve, 100))
 
     // Restore fetch
-    global.fetch = originalFetch
+    ;(window as any).fetch = originalFetch
     unsub()
 
     // Check tracer events were emitted
     const invokeEvents = policyEvents.filter(e => e.type === 'policy.invoke')
     expect(invokeEvents.length).toBe(1)
-    expect(invokeEvents[0].label).toBe('mock/model')
+    expect(invokeEvents[0]?.label).toBe('mock/model')
   })
 
   it('returns failure when confidence below threshold', async () => {

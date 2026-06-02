@@ -45,8 +45,8 @@ export function PerformancePanel({
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [hovered, setHovered] = useState<{ tickRate: number; latencyMs: number; t: number } | null>(null)
 
-  const tickRates = useMemo(() => data.map(d => d.tickRate).slice(-TICK_HISTORY), [data])
-  const latencies = useMemo(() => data.map(d => d.latencyMs).slice(-TICK_HISTORY), [data])
+  const tickRates = useMemo(() => (data ?? []).map(d => d.tickRate).slice(-TICK_HISTORY), [data])
+  const latencies = useMemo(() => (data ?? []).map(d => d.latencyMs).slice(-TICK_HISTORY), [data])
 
   const stats = useMemo(() => {
     if (tickRates.length === 0) return null

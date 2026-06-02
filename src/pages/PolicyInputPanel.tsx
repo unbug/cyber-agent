@@ -40,10 +40,7 @@ interface PolicyInputPanelProps {
 }
 
 export function PolicyInputPanel({
-  policyResults,
   policyEvents,
-  width = 600,
-  height = 280,
 }: PolicyInputPanelProps) {
   const [selectedIdx, setSelectedIdx] = useState(0)
   const [showObservations, setShowObservations] = useState(true)
@@ -52,7 +49,7 @@ export function PolicyInputPanel({
   // Build observation list from policy events
   const observations = useMemo((): PolicyObservation[] => {
     const result: PolicyObservation[] = []
-    for (const evt of policyEvents) {
+    for (const evt of policyEvents ?? []) {
       if (!evt.payload || evt.type !== 'policy.invoke') continue
       const payload = evt.payload as Record<string, unknown>
       if (!payload.modelId) continue
@@ -69,7 +66,7 @@ export function PolicyInputPanel({
       let sourceNode: string | undefined
       for (let i = policyEvents.length - 1; i >= 0; i--) {
         const prevEvt = policyEvents[i]
-        if (prevEvt.t <= evt.t && prevEvt.type === 'node.enter') {
+        if (prevEvt && prevEvt.t <= evt.t && prevEvt.type === 'node.enter') {
           sourceNode = prevEvt.label
           break
         }
@@ -168,8 +165,9 @@ export function PolicyInputPanel({
           <div className="policy-input-section">
             <div className="policy-input-section-title">Action Output</div>
             <div className="policy-input-action-bars">
-              {latest.actionVector.map((val, i) => {
-                const absMax = Math.max(...(latest.actionVector.map(Math.abs) as number[]), 0.01)
+              {(latest.actionVector ?? []).map((val: number, i: number) => {
+                const vec = latest.actionVector ?? []
+                const absMax = Math.max(...vec.map(Math.abs), 0.01)
                 const norm = val / absMax
                 return (
                   <div key={i} className="policy-input-action-bar">
