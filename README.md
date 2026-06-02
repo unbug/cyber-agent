@@ -438,7 +438,15 @@ Make CyberAgent the orchestration layer over modern policies.
   - `src/engine/policy.test.ts` — 25 tests (registry, clients, mappings, action node, condition)
   - `experimental` — sim-only; real-hardware transfer validation pending
 - [x] `WhenPolicyConfident` selector branch.
-- [ ] Reference integration: Pi0 / SmolVLA / GR00T via LeRobot bridge.
+- [x] Reference integration: Pi0 / SmolVLA / GR00T via LeRobot bridge.
+  - `src/engine/lerobot-bridge.ts` — `LeRobotPolicyClient` with WebSocket handshake,
+    observation send, camera frame support, task switching, auto-reconnect
+  - `LEROBOT_MODELS` registry with `pi0`, `smolvla`, `gr00t` pre-configured
+  - `createLeRobotClient()` factory with camera config derivation
+  - `generateLeRobotHILChecklist()` for HIL docs
+  - `docs/hil/lerobot-bridge/CHECKLIST.md` — HIL verification checklist
+  - 22 unit tests
+  - ⚠️ `experimental` — sim-only; real-hardware transfer validation pending
 - [ ] `/debug` shows policy input frames + action vector alongside BT.
 - [ ] Cookbook: how to ship a learned skill inside a hand-authored
       character.
