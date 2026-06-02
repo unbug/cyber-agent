@@ -95,6 +95,9 @@ import * as guardianBot from './guardian-bot'
 import * as musicianBot from './musician-bot'
 import * as curiousBird from './curious-bird'
 
+// v2.2 VLA hybrid character
+import * as vlaHybridGuardian from './vla-hybrid-guardian'
+
 // v2.1 cat-dog demo (social BT primitives)
 import * as catDogDemo from './cat-dog-demo/character'
 
@@ -188,6 +191,8 @@ registerAgent(sloth, 'sloth')
 registerAgent(narwhal, 'narwhal')
 registerAgent(cricket, 'cricket')
 registerAgent(bat, 'bat')
+// v2.2 VLA hybrid character
+registerAgent(vlaHybridGuardian, 'vla-hybrid-guardian')
 
 // v2.1 cat-dog demo (social BT primitives)
 registerAgent(catDogDemo.cat, 'demo-cat')
@@ -211,7 +216,9 @@ const agentList: Array<{ character: Character }> = [
   // v1.1 perception-driven characters
   shyCat, playfulDog, guardianBot, musicianBot, curiousBird,
   // v2.1 cat-dog demo
-  catDogDemo.cat, catDogDemo.dog
+  catDogDemo.cat, catDogDemo.dog,
+  // v2.2 VLA hybrid
+  vlaHybridGuardian
 ]
 
 // ─── Public API ──────────────────────────────────────────────
