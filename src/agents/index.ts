@@ -271,7 +271,9 @@ export function getAllBehaviors(): CharacterBehavior[] {
 }
 
 /**
- * Save a custom character definition as a JSON file
+ * Save a custom character definition as a JSON file.
+ *
+ * v3.0 format includes VAL, episodic memory, and perception bus config.
  */
 export function saveCharacterAsJSON(
   name: string,
@@ -279,9 +281,13 @@ export function saveCharacterAsJSON(
   tags: string[],
   difficulty: string,
   emoji: string,
-  behaviorTree: any
+  behaviorTree: any,
+  emotionPreset?: string,
+  valConfig?: import('./types').ValConfig,
+  memoryConfig?: import('./types').MemoryConfig,
+  perceptionConfig?: import('./types').PerceptionConfig,
 ): void {
-  const characterData = {
+  const characterData: Record<string, unknown> = {
     id: name.toLowerCase().replace(/\s+/g, '-'),
     name,
     emoji,
@@ -291,6 +297,11 @@ export function saveCharacterAsJSON(
     category: 'custom' as const,
     behaviorTree,
   }
+
+  if (emotionPreset) characterData.emotionPreset = emotionPreset
+  if (valConfig) characterData.valConfig = valConfig
+  if (memoryConfig) characterData.memoryConfig = memoryConfig
+  if (perceptionConfig) characterData.perceptionConfig = perceptionConfig
 
   const blob = new Blob([JSON.stringify(characterData, null, 2)], { type: 'application/json' })
   const url = URL.createObjectURL(blob)
