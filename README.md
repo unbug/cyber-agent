@@ -492,7 +492,14 @@ The "everyone can author a soul" release.
   - `InMemoryEpisodicStore` — accepts MemoryConfig constructor param
   - `PerceptionBus` — accepts PerceptionConfig enabled/categories/bufferSize
   - `useDebug` — exposes character config state + setCharacterConfig
-- [ ] One-click publish to Marketplace + signed character bundles.
+- [x] One-click publish to Marketplace + signed character bundles.
+  - `src/utils/character-bundle.ts` — ES256 signing via Web Crypto API (P-256), deterministic signature input
+  - `src/utils/bundle-store.ts` — IndexedDB-backed BundleStore (publish/get/list/delete/reverify/import)
+  - `src/utils/bundle-store.test.ts` — 7 tests (parse, verify, summary)
+  - `src/pages/MarketplacePage.tsx` — "My Published Bundles" section with verification badges, re-verify/download/delete actions
+  - Import modal with paste + drag-and-drop bundle JSON, signature verification feedback
+  - CharacterEditor Publish button → signed bundle download
+  - i18n translations (en/zh)
 - [ ] Hosted `/debug` (share a session URL with a teammate).
 - [ ] Plugin SDK (third-party BT nodes / adapters / sensors).
 - [ ] Stable `@cyber-agent/sdk@3` with breaking-change migration guide.
