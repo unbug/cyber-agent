@@ -483,7 +483,15 @@ behavior with a learned VLA primitive on real hardware.
 
 The "everyone can author a soul" release.
 
-- [ ] No-code character editor with VAL / memory / perception wired in.
+- [x] No-code character editor with VAL / memory / perception wired in.
+  - `src/pages/CharacterEditor.tsx` — full no-code editor with VAL affect, episodic memory, and perception config panels
+  - `src/pages/CharacterConfigPanel.tsx` — debug panel showing live character config
+  - `ValEngine` — respects valConfig initial/baseline/decay/perception overrides
+  - `BehaviorTreeRunner` — passes valConfig/memoryConfig/perceptionConfig to engine
+  - `loadCharacterFromJSON` — v3.0 format loader with custom agent registration
+  - `InMemoryEpisodicStore` — accepts MemoryConfig constructor param
+  - `PerceptionBus` — accepts PerceptionConfig enabled/categories/bufferSize
+  - `useDebug` — exposes character config state + setCharacterConfig
 - [ ] One-click publish to Marketplace + signed character bundles.
 - [ ] Hosted `/debug` (share a session URL with a teammate).
 - [ ] Plugin SDK (third-party BT nodes / adapters / sensors).
