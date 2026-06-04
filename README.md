@@ -500,7 +500,11 @@ The "everyone can author a soul" release.
   - Import modal with paste + drag-and-drop bundle JSON, signature verification feedback
   - CharacterEditor Publish button → signed bundle download
   - i18n translations (en/zh)
-- [ ] Hosted `/debug` (share a session URL with a teammate).
+- [x] Hosted `/debug` (share a session URL with a teammate).
+  - `src/utils/session-share.ts` — encode/decode session state with deflate+base64url
+  - `src/components/ShareSessionPanel.tsx` — ShareSessionPanel with generate/copy/close buttons
+  - Auto-load shared session from URL hash on mount
+  - 7 tests for session-share + 5 tests for ShareSessionPanel
 - [ ] Plugin SDK (third-party BT nodes / adapters / sensors).
 - [ ] Stable `@cyber-agent/sdk@3` with breaking-change migration guide.
 
