@@ -1,11 +1,13 @@
-import { useState, useMemo } from 'react'
+import React, { useState, useMemo, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Download, Github, Package, Star, Search, ArrowRight, ExternalLink } from 'lucide-react'
+import { Download, Github, Package, Star, Search, ArrowRight, ExternalLink, ShieldCheck, ShieldAlert, Trash2, Upload, X } from 'lucide-react'
 import { HoverBeam } from '@/components/HoverBeam'
 import { characters, getCompatibleAdapters } from '@/agents'
 import { downloadCharacter } from '@/utils/downloadCharacter'
 import { useI18n } from '@/i18n'
+import { listBundles, deleteBundle, reverifyBundle, importBundle, getBundleSummary } from '@/utils/bundle-store'
+import type { StoredBundle } from '@/utils/bundle-store'
 import styles from './MarketplacePage.module.css'
 
 // ── Hand-picked featured characters ──────────────────────────────
@@ -58,6 +60,69 @@ export function MarketplacePage() {
   const [search, setSearch] = useState('')
   const [activeCategory, setActiveCategory] = useState<string>('all')
   const { t } = useI18n()
+
+  // ── Published bundles state ─────────────────────────────────
+  const [publishedBundles, setPublishedBundles] = useState<StoredBundle[]>([])
+  const [importModalOpen, setImportModalOpen] = useState(false)
+  const [importJson, setImportJson] = useState('')
+  const [importResult, setImportResult] = useState<{ ok: boolean; error?: string; verified?: boolean } | null>(null)
+  const [verifyingId, setVerifyingId] = useState<string | null>(null)
+
+  const loadBundles = useCallback(async () => {
+    try {
+      const bundles = await listBundles()
+      setPublishedBundles(bundles)
+    } catch {
+      setPublishedBundles([])
+    }
+  }, [])
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  React.useEffect(() => { loadBundles() }, [])
+
+  const handleDeleteBundle = async (id: string) => {
+    await deleteBundle(id)
+    setPublishedBundles(prev => prev.filter(b => b.id !== id))
+  }
+
+  const handleReverify = async (id: string) => {
+    setVerifyingId(id)
+    const ok = await reverifyBundle(id)
+    setVerifyingId(null)
+    await loadBundles()
+    return ok
+  }
+
+  const handleImport = async () => {
+    if (!importJson.trim()) {
+      setImportResult({ ok: false, error: 'Please paste bundle JSON.' })
+      return
+    }
+    const result = await importBundle(importJson)
+    if (result.error) {
+      setImportResult({ ok: false, error: result.error })
+    } else {
+      setImportResult({ ok: true, verified: result.verified })
+      await loadBundles()
+      setImportJson('')
+      setImportModalOpen(false)
+    }
+  }
+
+  const handleImportFromDrop = async (e: React.DragEvent) => {
+    e.preventDefault()
+    const file = e.dataTransfer.files[0]
+    if (!file) return
+    const text = await file.text()
+    const result = await importBundle(text)
+    if (result.error) {
+      setImportResult({ ok: false, error: result.error })
+    } else {
+      setImportResult({ ok: true, verified: result.verified })
+      await loadBundles()
+      setImportModalOpen(false)
+    }
+  }
 
   const featured = FEATURED_IDS.map(id => characters.find(c => c.id === id)).filter(Boolean) as typeof characters
 
@@ -226,6 +291,108 @@ export function MarketplacePage() {
           </div>
         </section>
 
+        {/* ── My Published Bundles ───────────────────── */}
+        {publishedBundles.length > 0 && (
+          <section className={styles.section}>
+            <div className={styles.sectionHead}>
+              <Package size={14} className={styles.sectionIcon} />
+              <h2 className={styles.sectionTitle}>
+                {t('marketplace.my_published')}
+                <span className={styles.count}>{publishedBundles.length}</span>
+              </h2>
+              <button
+                className={`${styles.filterBtn} ${styles.importBtn}`}
+                onClick={() => {
+                  setImportModalOpen(true)
+                  setImportResult(null)
+                }}
+                title="Import a signed character bundle"
+              >
+                <Upload size={13} />
+                {t('marketplace.import')}
+              </button>
+            </div>
+            <div className={styles.bundleList}>
+              {publishedBundles.map((bundle) => {
+                const summary = getBundleSummary(bundle)
+                return (
+                  <motion.div
+                    key={bundle.id}
+                    className={styles.bundleCard}
+                    data-verified={summary.verified ? 'true' : 'false'}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <div className={styles.bundleInfo}>
+                      <span className={styles.bundleEmoji}>📦</span>
+                      <div className={styles.bundleMeta}>
+                        <span className={styles.bundleName}>{summary.name}</span>
+                        <div className={styles.bundleMetaRow}>
+                          {summary.author && (
+                            <span className={styles.bundleAuthor}>by {summary.author}</span>
+                          )}
+                          <span className={styles.bundleDot}>·</span>
+                          <span className={styles.bundleDate}>
+                            {new Date(summary.publishedAt).toLocaleDateString()}
+                          </span>
+                          <span className={styles.bundleDot}>·</span>
+                          <span className={styles.bundleNodes}>{summary.nodeCount} nodes</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className={styles.bundleActions}>
+                      <span
+                        className={`${styles.verifiedBadge} ${summary.verified ? styles.verifiedOk : styles.verifiedUnknown}`}
+                        title={summary.verified ? 'Signature verified' : 'Not yet verified'}
+                      >
+                        {summary.verified ? (
+                          <ShieldCheck size={14} />
+                        ) : (
+                          <ShieldAlert size={14} />
+                        )}
+                        {summary.verified ? 'Verified' : 'Unknown'}
+                      </span>
+                      <button
+                        className={styles.reverifyBtn}
+                        onClick={() => handleReverify(bundle.id)}
+                        disabled={verifyingId === bundle.id}
+                        title="Re-verify signature"
+                      >
+                        {verifyingId === bundle.id ? '…' : '↻'}
+                      </button>
+                      <button
+                        className={styles.downloadBundleBtn}
+                        onClick={() => {
+                          const blob = new Blob([JSON.stringify(bundle.bundle, null, 2)], {
+                            type: 'application/json',
+                          })
+                          const url = URL.createObjectURL(blob)
+                          const a = document.createElement('a')
+                          a.href = url
+                          a.download = `${bundle.id}-bundle.json`
+                          a.click()
+                          URL.revokeObjectURL(url)
+                        }}
+                        title="Download bundle JSON"
+                      >
+                        <Download size={13} />
+                      </button>
+                      <button
+                        className={styles.deleteBundleBtn}
+                        onClick={() => handleDeleteBundle(bundle.id)}
+                        title="Remove bundle"
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    </div>
+                  </motion.div>
+                )
+              })}
+            </div>
+          </section>
+        )}
+
         {/* ── Submit / Contribute ───────────────────────── */}
         <div className={styles.submitSection}>
           <h2 className={styles.submitTitle}>{t('marketplace.submit_title')}</h2>
@@ -262,6 +429,53 @@ export function MarketplacePage() {
         </div>
 
       </div>
+
+      {/* ── Import Modal ────────────────────────────── */}
+      {importModalOpen && (
+        <div className={styles.overlay} onClick={() => setImportModalOpen(false)}>
+          <div
+            className={styles.importModal}
+            onClick={e => e.stopPropagation()}
+            onDragOver={e => e.preventDefault()}
+            onDrop={handleImportFromDrop}
+          >
+            <div className={styles.importModalHeader}>
+              <h2 className={styles.modalTitle}>Import Signed Bundle</h2>
+              <button className={styles.closeBtn} onClick={() => setImportModalOpen(false)}>
+                <X size={18} />
+              </button>
+            </div>
+            <p className={styles.importHint}>Paste a signed character bundle JSON, or drag & drop a .json file here.</p>
+            <textarea
+              value={importJson}
+              onChange={e => setImportJson(e.target.value)}
+              placeholder='{ "$schema": "cyberagent/character-bundle/v1", ... }'
+              className={styles.importTextarea}
+              rows={10}
+            />
+            {importResult && (
+              <div className={`${styles.importResult} ${importResult.ok ? styles.importOk : styles.importError}`}>
+                {importResult.ok ? (
+                  <>
+                    <ShieldCheck size={16} />
+                    <span>{importResult.verified ? 'Bundle verified and imported!' : 'Bundle imported (signature check skipped)'}</span>
+                  </>
+                ) : (
+                  <>
+                    <ShieldAlert size={16} />
+                    <span>{importResult.error}</span>
+                  </>
+                )}
+              </div>
+            )}
+            <div className={styles.importActions}>
+              <button className={styles.btnGhost} onClick={() => setImportModalOpen(false)}>Cancel</button>
+              <button className={styles.btnPrimary} onClick={handleImport}>Import</button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   )
 }

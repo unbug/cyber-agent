@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { characters, getBehavior, saveCharacterAsJSON } from '@/agents'
+import { signCharacterBundle, downloadBundle } from '@/utils/character-bundle'
 import type { BTEditionNode } from '@/agents'
 import type { Character, ValConfig, MemoryConfig, PerceptionConfig } from '@/agents/types'
 import type { BehaviorNodeDef } from '@/engine/types'
@@ -490,6 +491,39 @@ export default function CharacterEditor() {
     }
   }
 
+  /** Publish as signed bundle — one-click marketplace-ready export */
+  const handlePublish = async () => {
+    if (!name.trim()) {
+      notify('Enter a character name first.')
+      return
+    }
+    const config: Pick<Character, 'valConfig' | 'memoryConfig' | 'perceptionConfig'> = {}
+    if (valConfig) config.valConfig = valConfig
+    if (memoryConfig) config.memoryConfig = memoryConfig
+    if (perceptionConfig) config.perceptionConfig = perceptionConfig
+
+    const characterData: Record<string, unknown> = {
+      id: displayId,
+      name,
+      emoji,
+      description,
+      tags,
+      difficulty,
+      category,
+      behaviorTree: btRoot,
+      emotionPreset,
+      ...config,
+    }
+
+    const bundle = await signCharacterBundle(characterData, {
+      author: 'CyberAgent Editor',
+      tags: [...tags, 'published'],
+    })
+
+    downloadBundle(bundle, `${displayId}-bundle.json`)
+    notify(`Published! Signed character bundle downloaded.`)
+  }
+
   const handleCopyBT = async () => {
     if (!btRoot) return
     try {
@@ -514,6 +548,7 @@ export default function CharacterEditor() {
         <div className={styles.headerRight}>
           <button onClick={() => setShowImport(true)} className={styles.btnGhost}>Import BT</button>
           <button onClick={handleCopyBT} disabled={!btRoot} className={styles.btnGhost}>Copy BT</button>
+          <button onClick={handlePublish} className={styles.btnPublish}>Publish</button>
           <button onClick={handleExport} className={styles.btnPrimary}>Export</button>
         </div>
       </header>

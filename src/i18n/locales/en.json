@@ -155,7 +155,16 @@
     "create_in_editor": "Create in Editor",
     "total_chars": "Characters",
     "categories": "Categories",
-    "possibilities": "Possibilities"
+    "possibilities": "Possibilities",
+    "my_published": "My Published Bundles",
+    "import": "Import Bundle",
+    "verified": "Verified",
+    "unknown": "Unknown",
+    "reverify": "Re-verify",
+    "import_modal_title": "Import Signed Bundle",
+    "import_hint": "Paste a signed character bundle JSON, or drag & drop a .json file here.",
+    "import_success": "Bundle verified and imported!",
+    "import_success_unverified": "Bundle imported (signature check skipped)"
   },
   "detail": {
     "personality": "Personality",
