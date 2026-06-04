@@ -32,6 +32,7 @@ import { PolicyInputPanel } from './PolicyInputPanel'
 import { useMultiAgentDebug } from '@/hooks/useMultiAgentDebug'
 import { computeMemoryStats } from '@/memory/episodic-store'
 import { CharacterConfigPanel } from './CharacterConfigPanel'
+import { ShareSessionPanel } from '@/components/ShareSessionPanel'
 import styles from './DebugPage.module.css'
 
 // ─── BT Tree Renderer ─────────────────────────────────────────
@@ -640,6 +641,18 @@ export function DebugPage() {
         policyEvents={debug.policyEvents}
         width={700}
         height={280}
+      />
+
+      {/* Share Session Panel */}
+      <ShareSessionPanel
+        character={debug.emotionPreset ?? 'unknown'}
+        btTree={debug.tree}
+        blackboard={debug.blackboard}
+        recentEvents={debug.adapterEvents}
+        valState={debug.valState}
+        valHistory={debug.valHistory}
+        diffs={diffs}
+        onSessionLoaded={() => {}}
       />
 
       {/* Multi-Agent Debug Panels */}
