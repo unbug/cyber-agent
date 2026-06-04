@@ -31,6 +31,7 @@ import { PolicyPanel } from './PolicyPanel'
 import { PolicyInputPanel } from './PolicyInputPanel'
 import { useMultiAgentDebug } from '@/hooks/useMultiAgentDebug'
 import { computeMemoryStats } from '@/memory/episodic-store'
+import { CharacterConfigPanel } from './CharacterConfigPanel'
 import styles from './DebugPage.module.css'
 
 // ─── BT Tree Renderer ─────────────────────────────────────────
@@ -621,6 +622,14 @@ export function DebugPage() {
 
       {/* Social Events Panel (multi-agent) */}
       <SocialEventsPanel events={debug.socialEvents} />
+
+      {/* Character Config Panel (v3.0) */}
+      <CharacterConfigPanel
+        emotionPreset={debug.emotionPreset}
+        valConfig={debug.valConfig}
+        memoryConfig={debug.memoryConfig}
+        perceptionConfig={debug.perceptionConfig}
+      />
 
       {/* Policy Inference Panel (v2.2) */}
       <PolicyPanel />

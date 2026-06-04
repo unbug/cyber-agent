@@ -21,6 +21,7 @@ import type { ValState } from '@/affect/types'
 import type { CrossTalkReport } from '@/pages/CrossTalkPanel'
 import type { PerformanceEntry } from '@/pages/PerformancePanel'
 import type { PolicyResult } from '@/engine/policy'
+import type { MemoryConfig, PerceptionConfig, ValConfig } from '@/agents/types'
 
 // ─── Internal state ─────────────────────────────────────────────
 
@@ -75,6 +76,14 @@ interface DebugState {
   policyResults: PolicyResult[]
   /** Policy invocation events for timeline */
   policyEvents: TracerEvent[]
+  /** v3.0: emotion preset from character config */
+  emotionPreset?: string
+  /** v3.0: VAL config from character config */
+  valConfig?: ValConfig
+  /** v3.0: memory config from character config */
+  memoryConfig?: MemoryConfig
+  /** v3.0: perception config from character config */
+  perceptionConfig?: PerceptionConfig
 }
 
 const MAX_BREADCRUMB = 50
@@ -82,7 +91,20 @@ const MAX_ADAPTER_EVENTS = 200
 const MAX_TICK_TIMES = 120
 const TICK_HISTORY = 120
 
-export function useDebug(): DebugState & {
+export interface CharacterConfigFields {
+  emotionPreset?: string
+  valConfig?: ValConfig
+  memoryConfig?: MemoryConfig
+  perceptionConfig?: PerceptionConfig
+  setCharacterConfig: (emotionPreset?: string, valConfig?: ValConfig, memoryConfig?: MemoryConfig, perceptionConfig?: PerceptionConfig) => void
+}
+
+export function useDebug(): DebugState & CharacterConfigFields & {
+  valConfig?: ValConfig
+  memoryConfig?: MemoryConfig
+  perceptionConfig?: PerceptionConfig
+  emotionPreset?: string
+  setCharacterConfig: (emotionPreset?: string, valConfig?: ValConfig, memoryConfig?: MemoryConfig, perceptionConfig?: PerceptionConfig) => void
   /** Force a blackboard snapshot */
   captureBlackboard: (bb: Blackboard) => void
   /** Update the runtime tree */
@@ -130,6 +152,10 @@ export function useDebug(): DebugState & {
     resetCrossTalk: () => {},
     policyResults: [],
     policyEvents: [],
+    emotionPreset: undefined,
+    valConfig: undefined,
+    memoryConfig: undefined,
+    perceptionConfig: undefined,
   })
 
   const stateRef = useRef(state)
@@ -174,6 +200,10 @@ export function useDebug(): DebugState & {
       resetCrossTalk: () => {},
       policyResults: [],
       policyEvents: [],
+      emotionPreset: undefined,
+      valConfig: undefined,
+      memoryConfig: undefined,
+      perceptionConfig: undefined,
     })
   }, [])
 
@@ -281,6 +311,17 @@ export function useDebug(): DebugState & {
     },
     [],
   )
+
+  /** Set character config (v3.0) */
+  const setCharacterConfig = useCallback((emotionPreset?: string, valConfig?: ValConfig, memoryConfig?: MemoryConfig, perceptionConfig?: PerceptionConfig) => {
+    setState(prev => ({
+      ...prev,
+      emotionPreset,
+      valConfig,
+      memoryConfig,
+      perceptionConfig,
+    }))
+  }, [])
 
   /** Reset cross-talk counters */
   const resetCrossTalk = useCallback(() => {
@@ -400,6 +441,11 @@ export function useDebug(): DebugState & {
     perfData: state.perfData,
     policyResults: state.policyResults,
     policyEvents: state.policyEvents,
+    emotionPreset: state.emotionPreset,
+    valConfig: state.valConfig,
+    memoryConfig: state.memoryConfig,
+    perceptionConfig: state.perceptionConfig,
+    setCharacterConfig,
     captureBlackboard,
     updateTree,
     reset,
@@ -410,7 +456,12 @@ export function useDebug(): DebugState & {
     simulateForgetting,
     updateCrossTalk,
     resetCrossTalk,
-  } as DebugState & {
+  } as unknown as DebugState & {
+    emotionPreset?: string
+    valConfig?: ValConfig
+    memoryConfig?: MemoryConfig
+    perceptionConfig?: PerceptionConfig
+    setCharacterConfig: (emotionPreset?: string, valConfig?: ValConfig, memoryConfig?: MemoryConfig, perceptionConfig?: PerceptionConfig) => void
     captureBlackboard: (bb: Blackboard) => void
     updateTree: (tree: RuntimeNode) => void
     reset: () => void

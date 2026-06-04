@@ -11,6 +11,8 @@ import { useRef, useState, useEffect, useCallback } from 'react'
 import { BehaviorTreeRunner, CanvasAdapter } from '../engine'
 import { getBehavior, getCharacter } from '../agents'
 import type { RunnerSnapshot, RunnerState } from '../engine'
+import type { MemoryConfig, PerceptionConfig, ValConfig } from '../agents/types'
+import { useDebug } from './useDebug'
 
 export interface UseBehaviorTreeResult {
   canvasRef: React.RefObject<HTMLCanvasElement | null>
@@ -20,6 +22,10 @@ export interface UseBehaviorTreeResult {
   stop: () => void
   pause: () => void
   resume: () => void
+  /** v3.0: memory config from character */
+  memoryConfig?: MemoryConfig
+  /** v3.0: perception config from character */
+  perceptionConfig?: PerceptionConfig
 }
 
 export function useBehaviorTree(characterId: string): UseBehaviorTreeResult {
@@ -27,6 +33,9 @@ export function useBehaviorTree(characterId: string): UseBehaviorTreeResult {
   const runnerRef = useRef<BehaviorTreeRunner | null>(null)
   const [snapshot, setSnapshot] = useState<RunnerSnapshot | null>(null)
   const [state, setState] = useState<RunnerState>('stopped')
+  const [memoryConfig, setMemoryConfig] = useState<MemoryConfig | undefined>()
+  const [perceptionConfig, setPerceptionConfig] = useState<PerceptionConfig | undefined>()
+  const debug = useDebug()
 
   // Cleanup on unmount
   useEffect(() => {
@@ -60,6 +69,15 @@ export function useBehaviorTree(characterId: string): UseBehaviorTreeResult {
     // Create adapter and runner
     const adapter = new CanvasAdapter(canvas, getEmoji(characterId))
     const runner = new BehaviorTreeRunner(behavior, adapter)
+    // v3.0: expose character config for debug panel
+    const memCfg = (behavior as any).memoryConfig as MemoryConfig | undefined
+    const percCfg = (behavior as any).perceptionConfig as PerceptionConfig | undefined
+    const valCfg = (behavior as any).valConfig as ValConfig | undefined
+    const emoPreset = (behavior as any).emotionPreset as string | undefined
+    setMemoryConfig(memCfg)
+    setPerceptionConfig(percCfg)
+    // Push config into debug panel
+    debug.setCharacterConfig(emoPreset, valCfg, memCfg, percCfg)
     runner.setCanvasSize(rect.width, rect.height)
 
     // Track pointer
@@ -117,7 +135,10 @@ export function useBehaviorTree(characterId: string): UseBehaviorTreeResult {
     runnerRef.current = null
     setState('stopped')
     setSnapshot(null)
-  }, [])
+    setMemoryConfig(undefined)
+    setPerceptionConfig(undefined)
+    debug.setCharacterConfig(undefined, undefined, undefined, undefined)
+  }, [debug])
 
   const pause = useCallback(() => {
     runnerRef.current?.pause()
@@ -129,7 +150,7 @@ export function useBehaviorTree(characterId: string): UseBehaviorTreeResult {
     setState('running')
   }, [])
 
-  return { canvasRef, snapshot, state, start, stop, pause, resume }
+  return { canvasRef, snapshot, state, start, stop, pause, resume, memoryConfig, perceptionConfig }
 }
 
 function getEmoji(id: string): string {

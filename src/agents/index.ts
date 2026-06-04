@@ -314,6 +314,50 @@ export function saveCharacterAsJSON(
   URL.revokeObjectURL(url)
 }
 
+/**
+ * Load a character definition from a JSON object (v3.0 format).
+ * Registers it in the character map and gallery so it appears in /gallery.
+ */
+export function loadCharacterFromJSON(
+  data: Record<string, unknown>,
+): { character: Character; behavior: CharacterBehavior } | null {
+  const characterData = {
+    id: String(data.id ?? 'custom-' + Date.now()),
+    name: String(data.name ?? 'Custom Character'),
+    emoji: String(data.emoji ?? '🤖'),
+    category: (data.category as Character['category']) ?? 'companion',
+    description: String(data.description ?? ''),
+    tags: Array.isArray(data.tags) ? (data.tags as string[]) : ['custom'],
+    difficulty: (data.difficulty as Character['difficulty']) ?? 'medium',
+    compatibleAdapters: ['canvas'],
+    behaviorTree: data.behaviorTree ?? null,
+    emotionPreset: data.emotionPreset as string | undefined,
+    valConfig: data.valConfig as import('./types').ValConfig | undefined,
+    memoryConfig: data.memoryConfig as import('./types').MemoryConfig | undefined,
+    perceptionConfig: data.perceptionConfig as import('./types').PerceptionConfig | undefined,
+    personality: (data.personality as string[]) ?? [],
+  }
+
+  // Register in the character map so it appears in /gallery
+  const behavior = {
+    characterId: characterData.id,
+    name: characterData.name,
+    tree: characterData.behaviorTree,
+    defaults: {},
+    tickIntervalMs: 100,
+  }
+
+  // Inject into global character map
+  const agentList = globalThis as unknown as Record<string, unknown>
+  if (!agentList.__cyberagent_customAgents) {
+    agentList.__cyberagent_customAgents = new Map<string, { character: Character; behavior: CharacterBehavior }>()
+  }
+  const customMap = agentList.__cyberagent_customAgents as Map<string, { character: Character; behavior: CharacterBehavior }>
+  customMap.set(characterData.id, { character: characterData, behavior: behavior as unknown as CharacterBehavior } as unknown as { character: Character; behavior: CharacterBehavior })
+
+  return { character: characterData, behavior: behavior as never }
+}
+
 // ─── Re-exports ──────────────────────────────────────────────
 
 export type { Character } from './types'

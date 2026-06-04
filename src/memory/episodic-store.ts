@@ -20,6 +20,7 @@ import type {
   ForgettingCurveParams,
 } from './types'
 import { DEFAULT_FORGETTING_PARAMS } from './types'
+import type { MemoryConfig } from '../agents/types'
 
 // ─── Forgetting Curve ─────────────────────────────────────────────
 
@@ -56,10 +57,25 @@ function nextMemoryId(): string {
 export class InMemoryEpisodicStore implements EpisodicStoreBackend {
   private memories: Map<string, EpisodicMemory>
   private readonly params: ForgettingCurveParams
+  public readonly enabled: boolean
 
-  constructor(params?: ForgettingCurveParams) {
+  constructor(paramsOrConfig?: ForgettingCurveParams | MemoryConfig) {
     this.memories = new Map()
-    this.params = { ...DEFAULT_FORGETTING_PARAMS, ...params }
+    // v3.0: accept MemoryConfig from character editor
+    if (paramsOrConfig && typeof paramsOrConfig === 'object' && 'enabled' in paramsOrConfig) {
+      const cfg = paramsOrConfig as MemoryConfig
+      this.enabled = cfg.enabled ?? true
+      this.params = {
+        ...DEFAULT_FORGETTING_PARAMS,
+        initialRelevance: cfg.initialRelevance ?? DEFAULT_FORGETTING_PARAMS.initialRelevance,
+        halfLifeMs: cfg.halfLifeMs ?? DEFAULT_FORGETTING_PARAMS.halfLifeMs,
+        minRelevance: cfg.minRelevance ?? DEFAULT_FORGETTING_PARAMS.minRelevance,
+        salienceBoost: cfg.salienceBoost ?? DEFAULT_FORGETTING_PARAMS.salienceBoost,
+      }
+    } else {
+      this.enabled = true
+      this.params = { ...DEFAULT_FORGETTING_PARAMS, ...paramsOrConfig }
+    }
   }
 
   encode(

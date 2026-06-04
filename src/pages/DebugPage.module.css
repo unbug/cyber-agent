@@ -2118,6 +2118,109 @@
   border-color: var(--border-hover);
 }
 
+/* ─── Character Config Panel (v3.0) ───────────────────────── */
+
+.configPanel {
+  padding: var(--space-3);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-top: var(--space-3);
+}
+
+.configPanelTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--border);
+}
+
+.configPanelIcon {
+  font-size: 1.1rem;
+}
+
+.configPanelTitle span {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.configSection {
+  margin-bottom: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg-elevated);
+  border-radius: var(--radius-sm);
+}
+
+.configSectionTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-bottom: var(--space-2);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.configSectionIcon {
+  font-size: 0.9rem;
+}
+
+.configRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) 0;
+  font-size: 0.7rem;
+}
+
+.configLabel {
+  color: var(--text-tertiary);
+  font-weight: 500;
+  min-width: 120px;
+}
+
+.configValue {
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+}
+
+.configHint {
+  color: var(--text-tertiary);
+  font-size: 0.65rem;
+  margin-left: var(--space-1);
+}
+
+.configOn {
+  color: #22c55e;
+  font-weight: 600;
+}
+
+.configOff {
+  color: #ef4444;
+  font-weight: 600;
+}
+
+.configCategoryGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.configCategoryBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 6px;
+  font-size: 0.65rem;
+  background: #8b5cf611;
+  border: 1px solid #8b5cf633;
+  border-radius: 99px;
+  color: #a78bfa;
+}
+
 /* ─── Compare Toggle Button ─────────────────────────────────── */
 
 .compareToggleBtn {

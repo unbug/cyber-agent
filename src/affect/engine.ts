@@ -101,6 +101,8 @@ export const emotionPresets: Record<string, EmotionDSL> = {
 
 // ─── VAL Engine ────────────────────────────────────────────────
 
+import type { ValConfig } from '../agents/types'
+
 export interface ValEngineOptions {
   /** Character ID for tracer labels */
   characterId: string
@@ -110,6 +112,8 @@ export interface ValEngineOptions {
   emotion?: Partial<EmotionDSL>
   /** VAL decay rate multiplier (1 = default) */
   decayMultiplier?: number
+  /** v3.0: custom VAL config from character editor */
+  valConfig?: ValConfig
 }
 
 export class ValEngine {
@@ -126,22 +130,39 @@ export class ValEngine {
     this.characterId = opts.characterId
     const preset = opts.emotionPreset ? emotionPresets[opts.emotionPreset] : undefined
     const emotion = opts.emotion || {}
+    const cfg = opts.valConfig || {}
 
-    this.val = createValState(
-      emotion.initial?.valence ?? preset?.initial.valence ?? 0,
-      emotion.initial?.arousal ?? preset?.initial.arousal ?? 0.3,
-      emotion.initial?.dominance ?? preset?.initial.dominance ?? 0.5,
-    )
+    // valConfig.initial overrides everything for initial VAL
+    const initValence = cfg.initial?.valence ?? emotion.initial?.valence ?? preset?.initial.valence ?? 0
+    const initArousal = cfg.initial?.arousal ?? emotion.initial?.arousal ?? preset?.initial.arousal ?? 0.3
+    const initDominance = cfg.initial?.dominance ?? emotion.initial?.dominance ?? preset?.initial.dominance ?? 0.5
 
+    this.val = createValState(initValence, initArousal, initDominance)
+
+    // valConfig.baseline overrides everything for baseline
     this.baseline = createValState(
-      emotion.baseline?.valence ?? preset?.baseline?.valence ?? 0,
-      emotion.baseline?.arousal ?? preset?.baseline?.arousal ?? 0.3,
-      emotion.baseline?.dominance ?? preset?.baseline?.dominance ?? 0.5,
+      cfg.baseline?.valence ?? emotion.baseline?.valence ?? preset?.baseline?.valence ?? 0,
+      cfg.baseline?.arousal ?? emotion.baseline?.arousal ?? preset?.baseline?.arousal ?? 0.3,
+      cfg.baseline?.dominance ?? emotion.baseline?.dominance ?? preset?.baseline?.dominance ?? 0.5,
     )
 
-    this.decayRate = (emotion.decayRate ?? preset?.decayRate ?? 0.001) * (opts.decayMultiplier ?? 1)
-    this.perceptionSensitivity = emotion.perceptionSensitivity ?? preset?.perceptionSensitivity ?? 0.1
-    this.perceptionModifiers = emotion.perceptionModifiers ?? preset?.perceptionModifiers
+    // valConfig.decayMultiplier stacks on top of decayRate
+    const baseDecay = emotion.decayRate ?? preset?.decayRate ?? 0.001
+    this.decayRate = baseDecay * (opts.decayMultiplier ?? 1) * (cfg.decayMultiplier ?? 1)
+
+    // valConfig.perceptionSensitivity overrides
+    this.perceptionSensitivity = cfg.perceptionSensitivity ?? emotion.perceptionSensitivity ?? preset?.perceptionSensitivity ?? 0.1
+
+    // valConfig.perceptionModifiers merge with emotion/preset
+    if (cfg.perceptionModifiers) {
+      this.perceptionModifiers = {
+        ...preset?.perceptionModifiers,
+        ...emotion.perceptionModifiers,
+        ...cfg.perceptionModifiers,
+      }
+    } else {
+      this.perceptionModifiers = emotion.perceptionModifiers ?? preset?.perceptionModifiers
+    }
   }
 
   get valence(): number { return this.val.valence }

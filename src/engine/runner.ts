@@ -26,6 +26,7 @@ import { hydrate, tick, resetTree } from './executor'
 import { emitTickStart, emitBbSet } from './tracer'
 import { SafetySupervisor, type SafetyOptions, type SafetyEvent } from './safety-supervisor'
 import { ValEngine, type ValState } from '../affect/engine'
+import type { MemoryConfig, PerceptionConfig } from '../agents/types'
 
 // Ensure all builtins are registered
 import './builtins'
@@ -64,6 +65,12 @@ export class BehaviorTreeRunner {
 
   /** Affect engine (VAL state) */
   private valEngine: ValEngine | null
+
+  /** v3.0: episodic memory config */
+  public memoryConfig?: MemoryConfig
+
+  /** v3.0: perception bus config */
+  public perceptionConfig?: PerceptionConfig
 
   /** Callback invoked after every tick — use for UI updates */
   public onTick: ((snapshot: RunnerSnapshot) => void) | null = null
@@ -105,11 +112,16 @@ export class BehaviorTreeRunner {
     }
 
     // Create VAL affect engine
+    const valCfg = (behavior as any).valConfig as import('../agents/types').ValConfig | undefined
     this.valEngine = new ValEngine({
       characterId: behavior.characterId,
       emotionPreset: (behavior as any).emotionPreset as string | undefined,
       emotion: (behavior as any).emotion as any,
+      valConfig: valCfg,
     })
+    // v3.0: store character configs for debug panel
+    this.memoryConfig = (behavior as any).memoryConfig as MemoryConfig | undefined
+    this.perceptionConfig = (behavior as any).perceptionConfig as PerceptionConfig | undefined
   }
 
   get state(): RunnerState { return this._state }
@@ -207,11 +219,15 @@ export class BehaviorTreeRunner {
       Object.assign(this.bb, behavior.defaults)
     }
     // Recreate VAL engine for new behavior
+    const valCfg2 = (behavior as any).valConfig as import('../agents/types').ValConfig | undefined
     this.valEngine = new ValEngine({
       characterId: behavior.characterId,
       emotionPreset: (behavior as any).emotionPreset as string | undefined,
       emotion: (behavior as any).emotion as any,
+      valConfig: valCfg2,
     })
+    this.memoryConfig = (behavior as any).memoryConfig as MemoryConfig | undefined
+    this.perceptionConfig = (behavior as any).perceptionConfig as PerceptionConfig | undefined
     if (wasRunning) this.start()
   }
 
