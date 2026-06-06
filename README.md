@@ -514,7 +514,16 @@ The "everyone can author a soul" release.
   - `src/pages/PluginManagerPage.module.css` — panel styling
   - `docs/cookbook/v3.0/plugin-sdk.md` — comprehensive plugin authoring guide
   - 67 unit tests (registry + loader + sandbox)
-- [ ] Stable `@cyber-agent/sdk@3` with breaking-change migration guide.
+- [x] Stable `@cyber-agent/sdk@3` with breaking-change migration guide.
+  - `sdk/package.json` version bumped to `3.0.0`
+  - `sdk/src/public-api.ts` marks v3.0 stable surface with full import examples
+  - `sdk/MIGRATION.md` — comprehensive 1.x → 3.0 migration guide:
+    - Plugin SDK adoption guide
+    - Adapter v1 shim deprecation timeline (removed in v4.0)
+    - New stable exports (plugin, session sharing, marketplace)
+    - Full v1→v2 migration examples
+  - `sdk/CHANGELOG.md` — v3.0.0 entry documenting all major features
+  - Stability guarantee: APIs in public-api.ts stable until 4.0
 
 **Release gate**: a non-engineer publishes a working character driving a
 real toy without writing TypeScript.
