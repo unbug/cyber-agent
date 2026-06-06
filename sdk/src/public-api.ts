@@ -1,8 +1,8 @@
 /**
- * @fileoverview CyberAgent SDK — Public API Surface (v1.0 Stable)
+ * @fileoverview CyberAgent SDK — Public API Surface (v3.0 Stable)
  *
- * This file defines the EXACT public API surface for @cyber-agent/sdk@1.x.
- * All exports here are STABLE and will not change until @cyber-agent/sdk@2.0.
+ * This file defines the EXACT public API surface for @cyber-agent/sdk@3.x.
+ * All exports here are STABLE and will not change until @cyber-agent/sdk@4.0.
  *
  * Import from this file for the most complete public API:
  *   import {
@@ -20,13 +20,22 @@
  *     isAdapterV2,
  *     wrapV1AsV2,
  *     DEFAULT_CAPABILITIES_V2,
+ *     getPluginRegistry,
+ *     PluginLoader,
+ *     validateManifest,
+ *     createPluginContext,
+ *     executePluginCode,
+ *     TRACE_SCHEMA_VERSION,
+ *     validateTrace,
+ *     migrateTrace,
  *   } from '@cyber-agent/sdk'
  *
  * Or import sub-paths for tree-shaking:
  *   import { hydrate, tick } from '@cyber-agent/sdk/engine/executor'
  *   import { TelemetryEvent } from '@cyber-agent/sdk/trace/schema'
+ *   import { getPluginRegistry } from '@cyber-agent/sdk/plugin/registry'
  *
- * @stable This module is part of the v1.0 stable API surface.
+ * @stable This module is part of the v3.0 stable API surface.
  */
 
 // ─── Core Types (frozen) ───────────────────────────────────────

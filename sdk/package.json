@@ -1,6 +1,6 @@
 {
   "name": "@cyber-agent/sdk",
-  "version": "1.0.0",
+  "version": "3.0.0",
   "description": "CyberAgent SDK — Behavior Tree engine and Robot Adapter for AI characters",
   "main": "dist/index.js",
   "module": "dist/index.mjs",

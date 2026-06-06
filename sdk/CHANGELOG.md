@@ -5,6 +5,54 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.0.0] — 2026-06-06
+
+### Added
+- **Plugin SDK** — Third-party BT nodes, adapters, and sensors via plugin system
+  - `PluginManifest`, `PluginRegistration`, `PluginRegistry`, `PluginSandbox` types
+  - `PluginRegistryImpl` with register/get/list/unload/clear/capability checks
+  - `PluginLoader` with manifest validation, dependency resolution, discovery
+  - `createPluginContext` + `executePluginCode` with dangerous-pattern blocking
+  - `PluginManagerPage` debug panel for browsing/managing plugins
+- **Session sharing** — Compress + share BT session state via URL hash
+  - `encodeSession()` / `decodeSession()` with deflate+base64url
+  - `ShareSessionPanel` component with generate/copy/close
+  - Auto-load shared session from URL hash on mount
+- **Character editor** — No-code character editor with VAL / memory / perception
+  - `CharacterEditor` with live config panels
+  - `loadCharacterFromJSON` for v3.0 format
+- **Marketplace** — One-click publish with signed character bundles
+  - ES256 signing via Web Crypto API (P-256)
+  - `BundleStore` with IndexedDB backend
+  - Import modal with drag-and-drop + signature verification
+- **Multi-agent** — Shared blackboard, social BT primitives, multi-executor
+  - `BroadcastEmotion`, `Negotiate`, `Mirror`, `RoleSwap` primitives
+  - `World` + `SpatialIndex` + `MultiExecutor`
+  - Scene library: playground, park, campus, schoolyard
+  - `/playground` page with drag-and-drop agent placement
+  - `MultiBroadcastAdapter` with NTP-style time sync
+- **VLA / policy slot-in** — Learnable policy integration
+  - `RunPolicy` action node with `PolicyConfig` / `ObservationSpec` / `ActionSpec`
+  - `WhenPolicyConfident` selector branch
+  - `LeRobotPolicyClient` with WebSocket handshake + auto-reconnect
+  - `PolicyInputPanel` in /debug for inspecting policy frames
+  - VLA-Hybrid Guardian sample character
+- **Domain randomization** — Mass, friction, latency, sensor-noise sliders
+- **Dataset recording** — Episode recorder + HuggingFace Hub upload
+- **`/debug` enhancements** — Multi-agent timeline, agent diff, VAL trajectory
+
+### Changed
+- **SDK version bumped to 3.0.0** — Major version aligns with v3.0 Studio release
+- **Public API surface expanded** — Plugin SDK, session sharing, marketplace exports now stable
+- **`wrapV1AsV2()` deprecated** — Will be removed in v4.0; migrate to `RobotAdapterV2` directly
+
+### Deprecated
+- `wrapV1AsV2()` — v1 adapter shim, deprecated in v3.0, removal in v4.0
+- `RobotAdapterV1` — will be removed in v4.0 alongside the shim
+
+### Migration
+- See [MIGRATION.md](./MIGRATION.md) for 1.x → 3.0 migration guide
+
 ## [1.0.0] — 2026-04-30
 
 ### Added
