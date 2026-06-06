@@ -18,6 +18,26 @@
       "types": "./dist/trace/schema.d.ts",
       "import": "./dist/trace/schema.mjs",
       "require": "./dist/trace/schema.js"
+    },
+    "./plugin": {
+      "types": "./dist/plugin/index.d.ts",
+      "import": "./dist/plugin/index.mjs",
+      "require": "./dist/plugin/index.js"
+    },
+    "./plugin/registry": {
+      "types": "./dist/plugin/registry.d.ts",
+      "import": "./dist/plugin/registry.mjs",
+      "require": "./dist/plugin/registry.js"
+    },
+    "./plugin/sandbox": {
+      "types": "./dist/plugin/sandbox.d.ts",
+      "import": "./dist/plugin/sandbox.mjs",
+      "require": "./dist/plugin/sandbox.js"
+    },
+    "./plugin/loader": {
+      "types": "./dist/plugin/loader.d.ts",
+      "import": "./dist/plugin/loader.mjs",
+      "require": "./dist/plugin/loader.js"
     }
   },
   "files": [
@@ -27,7 +47,7 @@
     "MIGRATION.md"
   ],
   "scripts": {
-    "build": "tsup src/index.ts src/trace/schema.ts src/cli/index.ts src/cli/record.ts src/cli/replay.ts src/cli/lint.ts --format esm,cjs --dts --clean --out-dir dist",
+    "build": "tsup src/index.ts src/trace/schema.ts src/cli/index.ts src/cli/record.ts src/cli/replay.ts src/cli/lint.ts src/plugin/index.ts --format esm,cjs --dts --clean --out-dir dist",
     "dev": "tsup src/index.ts --format esm,cjs --dts --watch",
     "test": "vitest run",
     "prepublishOnly": "npm run build"

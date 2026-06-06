@@ -505,7 +505,15 @@ The "everyone can author a soul" release.
   - `src/components/ShareSessionPanel.tsx` — ShareSessionPanel with generate/copy/close buttons
   - Auto-load shared session from URL hash on mount
   - 7 tests for session-share + 5 tests for ShareSessionPanel
-- [ ] Plugin SDK (third-party BT nodes / adapters / sensors).
+- [x] Plugin SDK (third-party BT nodes / adapters / sensors).
+  - `sdk/src/plugin/types.ts` — PluginManifest, PluginRegistration, PluginRegistry, PluginSandbox, PluginRegistrationContext types
+  - `sdk/src/plugin/registry.ts` — PluginRegistryImpl with register/get/list/unload/clear/capability checks
+  - `sdk/src/plugin/loader.ts` — PluginLoader with manifest validation, dependency resolution, discovery
+  - `sdk/src/plugin/sandbox.ts` — createPluginContext + executePluginCode with dangerous-pattern blocking
+  - `src/pages/PluginManagerPage.tsx` — debug panel for browsing/managing plugins
+  - `src/pages/PluginManagerPage.module.css` — panel styling
+  - `docs/cookbook/v3.0/plugin-sdk.md` — comprehensive plugin authoring guide
+  - 67 unit tests (registry + loader + sandbox)
 - [ ] Stable `@cyber-agent/sdk@3` with breaking-change migration guide.
 
 **Release gate**: a non-engineer publishes a working character driving a

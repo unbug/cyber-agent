@@ -33,6 +33,7 @@ import { useMultiAgentDebug } from '@/hooks/useMultiAgentDebug'
 import { computeMemoryStats } from '@/memory/episodic-store'
 import { CharacterConfigPanel } from './CharacterConfigPanel'
 import { ShareSessionPanel } from '@/components/ShareSessionPanel'
+import { PluginManagerPage } from './PluginManagerPage'
 import styles from './DebugPage.module.css'
 
 // ─── BT Tree Renderer ─────────────────────────────────────────
@@ -654,6 +655,9 @@ export function DebugPage() {
         diffs={diffs}
         onSessionLoaded={() => {}}
       />
+
+      {/* Plugin Manager (v3.0) */}
+      <PluginManagerPage />
 
       {/* Multi-Agent Debug Panels */}
       {(() => {

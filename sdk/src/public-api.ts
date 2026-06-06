@@ -122,6 +122,48 @@ export {
 // CLI is a separate binary; consumers import via 'cyber-agent' bin.
 // Sub-commands: record, replay, trace lint
 
+// ─── Plugin System (v3.0) ──────────────────────────────────────
+
+export type {
+  PluginManifest,
+  PluginRegistration,
+  PluginRegistry,
+  PluginType,
+  PluginSandbox,
+  PluginRegistrationContext,
+  PluginActionFn,
+  PluginConditionFn,
+  PluginAdapterFactory,
+  PluginSensorFactory,
+  PluginHookFn,
+  PluginCharacterDefinition,
+  PluginDebugInfo,
+} from './plugin'
+
+export {
+  validateManifest,
+  getPluginRegistry,
+  resetPluginRegistry,
+} from './plugin/registry'
+
+export {
+  createPluginContext,
+  executePluginCode,
+  isSandboxValid,
+} from './plugin/sandbox'
+
+export {
+  PluginLoader,
+  createPluginLoader,
+  loadPluginFromManifest,
+} from './plugin/loader'
+
+export type {
+  PluginSource,
+  DiscoveredPlugin,
+  PluginLoaderConfig,
+} from './plugin/loader'
+
 // ─── Convenience ───────────────────────────────────────────────
 
 export { createCanvasRunner } from './index'

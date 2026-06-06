@@ -21,7 +21,11 @@
       "@/*": ["src/*"],
       "@cyber-agent/sdk": ["sdk/src/index.ts"],
       "@cyber-agent/sdk/*": ["sdk/src/*.ts"],
-      "@cyber-agent/sdk/trace": ["sdk/src/trace/schema.ts"]
+      "@cyber-agent/sdk/trace": ["sdk/src/trace/schema.ts"],
+      "@cyber-agent/sdk/plugin": ["sdk/src/plugin/index.ts"],
+      "@cyber-agent/sdk/plugin/registry": ["sdk/src/plugin/registry.ts"],
+      "@cyber-agent/sdk/plugin/sandbox": ["sdk/src/plugin/sandbox.ts"],
+      "@cyber-agent/sdk/plugin/loader": ["sdk/src/plugin/loader.ts"]
     }
   },
   "include": ["src", "vite-env.d.ts"]
