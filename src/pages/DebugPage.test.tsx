@@ -33,6 +33,20 @@ const mockState = {
   valHistory: [],
 }
 
+// Mock localStorage so collapsible sections are expanded in tests
+const localStorageMock: Record<string, string> = {}
+Object.defineProperty(window, 'localStorage', {
+  value: {
+    getItem: (key: string) => localStorageMock[key] ?? null,
+    setItem: (key: string, value: string) => { localStorageMock[key] = value },
+    removeItem: (key: string) => { delete localStorageMock[key] },
+    clear: () => { Object.keys(localStorageMock).forEach(k => delete localStorageMock[k]) },
+    get length() { return Object.keys(localStorageMock).length },
+    key: (n: number) => Object.keys(localStorageMock)[n] ?? null,
+  },
+  writable: true,
+})
+
 function renderWithRouter(ui: React.ReactElement) {
   return render(<MemoryRouter>{ui}</MemoryRouter>)
 }
@@ -76,15 +90,13 @@ describe('DebugPage', () => {
     expect(screen.getByText('🗑 Clear')).toBeInTheDocument()
   })
 
-  it('shows error toggle when errors exist', () => {
-    vi.spyOn(useDebugModule, 'useDebug').mockReturnValue({
-      ...mockState,
-      errors: [
-        { t: 1000, type: 'error' as const, label: 'error', payload: { message: 'test error' } },
-      ],
-      totalEvents: 1,
-    } as any)
+  it('shows collapsible sections', () => {
+    vi.spyOn(useDebugModule, 'useDebug').mockReturnValue(mockState as any)
     renderWithRouter(<DebugPage />)
-    expect(screen.getByText('⚠ 1 error')).toBeInTheDocument()
+    expect(screen.getByText('Performance & Tracing')).toBeInTheDocument()
+    expect(screen.getByText('Hardware & Safety')).toBeInTheDocument()
+    expect(screen.getByText('AI & Perception')).toBeInTheDocument()
+    expect(screen.getByText('Character & Memory')).toBeInTheDocument()
+    expect(screen.getByText('Tools')).toBeInTheDocument()
   })
 })

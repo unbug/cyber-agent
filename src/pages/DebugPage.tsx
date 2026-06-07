@@ -14,6 +14,7 @@ import { useDebug, diffBlackboards, type BbDiff } from '@/hooks/useDebug'
 import type { RuntimeNode } from '@/engine/types'
 import type { PerceptionCategory } from '@/perception/types'
 import { valToString } from '@/affect/types'
+import { CollapsibleSection } from '@/components/CollapsibleSection'
 import { TraceScrubber } from './TraceScrubber'
 import { BreakpointPanel } from '@/components/BreakpointPanel'
 import { TracePullerPanel } from '@/components/TracePullerPanel'
@@ -485,6 +486,8 @@ export function DebugPage() {
     tracer.setEnabled(!tracer.enabled)
   }, [])
 
+  const multiDebug = useMultiAgentDebug()
+
   return (
     <div className={styles.page}>
       {/* Top stats bar */}
@@ -523,186 +526,7 @@ export function DebugPage() {
         </div>
       </div>
 
-      {/* Performance Panel */}
-      <PerformancePanel
-        data={debug.perfData}
-        width={800}
-        height={180}
-      />
-
-      {/* Error log */}
-      {showErrors && <ErrorLog errors={debug.errors} />}
-      {debug.errors.length > 0 && (
-        <button
-          className={styles.errorToggle}
-          onClick={() => setShowErrors(!showErrors)}
-        >
-          ⚠ {debug.errors.length} error{debug.errors.length > 1 ? 's' : ''}
-        </button>
-      )}
-
-      {/* Trace Scrubber */}
-      <TraceScrubber
-        liveEvents={debug.breadcrumb}
-        liveBlackboard={debug.blackboard}
-        traceData={scrubberTraceData}
-      />
-
-      {/* Breakpoint Panel */}
-      <BreakpointPanel
-        onTriggered={() => {
-          /* breakpoint triggered — banner shown in panel */
-        }}
-      />
-
-      {/* Trace Puller — real device WebSocket */}
-      <TracePullerPanel
-        onLoadScrubber={(data) => {
-          // Convert pulled trace data to TracerEvent[] for scrubber
-          const events: TracerEvent[] = (data.events as { t: number; type: string; label: string; payload: unknown }[]).map(e => ({
-            t: e.t,
-            type: e.type as TracerEventType,
-            label: e.label,
-            payload: e.payload as Record<string, unknown> | undefined,
-          }))
-          setScrubberTraceData({ header: data.header, events })
-        }}
-      />
-
-      {/* Sim ↔ Real Trace Comparison */}
-      {showCompare && (
-        <SimRealComparePanel toleranceMs={50} />
-      )}
-      <button
-        className={styles.compareToggleBtn}
-        onClick={() => setShowCompare(!showCompare)}
-      >
-        {showCompare ? '▲ Hide' : '▼ Sim↔Real Compare'}
-      </button>
-
-      {/* Multi-Broadcast Cross-Talk Monitor */}
-      {showCrossTalk && (
-        <CrossTalkPanel
-          report={debug.crossTalkReport}
-          drift={debug.drift}
-          driftOk={debug.driftOk}
-          eStopActive={debug.eStopActive}
-          robotCount={debug.robotCount}
-          onReset={debug.resetCrossTalk}
-        />
-      )}
-      <button
-        className={styles.compareToggleBtn}
-        onClick={() => setShowCrossTalk(!showCrossTalk)}
-      >
-        {showCrossTalk ? '▲ Hide' : '▼ Cross-Talk Monitor'}
-      </button>
-
-      {/* Safety Supervisor */}
-      <SafetyEventPanel
-        safetyState={debug.safetyState}
-        eStopActive={debug.eStopActive}
-        events={debug.safetyEvents}
-        onClearEStop={() => {
-          debug.updateSafety('ok', false)
-        }}
-        onSelfTest={async () => {
-          setSelfTestLoading(true)
-          try {
-            // Self-test requires a running runner; report best-effort
-            setSelfTestResult({ ok: true, status: 'no-runner', checks: [] })
-          } finally {
-            setSelfTestLoading(false)
-          }
-        }}
-        selfTestResult={selfTestResult}
-        selfTestLoading={selfTestLoading}
-      />
-
-      {/* Perception Panel */}
-      <PerceptionPanel events={debug.perceptionEvents} />
-
-      {/* Social Events Panel (multi-agent) */}
-      <SocialEventsPanel events={debug.socialEvents} />
-
-      {/* Character Config Panel (v3.0) */}
-      <CharacterConfigPanel
-        emotionPreset={debug.emotionPreset}
-        valConfig={debug.valConfig}
-        memoryConfig={debug.memoryConfig}
-        perceptionConfig={debug.perceptionConfig}
-      />
-
-      {/* Policy Inference Panel (v2.2) */}
-      <PolicyPanel />
-
-      {/* Policy Input Frames — alongside BT tree (v2.2 checkbox 4) */}
-      <PolicyInputPanel
-        policyResults={debug.policyResults}
-        policyEvents={debug.policyEvents}
-        width={700}
-        height={280}
-      />
-
-      {/* Share Session Panel */}
-      <ShareSessionPanel
-        character={debug.emotionPreset ?? 'unknown'}
-        btTree={debug.tree}
-        blackboard={debug.blackboard}
-        recentEvents={debug.adapterEvents}
-        valState={debug.valState}
-        valHistory={debug.valHistory}
-        diffs={diffs}
-        onSessionLoaded={() => {}}
-      />
-
-      {/* Plugin Manager (v3.0) */}
-      <PluginManagerPage />
-
-      {/* Multi-Agent Debug Panels */}
-      {(() => {
-        const multiDebug = useMultiAgentDebug()
-        return (
-          <>
-            {multiDebug.agents.length > 0 && multiDebug.totalEvents > 0 && (
-              <MultiAgentTimelinePanel
-                agents={multiDebug.agents}
-                timeWindowMs={30000}
-              />
-            )}
-            {multiDebug.agents.length >= 2 && (
-              <AgentDiffPanel agents={multiDebug.agents} />
-            )}
-          </>
-        )
-      })()}
-
-      {/* Memories Panel */}
-      <MemoriesPanel
-        memories={debug.memories}
-        stats={computeMemoryStats(debug.memories)}
-        onPurge={debug.purgeMemories}
-        onForget={debug.simulateForgetting}
-      />
-
-      {/* Affect (VAL) Panel */}
-      <VALPanel
-        valState={debug.valState}
-        valHistory={debug.valHistory}
-        perceptionEvents={debug.perceptionEvents}
-        emotionLabel={debug.valState ? valToString(debug.valState) : 'idle'}
-      />
-
-      {/* VAL Trajectory — aligned with perception & adapter timeline */}
-      <VALTimelinePanel
-        valState={debug.valState}
-        valHistory={debug.valHistory}
-        perceptionEvents={debug.perceptionEvents}
-        adapterEvents={debug.adapterEvents}
-        width={900}
-      />
-
-      {/* Main split view */}
+      {/* ─── Core: always visible ─── */}
       <div className={styles.splitView}>
         {/* Left: BT Graph */}
         <div className={styles.panel}>
@@ -758,6 +582,138 @@ export function DebugPage() {
           </div>
         </div>
       </div>
+
+      {/* ─── Collapsible sections ─── */}
+
+      {/* Performance & Tracing */}
+      <CollapsibleSection sectionKey="performance" title="Performance & Tracing" icon="📊" defaultOpen={false}>
+        <PerformancePanel data={debug.perfData} width={800} height={180} />
+        {showErrors && <ErrorLog errors={debug.errors} />}
+        {debug.errors.length > 0 && (
+          <button className={styles.errorToggle} onClick={() => setShowErrors(!showErrors)}>
+            ⚠ {debug.errors.length} error{debug.errors.length > 1 ? 's' : ''}
+          </button>
+        )}
+        <TraceScrubber liveEvents={debug.breadcrumb} liveBlackboard={debug.blackboard} traceData={scrubberTraceData} />
+        <BreakpointPanel onTriggered={() => {}} />
+        <TracePullerPanel
+          onLoadScrubber={(data) => {
+            const events: TracerEvent[] = (data.events as { t: number; type: string; label: string; payload: unknown }[]).map(e => ({
+              t: e.t,
+              type: e.type as TracerEventType,
+              label: e.label,
+              payload: e.payload as Record<string, unknown> | undefined,
+            }))
+            setScrubberTraceData({ header: data.header, events })
+          }}
+        />
+      </CollapsibleSection>
+
+      {/* Hardware & Safety */}
+      <CollapsibleSection sectionKey="hardware" title="Hardware & Safety" icon="🤖" defaultOpen={false}>
+        {showCompare && <SimRealComparePanel toleranceMs={50} />}
+        <button className={styles.compareToggleBtn} onClick={() => setShowCompare(!showCompare)}>
+          {showCompare ? '▲ Hide' : '▼ Sim↔Real Compare'}
+        </button>
+        {showCrossTalk && (
+          <CrossTalkPanel
+            report={debug.crossTalkReport}
+            drift={debug.drift}
+            driftOk={debug.driftOk}
+            eStopActive={debug.eStopActive}
+            robotCount={debug.robotCount}
+            onReset={debug.resetCrossTalk}
+          />
+        )}
+        <button className={styles.compareToggleBtn} onClick={() => setShowCrossTalk(!showCrossTalk)}>
+          {showCrossTalk ? '▲ Hide' : '▼ Cross-Talk Monitor'}
+        </button>
+        <SafetyEventPanel
+          safetyState={debug.safetyState}
+          eStopActive={debug.eStopActive}
+          events={debug.safetyEvents}
+          onClearEStop={() => debug.updateSafety('ok', false)}
+          onSelfTest={async () => {
+            setSelfTestLoading(true)
+            try {
+              setSelfTestResult({ ok: true, status: 'no-runner', checks: [] })
+            } finally {
+              setSelfTestLoading(false)
+            }
+          }}
+          selfTestResult={selfTestResult}
+          selfTestLoading={selfTestLoading}
+        />
+      </CollapsibleSection>
+
+      {/* AI & Perception */}
+      <CollapsibleSection sectionKey="ai" title="AI & Perception" icon="🧠" defaultOpen={false}>
+        <PolicyPanel />
+        <PolicyInputPanel
+          policyResults={debug.policyResults}
+          policyEvents={debug.policyEvents}
+          width={700}
+          height={280}
+        />
+        <PerceptionPanel events={debug.perceptionEvents} />
+      </CollapsibleSection>
+
+      {/* Character & Memory */}
+      <CollapsibleSection sectionKey="character" title="Character & Memory" icon="🎭" defaultOpen={false}>
+        <CharacterConfigPanel
+          emotionPreset={debug.emotionPreset}
+          valConfig={debug.valConfig}
+          memoryConfig={debug.memoryConfig}
+          perceptionConfig={debug.perceptionConfig}
+        />
+        <MemoriesPanel
+          memories={debug.memories}
+          stats={computeMemoryStats(debug.memories)}
+          onPurge={debug.purgeMemories}
+          onForget={debug.simulateForgetting}
+        />
+        <VALPanel
+          valState={debug.valState}
+          valHistory={debug.valHistory}
+          perceptionEvents={debug.perceptionEvents}
+          emotionLabel={debug.valState ? valToString(debug.valState) : 'idle'}
+        />
+        <VALTimelinePanel
+          valState={debug.valState}
+          valHistory={debug.valHistory}
+          perceptionEvents={debug.perceptionEvents}
+          adapterEvents={debug.adapterEvents}
+          width={900}
+        />
+      </CollapsibleSection>
+
+      {/* Social */}
+      <CollapsibleSection sectionKey="social" title="Social" icon="👥" badge={debug.socialEvents.length} defaultOpen={false}>
+        <SocialEventsPanel events={debug.socialEvents} />
+      </CollapsibleSection>
+
+      {/* Multi-Agent */}
+      <CollapsibleSection sectionKey="multiagent" title="Multi-Agent" icon="🔗" badge={multiDebug.agents.length} defaultOpen={false}>
+        {multiDebug.agents.length > 0 && multiDebug.totalEvents > 0 && (
+          <MultiAgentTimelinePanel agents={multiDebug.agents} timeWindowMs={30000} />
+        )}
+        {multiDebug.agents.length >= 2 && <AgentDiffPanel agents={multiDebug.agents} />}
+      </CollapsibleSection>
+
+      {/* Tools */}
+      <CollapsibleSection sectionKey="tools" title="Tools" icon="🔧" defaultOpen={false}>
+        <ShareSessionPanel
+          character={debug.emotionPreset ?? 'unknown'}
+          btTree={debug.tree}
+          blackboard={debug.blackboard}
+          recentEvents={debug.adapterEvents}
+          valState={debug.valState}
+          valHistory={debug.valHistory}
+          diffs={diffs}
+          onSessionLoaded={() => {}}
+        />
+        <PluginManagerPage />
+      </CollapsibleSection>
     </div>
   )
 }
