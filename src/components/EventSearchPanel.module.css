@@ -1,0 +1,373 @@
+/* EventSearchPanel — Unified event search across all tracer events */
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ─── Search Bar ──────────────────────────────────────────────── */
+
+.searchBar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--bg-secondary);
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+}
+
+.searchInput {
+  flex: 1;
+  padding: 6px 10px;
+  font-size: 13px;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.searchInput:focus {
+  border-color: var(--accent-blue);
+}
+
+.clearBtn {
+  padding: 4px 8px;
+  font-size: 12px;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.clearBtn:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+/* ─── Type Filter ─────────────────────────────────────────────── */
+
+.typeFilterWrap {
+  position: relative;
+}
+
+.filterBtn {
+  padding: 4px 10px;
+  font-size: 12px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.filterBtn:hover {
+  background: var(--bg-quaternary);
+  color: var(--text-primary);
+}
+
+.filterBtnOpen {
+  border-color: var(--accent-blue);
+  color: var(--accent-blue);
+}
+
+.typeDropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 100;
+  min-width: 320px;
+  max-height: 400px;
+  overflow-y: auto;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.typeGroupHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.selectAllBtn {
+  padding: 2px 8px;
+  font-size: 11px;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  color: var(--accent-blue);
+  cursor: pointer;
+}
+
+.selectAllBtn:hover {
+  background: var(--bg-tertiary);
+}
+
+.typeGroup {
+  margin-bottom: 8px;
+}
+
+.typeGroupName {
+  display: block;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-tertiary);
+  margin-bottom: 4px;
+}
+
+.typeCheckboxes {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.typeCheckbox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 6px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background 0.15s;
+}
+
+.typeCheckbox:hover {
+  background: var(--bg-tertiary);
+}
+
+.typeCheckbox input[type="checkbox"] {
+  margin: 0;
+  accent-color: var(--accent-blue);
+}
+
+.typeIcon {
+  font-size: 11px;
+  width: 16px;
+  text-align: center;
+}
+
+.typeLabel {
+  flex: 1;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 11px;
+}
+
+.typeCount {
+  font-size: 10px;
+  color: var(--text-tertiary);
+}
+
+/* ─── Live Mode Toggle ────────────────────────────────────────── */
+
+.liveBtn, .exportBtn {
+  padding: 4px 10px;
+  font-size: 12px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.liveBtn:hover, .exportBtn:hover {
+  background: var(--bg-quaternary);
+  color: var(--text-primary);
+}
+
+.liveActive {
+  border-color: #22c55e;
+  color: #22c55e;
+}
+
+/* ─── Summary Bar ─────────────────────────────────────────────── */
+
+.summaryBar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 12px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.resultCount {
+  white-space: nowrap;
+}
+
+.typeDistribution {
+  flex: 1;
+  display: flex;
+  gap: 1px;
+  height: 6px;
+  border-radius: 3px;
+  overflow: hidden;
+  background: var(--bg-tertiary);
+}
+
+.distBar {
+  transition: width 0.3s ease;
+}
+
+.totalEvents {
+  white-space: nowrap;
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+
+/* ─── Results List ────────────────────────────────────────────── */
+
+.resultsList {
+  max-height: 400px;
+  overflow-y: auto;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+}
+
+.resultItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  font-size: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  transition: background 0.1s;
+}
+
+.resultItem:last-child {
+  border-bottom: none;
+}
+
+.resultItem:hover {
+  background: var(--bg-tertiary);
+}
+
+.resultTime {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 10px;
+  color: var(--text-tertiary);
+  width: 42px;
+  flex-shrink: 0;
+}
+
+.resultType {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 10px;
+  white-space: nowrap;
+  width: 90px;
+  flex-shrink: 0;
+}
+
+.resultLabel {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-primary);
+}
+
+.resultPayload {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 10px;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.resultAgentId {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 10px;
+  color: var(--accent-blue);
+  white-space: nowrap;
+}
+
+/* ─── Empty State ─────────────────────────────────────────────── */
+
+.emptyResult {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  color: var(--text-tertiary);
+}
+
+.emptyIcon {
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+
+.hint {
+  font-size: 11px;
+  margin-top: 4px;
+}
+
+/* ─── Highlighted Match ───────────────────────────────────────── */
+
+.mark {
+  background: rgba(59, 130, 246, 0.2);
+  color: var(--accent-blue);
+  border-radius: 2px;
+  padding: 0 1px;
+}
+
+/* ─── Keyboard Hints ──────────────────────────────────────────── */
+
+.hints {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  text-align: center;
+  padding: 4px;
+}
+
+kbd {
+  display: inline-block;
+  padding: 1px 5px;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 10px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+}
+
+/* ─── Scrollbar Styling ───────────────────────────────────────── */
+
+.resultsList::-webkit-scrollbar,
+.typeDropdown::-webkit-scrollbar {
+  width: 6px;
+}
+
+.resultsList::-webkit-scrollbar-track,
+.typeDropdown::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.resultsList::-webkit-scrollbar-thumb,
+.typeDropdown::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 3px;
+}
+
+.resultsList::-webkit-scrollbar-thumb:hover,
+.typeDropdown::-webkit-scrollbar-thumb:hover {
+  background: var(--text-tertiary);
+}

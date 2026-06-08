@@ -35,6 +35,7 @@ import { computeMemoryStats } from '@/memory/episodic-store'
 import { CharacterConfigPanel } from './CharacterConfigPanel'
 import { ShareSessionPanel } from '@/components/ShareSessionPanel'
 import { PluginManagerPage } from './PluginManagerPage'
+import { EventSearchPanel } from '@/components/EventSearchPanel'
 import styles from './DebugPage.module.css'
 
 // ─── BT Tree Renderer ─────────────────────────────────────────
@@ -585,6 +586,11 @@ export function DebugPage() {
 
       {/* ─── Collapsible sections ─── */}
 
+      {/* Event Search — unified search across all tracer events */}
+      <CollapsibleSection sectionKey="eventsearch" title="Event Search" icon="🔍" defaultOpen={false}>
+        <EventSearchPanel />
+      </CollapsibleSection>
+
       {/* Performance & Tracing */}
       <CollapsibleSection sectionKey="performance" title="Performance & Tracing" icon="📊" defaultOpen={false}>
         <PerformancePanel data={debug.perfData} width={800} height={180} />
@@ -701,7 +707,7 @@ export function DebugPage() {
       </CollapsibleSection>
 
       {/* Tools */}
-      <CollapsibleSection sectionKey="tools" title="Tools" icon="🔧" defaultOpen={false}>
+      <CollapsibleSection sectionKey="tools" title="Tools" icon="🔧" badge={debug.totalEvents} defaultOpen={false}>
         <ShareSessionPanel
           character={debug.emotionPreset ?? 'unknown'}
           btTree={debug.tree}
