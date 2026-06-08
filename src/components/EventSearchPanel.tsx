@@ -103,6 +103,7 @@ export function EventSearchPanel() {
   const searchInputRef = useRef<HTMLInputElement>(null)
   const liveSubscribedRef = useRef(false)
   const eventsArrRef = useRef<TracerEvent[]>([])
+  const [, forceUpdate] = useState(0)
 
   // Live event stream subscription — only when in live mode
   useEffect(() => {
@@ -133,9 +134,7 @@ export function EventSearchPanel() {
       unsub()
       liveSubscribedRef.current = false
     }
-  }, [liveMode])
-
-  const [, forceUpdate] = useState(0)
+  }, [liveMode, forceUpdate])
 
   // Build combined event list from live mode or snapshot
   const allEvents = useMemo(() => {

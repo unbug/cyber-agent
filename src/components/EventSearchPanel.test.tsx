@@ -114,11 +114,20 @@ describe('EventSearchPanel', () => {
 
   it('toggles live mode', async () => {
     renderWithRouter(<EventSearchPanel />)
-    const liveBtn = screen.getByText(/Live|Snapshot/i)
+    // Initial state: Snapshot mode
+    expect(screen.getByText(/○ Snapshot/)).toBeInTheDocument()
+
+    const liveBtn = screen.getByRole('button', { name: /Snapshot/i })
     fireEvent.click(liveBtn)
 
     await waitFor(() => {
-      expect(screen.getByText(/Snapshot/)).toBeInTheDocument()
+      expect(screen.getByText(/● Live/)).toBeInTheDocument()
+    })
+
+    // Click again to toggle back
+    fireEvent.click(liveBtn)
+    await waitFor(() => {
+      expect(screen.getByText(/○ Snapshot/)).toBeInTheDocument()
     })
   })
 
