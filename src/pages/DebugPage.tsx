@@ -36,6 +36,7 @@ import { CharacterConfigPanel } from './CharacterConfigPanel'
 import { ShareSessionPanel } from '@/components/ShareSessionPanel'
 import { PluginManagerPage } from './PluginManagerPage'
 import { EventSearchPanel } from '@/components/EventSearchPanel'
+import { ErrorTimelinePanel } from '@/components/ErrorTimelinePanel'
 import styles from './DebugPage.module.css'
 
 // ─── BT Tree Renderer ─────────────────────────────────────────
@@ -593,6 +594,7 @@ export function DebugPage() {
 
       {/* Performance & Tracing */}
       <CollapsibleSection sectionKey="performance" title="Performance & Tracing" icon="📊" defaultOpen={false}>
+        <ErrorTimelinePanel />
         <PerformancePanel data={debug.perfData} width={800} height={180} />
         {showErrors && <ErrorLog errors={debug.errors} />}
         {debug.errors.length > 0 && (
