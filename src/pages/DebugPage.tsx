@@ -37,6 +37,7 @@ import { ShareSessionPanel } from '@/components/ShareSessionPanel'
 import { PluginManagerPage } from './PluginManagerPage'
 import { EventSearchPanel } from '@/components/EventSearchPanel'
 import { ErrorTimelinePanel } from '@/components/ErrorTimelinePanel'
+import { DebugReportPanel } from '@/components/DebugReportPanel'
 import styles from './DebugPage.module.css'
 
 // ─── BT Tree Renderer ─────────────────────────────────────────
@@ -710,6 +711,7 @@ export function DebugPage() {
 
       {/* Tools */}
       <CollapsibleSection sectionKey="tools" title="Tools" icon="🔧" badge={debug.totalEvents} defaultOpen={false}>
+        <DebugReportPanel />
         <ShareSessionPanel
           character={debug.emotionPreset ?? 'unknown'}
           btTree={debug.tree}

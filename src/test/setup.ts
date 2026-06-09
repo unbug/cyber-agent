@@ -24,6 +24,16 @@ Object.defineProperty(window, 'IntersectionObserver', {
   value: MockIntersectionObserver,
 });
 
+// Mock URL methods not available in jsdom
+if (typeof URL.createObjectURL !== 'function') {
+  // @ts-ignore jsdom doesn't have these
+  URL.createObjectURL = () => 'blob:test';
+}
+if (typeof URL.revokeObjectURL !== 'function') {
+  // @ts-ignore jsdom doesn't have this
+  URL.revokeObjectURL = () => {};
+}
+
 // Mock matchMedia for border-beam and useTheme
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
