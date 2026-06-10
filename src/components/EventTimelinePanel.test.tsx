@@ -191,4 +191,46 @@ describe('EventTimelinePanel', () => {
       expect(countText.textContent).toMatch(/\d+ events/)
     })
   })
+
+  it('shows correlation chain when clicking an event with causal neighbors', () => {
+    // Emit a causal chain: tick.start → node.enter → action.dispatch → adapter.tx → node.exit
+    tracer.emit({ t: 100, type: 'tick.start', label: 'tick' })
+    tracer.emit({ t: 200, type: 'node.enter', label: 'seq.move' })
+    tracer.emit({ t: 300, type: 'action.dispatch', label: 'move.forward' })
+    tracer.emit({ t: 400, type: 'adapter.tx', label: 'cmd:move' })
+    tracer.emit({ t: 500, type: 'node.exit', label: 'seq.move' })
+
+    const { container } = render(<EventTimelinePanel />)
+
+    // Click on the action.dispatch event (3rd event)
+    const svg = container.querySelector('svg')!
+    fireEvent.click(svg)
+
+    waitFor(() => {
+      // Should show correlation section with related events
+      expect(screen.getByText(/Correlated Events/)).toBeInTheDocument()
+    })
+  })
+
+  it('shows playback controls in toolbar', () => {
+    render(<EventTimelinePanel />)
+    expect(screen.getByTitle('Play events')).toBeInTheDocument()
+    expect(screen.getByTitle('Speed up')).toBeInTheDocument()
+    expect(screen.getByTitle('Slow down')).toBeInTheDocument()
+  })
+
+  it('toggles playback on/off', () => {
+    tracer.emit({ t: 100, type: 'tick.start', label: 'tick' })
+
+    render(<EventTimelinePanel />)
+
+    // Initially not playing (shows ▶ Play)
+    expect(screen.getByTitle('Play events')).toHaveTextContent(/▶ Play/)
+
+    fireEvent.click(screen.getByTitle('Play events'))
+    waitFor(() => {
+      // After clicking, should show ⏸ Play (playing)
+      expect(screen.getByTitle('Pause playback')).toBeInTheDocument()
+    })
+  })
 })

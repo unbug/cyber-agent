@@ -28,6 +28,70 @@ import { useState, useCallback, useRef, useMemo, useEffect } from 'react'
 import { tracer, type TracerEvent, type TracerEventType } from '@/engine/tracer'
 import styles from './EventTimelinePanel.module.css'
 
+// ─── Event correlation helpers ────────────────────────────────
+
+/** Find events causally related to a given event within a time window */
+function findCorrelatedEvents(
+  allEvents: TracerEvent[],
+  targetIndex: number,
+  windowMs = 2000,
+): { before: TracerEvent[]; after: TracerEvent[] } {
+  const target = allEvents[targetIndex]
+  if (!target) return { before: [], after: [] }
+
+  const before: TracerEvent[] = []
+  const after: TracerEvent[] = []
+
+  // Look backward for causal predecessors (tick.start, node.enter, perception, etc.)
+  for (let i = targetIndex - 1; i >= Math.max(0, targetIndex - 50); i--) {
+    const e = allEvents[i]
+    if (!e) continue
+    if (target.t - e.t > windowMs) break
+    // Predecessors: tick.start, node.enter, perception, policy.invoke, social.event
+    if (
+      ['tick.start', 'node.enter', 'perception', 'policy.invoke',
+       'social.event', 'val.update'].includes(e.type)
+    ) {
+      before.unshift(e)
+    }
+  }
+
+  // Look forward for causal successors (node.exit, adapter.rx, policy.success/failure)
+  for (let i = targetIndex + 1; i < Math.min(allEvents.length, targetIndex + 50); i++) {
+    const e = allEvents[i]
+    if (!e) continue
+    if (e.t - target.t > windowMs) break
+    // Successors: node.exit, adapter.rx, policy.success/failure, action.dispatch
+    if (
+      ['node.exit', 'adapter.rx', 'policy.success', 'policy.failure',
+       'action.dispatch', 'error'].includes(e.type)
+    ) {
+      after.push(e)
+    }
+  }
+
+  return { before, after }
+}
+
+/** Build a correlation chain: predecessors → target → successors */
+function buildCorrelationChain(
+  allEvents: TracerEvent[],
+  targetIndex: number,
+): TracerEvent[] {
+  const { before, after } = findCorrelatedEvents(allEvents, targetIndex)
+  const target = allEvents[targetIndex]
+  if (!target) return []
+  return [...before, target, ...after]
+}
+
+// ─── Playback helpers ─────────────────────────────────────────
+
+interface PlaybackState {
+  playing: boolean
+  speed: number        // events per second (1-50)
+  currentIndex: number // current event index being highlighted
+}
+
 // ─── Type metadata ──────────────────────────────────────────────
 
 interface EventTypeMeta {
@@ -86,6 +150,13 @@ interface TimelineState {
   activeCategories: Set<string>
   keywordFilter: string
   agentIdFilter: string
+  correlationChain: TracerEvent[] | null  // correlated events for selected event
+}
+
+interface PlaybackState {
+  playing: boolean
+  speed: number        // events per second (1-50)
+  currentIndex: number // current event index being highlighted
 }
 
 // ─── Main component ─────────────────────────────────────────────
@@ -99,7 +170,16 @@ export function EventTimelinePanel() {
     activeCategories: new Set(Object.keys(CATEGORIES)),
     keywordFilter: '',
     agentIdFilter: '',
+    correlationChain: null,
   })
+
+  const [playback, setPlayback] = useState<PlaybackState>({
+    playing: false,
+    speed: 10,
+    currentIndex: -1,
+  })
+  const playbackRef = useRef<number | null>(null)
+  const filteredEventsRef = useRef<TracerEvent[]>([])
 
   const containerRef = useRef<HTMLDivElement>(null)
   const eventsRef = useRef<TracerEvent[]>([])
@@ -149,6 +229,36 @@ export function EventTimelinePanel() {
     }
   }, [events.length, state.autoScroll, dimensions.width, state.zoomLevel])
 
+  // Playback animation loop
+  useEffect(() => {
+    if (!playback.playing) {
+      if (playbackRef.current) {
+        cancelAnimationFrame(playbackRef.current)
+        playbackRef.current = null
+      }
+      return
+    }
+
+    const tick = () => {
+      setPlayback(prev => {
+        if (!prev.playing) return prev
+        // Advance by speed events per second (60fps → advance every ~speed/60 frames)
+        let nextIdx = prev.currentIndex + 1
+        if (nextIdx >= filteredEventsRef.current.length) {
+          // Loop back to start
+          nextIdx = 0
+        }
+        return { ...prev, currentIndex: nextIdx }
+      })
+      playbackRef.current = requestAnimationFrame(tick)
+    }
+
+    playbackRef.current = requestAnimationFrame(tick)
+    return () => {
+      if (playbackRef.current) cancelAnimationFrame(playbackRef.current)
+    }
+  }, [playback.playing, playback.speed])
+
   // Filtered events
   const filteredEvents = useMemo(() => {
     let result = events
@@ -179,16 +289,28 @@ export function EventTimelinePanel() {
     return result
   }, [events, state.activeCategories, state.keywordFilter, state.agentIdFilter])
 
+  // Sync filtered events to ref for playback animation loop (runs outside React render)
+  useEffect(() => {
+    filteredEventsRef.current = filteredEvents
+  })
+
   // Visible window of events
   const visibleCount = Math.max(10, Math.floor(dimensions.width / state.zoomLevel))
   const startIdx = Math.max(0, Math.min(state.scrollOffset, filteredEvents.length - visibleCount))
   const endIdx = Math.min(filteredEvents.length, startIdx + visibleCount)
   const visibleEvents = filteredEvents.slice(startIdx, endIdx)
 
-  // Event click handler
+  // Event click handler — also computes correlation chain
   const handleEventClick = useCallback((index: number) => {
-    setState(prev => ({ ...prev, selectedEventIndex: index }))
-  }, [])
+    const chain = buildCorrelationChain(filteredEvents, index)
+    setState(prev => ({
+      ...prev,
+      selectedEventIndex: index,
+      correlationChain: chain.length > 1 ? chain : null,
+    }))
+    // Pause playback when selecting an event
+    setPlayback(prev => ({ ...prev, playing: false }))
+  }, [filteredEvents])
 
   // Zoom controls
   const handleZoomIn = useCallback(() => {
@@ -234,6 +356,30 @@ export function EventTimelinePanel() {
       return { ...prev, activeCategories: next }
     })
   }, [])
+
+  // Playback controls
+  const handlePlaybackToggle = useCallback(() => {
+    setPlayback(prev => ({
+      ...prev,
+      playing: !prev.playing,
+      currentIndex: prev.currentIndex >= filteredEvents.length - 1 ? 0 : prev.currentIndex,
+    }))
+  }, [filteredEvents.length])
+
+  const handleSpeedChange = useCallback((delta: number) => {
+    setPlayback(prev => ({ ...prev, speed: Math.max(1, Math.min(50, prev.speed + delta)) }))
+  }, [])
+
+  // Correlation chain highlight set for fast lookup
+  const correlationHighlightSet = useMemo(() => {
+    if (!state.correlationChain) return new Set<number>()
+    const set = new Set<number>()
+    state.correlationChain.forEach(e => {
+      const idx = filteredEvents.indexOf(e)
+      if (idx >= 0) set.add(idx)
+    })
+    return set
+  }, [state.correlationChain, filteredEvents])
 
   // Selected event details
   const selectedEvent = state.selectedEventIndex !== null && state.selectedEventIndex >= startIdx && state.selectedEventIndex < endIdx
@@ -298,6 +444,9 @@ export function EventTimelinePanel() {
           <button className={styles.ctrlBtn} onClick={handleZoomIn} title="Zoom in">+</button>
           <button className={styles.ctrlBtn} onClick={handlePanLeft} title="Scroll left">◀</button>
           <button className={styles.ctrlBtn} onClick={handlePanRight} title="Scroll right">▶</button>
+        </div>
+
+        <div className={styles.toolbarSection}>
           <button
             className={`${styles.ctrlBtn} ${state.autoScroll ? styles.ctrlBtnActive : ''}`}
             onClick={() => setState(prev => ({ ...prev, autoScroll: !prev.autoScroll }))}
@@ -305,6 +454,19 @@ export function EventTimelinePanel() {
           >
             {state.autoScroll ? '⏸ Live' : '▶ Live'}
           </button>
+          <button
+            className={`${styles.ctrlBtn} ${playback.playing ? styles.ctrlBtnActive : ''}`}
+            onClick={handlePlaybackToggle}
+            title={playback.playing ? 'Pause playback' : 'Play events'}
+          >
+            {playback.playing ? '⏸ Play' : '▶ Play'}
+          </button>
+          <span className={styles.zoomLabel}>{playback.speed}x</span>
+          <button className={styles.ctrlBtn} onClick={() => handleSpeedChange(-1)} title="Slow down">−</button>
+          <button className={styles.ctrlBtn} onClick={() => handleSpeedChange(1)} title="Speed up">+</button>
+        </div>
+
+        <div className={styles.toolbarSection}>
           <button className={styles.ctrlBtn} onClick={handleExport} title="Export filtered events">📥</button>
         </div>
 
@@ -349,16 +511,47 @@ export function EventTimelinePanel() {
             const x = (i / Math.max(1, endIdx - startIdx)) * dimensions.width
             const meta = EVENT_TYPE_META[event.type] ?? { color: '#888', icon: '?', category: 'system' }
             const isSelected = state.selectedEventIndex === globalIdx
+            const isCorrelated = correlationHighlightSet.has(globalIdx)
+            const isPlaybackCurrent = playback.playing && playback.currentIndex === globalIdx
+
+            // Determine visual style based on state
+            let dotR = 4
+            let dotFill = meta.color
+            let dotStroke = 'none'
+            let dotStrokeWidth = 0
+
+            if (isPlaybackCurrent) {
+              // Playback highlight: pulsing white ring
+              dotR = 7
+              dotFill = '#fff'
+              dotStroke = meta.color
+              dotStrokeWidth = 3
+            } else if (isSelected) {
+              dotR = 6
+              dotFill = meta.color
+              dotStroke = '#fff'
+              dotStrokeWidth = 2
+            } else if (isCorrelated) {
+              // Correlation chain: slightly larger with subtle glow
+              dotR = 5
+              dotFill = meta.color
+              dotStroke = meta.color + '80' // semi-transparent
+              dotStrokeWidth = 1.5
+            }
 
             return (
               <g key={globalIdx} className={styles.eventGroup}>
+                {isCorrelated && !isSelected && (
+                  <circle cx={x} cy={dimensions.height / 2} r={dotR + 3}
+                    fill="none" stroke={meta.color + '30'} strokeWidth={1} />
+                )}
                 <circle
                   cx={x}
                   cy={dimensions.height / 2}
-                  r={isSelected ? 6 : 4}
-                  fill={meta.color}
-                  stroke={isSelected ? '#fff' : 'none'}
-                  strokeWidth={isSelected ? 2 : 0}
+                  r={dotR}
+                  fill={dotFill}
+                  stroke={dotStroke}
+                  strokeWidth={dotStrokeWidth}
                   className={styles.eventDot}
                   onClick={() => handleEventClick(globalIdx)}
                 />
@@ -403,7 +596,7 @@ export function EventTimelinePanel() {
       {/* Selected event detail panel */}
       {selectedEvent && (
         <div className={styles.detailPanel}>
-          <button className={styles.closeBtn} onClick={() => setState(prev => ({ ...prev, selectedEventIndex: null }))}>✕</button>
+          <button className={styles.closeBtn} onClick={() => setState(prev => ({ ...prev, selectedEventIndex: null, correlationChain: null }))}>✕</button>
           <h4 className={styles.detailTitle}>{selectedEvent.type}</h4>
           <div className={styles.detailRow}>
             <span className={styles.detailLabel}>Time:</span>
@@ -424,6 +617,37 @@ export function EventTimelinePanel() {
               <summary className={styles.detailSummary}>Payload ({Object.keys(selectedEvent.payload).length} fields)</summary>
               <pre>{JSON.stringify(selectedEvent.payload, null, 2)}</pre>
             </details>
+          )}
+
+          {/* Correlation chain */}
+          {state.correlationChain && state.correlationChain.length > 1 && (
+            <div className={styles.correlationSection}>
+              <h5 className={styles.correlationTitle}>Correlated Events ({state.correlationChain.length})</h5>
+              <div className={styles.correlationList}>
+                {state.correlationChain.map((e, idx) => {
+                  const isTarget = e === selectedEvent
+                  const meta = EVENT_TYPE_META[e.type] ?? { color: '#888', icon: '?' }
+                  return (
+                    <div
+                      key={idx}
+                      className={`${styles.correlationItem} ${isTarget ? styles.correlationItemTarget : ''}`}
+                      onClick={() => {
+                        const idx = filteredEvents.indexOf(e)
+                        if (idx >= 0) handleEventClick(idx)
+                      }}
+                    >
+                      <span
+                        className={styles.correlationDot}
+                        style={{ backgroundColor: meta.color, opacity: isTarget ? 1 : 0.6 }}
+                      />
+                      <span className={styles.correlationType}>{e.type}</span>
+                      <span className={styles.correlationLabel} title={e.label}>{e.label.slice(0, 40)}</span>
+                      <span className={styles.correlationTime}>{((e.t - selectedEvent.t) / 1000).toFixed(3)}s</span>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
           )}
         </div>
       )}
