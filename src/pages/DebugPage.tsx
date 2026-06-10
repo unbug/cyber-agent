@@ -594,7 +594,7 @@ export function DebugPage() {
       </CollapsibleSection>
 
       {/* Performance & Tracing */}
-      <CollapsibleSection sectionKey="performance" title="Performance & Tracing" icon="📊" defaultOpen={false}>
+      <CollapsibleSection sectionKey="performance" title="Performance & Tracing" icon="📊" defaultOpen={true}>
         <ErrorTimelinePanel />
         <PerformancePanel data={debug.perfData} width={800} height={180} />
         {showErrors && <ErrorLog errors={debug.errors} />}

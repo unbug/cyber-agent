@@ -3,9 +3,16 @@
  *
  * Allows rewinding, stepping, and fast-forwarding through a trace
  * (in-memory session or uploaded .cybertrace file).
+ *
+ * Features:
+ * - File upload via button + drag-and-drop
+ * - Trace metadata display (platform, character, event count)
+ * - Time-travel playback with speed control
+ * - Blackboard state reconstruction at any point in the trace
+ * - Active node tracking during scrubbing
  */
 
-import { useState, useCallback, useRef, useEffect, type ChangeEvent } from 'react'
+import { useState, useCallback, useRef, useEffect, type ChangeEvent, type DragEvent } from 'react'
 import type { TracerEvent } from '@/engine/tracer'
 import { lintTrace, type ParsedTrace } from '@cyber-agent/sdk/trace'
 import styles from './DebugPage.module.css'
@@ -23,6 +30,8 @@ interface ScrubberState {
   meta: Record<string, unknown> | null
   status: 'idle' | 'loading' | 'ready' | 'error'
   errorMsg: string
+  fileName: string
+  isDragOver: boolean
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────
@@ -117,6 +126,8 @@ export function TraceScrubber({ liveEvents: _liveEvents, liveBlackboard, traceDa
     meta: null,
     status: 'idle',
     errorMsg: '',
+    fileName: '',
+    isDragOver: false,
   })
 
   const playRef = useRef<number | null>(null)
@@ -135,13 +146,12 @@ export function TraceScrubber({ liveEvents: _liveEvents, liveBlackboard, traceDa
       meta: (traceData.header.meta ?? {}) as Record<string, unknown>,
       status: 'ready',
       errorMsg: '',
+      fileName: '',
+      isDragOver: false,
     })
   }, [traceData])
 
-  const handleUpload = useCallback(async (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-
+  const handleUpload = useCallback(async (file: File) => {
     setState(prev => ({ ...prev, status: 'loading', errorMsg: '' }))
 
     try {
@@ -157,15 +167,58 @@ export function TraceScrubber({ liveEvents: _liveEvents, liveBlackboard, traceDa
         meta: (trace.header.meta ?? {}) as Record<string, unknown>,
         status: 'ready',
         errorMsg: '',
+        fileName: file.name,
+        isDragOver: false,
       })
     } catch (err) {
       setState(prev => ({
         ...prev,
         status: 'error',
         errorMsg: (err as Error).message,
+        fileName: '',
+        isDragOver: false,
       }))
     }
   }, [])
+
+  const handleFileInput = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) handleUpload(file)
+  }, [handleUpload])
+
+  // Legacy upload handler for backward compat with old label
+  const handleLegacyUpload = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) handleUpload(file)
+  }, [handleUpload])
+
+  // Drag-and-drop handlers
+  const handleDragEnter = useCallback((e: DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setState(prev => ({ ...prev, isDragOver: true }))
+  }, [])
+
+  const handleDragLeave = useCallback((e: DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setState(prev => ({ ...prev, isDragOver: false }))
+  }, [])
+
+  const handleDragOver = useCallback((e: DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+  }, [])
+
+  const handleDrop = useCallback((e: DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setState(prev => ({ ...prev, isDragOver: false }))
+    const file = e.dataTransfer.files?.[0]
+    if (file && (file.name.endsWith('.cybertrace') || file.name.endsWith('.jsonl') || file.name.endsWith('.json'))) {
+      handleUpload(file)
+    }
+  }, [handleUpload])
 
   const handleSeek = useCallback((index: number) => {
     setState(prev => {
@@ -231,6 +284,8 @@ export function TraceScrubber({ liveEvents: _liveEvents, liveBlackboard, traceDa
       meta: null,
       status: 'idle',
       errorMsg: '',
+      fileName: '',
+      isDragOver: false,
     })
   }, [])
 
@@ -273,6 +328,11 @@ export function TraceScrubber({ liveEvents: _liveEvents, liveBlackboard, traceDa
         <div className={styles.errorItem}>
           <span className={styles.errorMsg}>{state.errorMsg}</span>
         </div>
+        {state.fileName && (
+          <div style={{ fontSize: '0.65rem', color: 'var(--text-tertiary)', marginBottom: 'var(--space-1)' }}>
+            File: {state.fileName}
+          </div>
+        )}
         <button className={styles.btn} onClick={handleBackToLive}>
           Back to Live
         </button>
@@ -281,9 +341,41 @@ export function TraceScrubber({ liveEvents: _liveEvents, liveBlackboard, traceDa
   }
 
   return (
-    <div className={styles.scrubber}>
+    <div
+      className={styles.scrubber}
+      onDragEnter={handleDragEnter}
+      onDragLeave={handleDragLeave}
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
+      style={{
+        border: state.isDragOver ? '2px dashed #3b82f6' : undefined,
+        backgroundColor: state.isDragOver ? '#3b82f608' : undefined,
+      }}
+    >
+      {/* Drag-and-drop zone when idle */}
+      {state.status === 'idle' && (
+        <div
+          className={styles.scrubberDropZone}
+          style={{ display: state.isDragOver ? 'flex' : 'none' }}
+        >
+          <span className={styles.scrubberDropIcon}>📂</span>
+          <span className={styles.scrubberDropText}>Drop .cybertrace file here</span>
+        </div>
+      )}
+
       {/* Upload bar */}
       <div className={styles.scrubberBar}>
+        {state.status === 'idle' && (
+          <label className={styles.btn}>
+            📂 Load Trace File
+            <input
+              type="file"
+              accept=".cybertrace,.jsonl,.json"
+              onChange={handleFileInput}
+              style={{ display: 'none' }}
+            />
+          </label>
+        )}
         <label className={styles.btn}>
           📂 Upload Trace
           <input
@@ -339,8 +431,10 @@ export function TraceScrubber({ liveEvents: _liveEvents, liveBlackboard, traceDa
               onChange={e => handleSeek(Number(e.target.value))}
             />
             <span className={styles.scrubberLabel}>
-              {state.currentIndex + 1} / {state.events.length} events
-              {(state.meta?.platform as string | undefined) && ` · ${state.meta!.platform as string}`}
+              {state.fileName && <span title={state.fileName}>📄 {state.fileName.slice(0, 20)}{state.fileName.length > 20 ? '…' : ''}</span>}
+              {' '}{state.currentIndex + 1} / {state.events.length} events
+              {state.meta?.platform && <span title={`Platform: ${state.meta.platform}`}> · 🤖 {state.meta.platform as string}</span>}
+              {state.meta?.character && <span title={`Character: ${state.meta.character}`}> · 🎭 {state.meta.character as string}</span>}
             </span>
           </>
         )}
