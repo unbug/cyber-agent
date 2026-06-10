@@ -9,8 +9,8 @@
  * - Back to live functionality
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { describe, it, expect } from 'vitest'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { TraceScrubber } from './TraceScrubber'
 import type { TracerEvent } from '@/engine/tracer'
@@ -68,18 +68,18 @@ describe('TraceScrubber', () => {
   it('shows drag-and-drop zone on drag enter when idle', () => {
     const { container } = renderWithRouter(<TraceScrubber liveEvents={[]} liveBlackboard={null} />)
     // Drag enter triggers the drop zone display
-    fireEvent.dragEnter(container.querySelector('.scrubber')!)
+    fireEvent.dragEnter(container.querySelector('.scrubber') as HTMLElement)
     expect(screen.getByText(/Drop .cybertrace file here/i)).toBeInTheDocument()
   })
 
   it('hides drag-and-drop zone on drag leave', () => {
     const { container } = renderWithRouter(<TraceScrubber liveEvents={[]} liveBlackboard={null} />)
-    fireEvent.dragEnter(container.querySelector('.scrubber')!)
+    fireEvent.dragEnter(container.querySelector('.scrubber') as HTMLElement)
     // Drop zone should be visible after drag enter
     expect(screen.getByText(/Drop .cybertrace file here/i)).toBeInTheDocument()
-    fireEvent.dragLeave(container.querySelector('.scrubber')!)
+    fireEvent.dragLeave(container.querySelector('.scrubber') as HTMLElement)
     // Drop zone should be hidden (display: none via style) - check the element's display property
-    const dropZone = container.querySelector('.scrubberDropZone')
+    const dropZone = container.querySelector('.scrubberDropZone') as HTMLElement | null
     expect(dropZone?.style.display).toBe('none')
   })
 
@@ -127,15 +127,15 @@ describe('TraceScrubber', () => {
 
   it('shows scrubber slider after trace load', () => {
     renderWithRouter(<TraceScrubber liveEvents={[]} liveBlackboard={null} traceData={makeTraceData(3)} />)
-    const slider = document.querySelector('.scrubberSlider') as HTMLInputElement
+    const slider = document.querySelector('.scrubberSlider')
     expect(slider).toBeInTheDocument()
-    expect(slider.max).toBe('2') // 3 events → max index 2
+    expect((slider as HTMLInputElement)?.max).toBe('2') // 3 events → max index 2
   })
 
   it('shows scrubber slider with correct range for single event', () => {
     renderWithRouter(<TraceScrubber liveEvents={[]} liveBlackboard={null} traceData={makeTraceData(1)} />)
-    const slider = document.querySelector('.scrubberSlider') as HTMLInputElement
-    expect(slider.max).toBe('0') // 1 event → max index 0
+    const slider = document.querySelector('.scrubberSlider')
+    expect((slider as HTMLInputElement)?.max).toBe('0') // 1 event → max index 0
   })
 
   // ─── Blackboard Preview ──────────────────────────────────────
@@ -148,8 +148,8 @@ describe('TraceScrubber', () => {
     renderWithRouter(<TraceScrubber liveEvents={[]} liveBlackboard={null} traceData={{ header: {}, events }} />)
 
     // Seek to event index 1 (the bb.set event)
-    const slider = document.querySelector('.scrubberSlider') as HTMLInputElement
-    fireEvent.change(slider, { target: { value: '1' } })
+    const slider = document.querySelector('.scrubberSlider')
+    fireEvent.change(slider!, { target: { value: '1' } })
 
     expect(screen.getByText(/Blackboard at Event #2/i)).toBeInTheDocument()
     expect(screen.getByText(/valence/i)).toBeInTheDocument()
@@ -162,8 +162,8 @@ describe('TraceScrubber', () => {
     renderWithRouter(<TraceScrubber liveEvents={[]} liveBlackboard={null} traceData={{ header: {}, events }} />)
 
     // At index -1 (before any event), no blackboard preview should show
-    const slider = document.querySelector('.scrubberSlider') as HTMLInputElement
-    fireEvent.change(slider, { target: { value: '-1' } })
+    const slider = document.querySelector('.scrubberSlider')
+    fireEvent.change(slider!, { target: { value: '-1' } })
 
     expect(screen.queryByText(/Blackboard at Event/i)).not.toBeInTheDocument()
   })
@@ -179,8 +179,8 @@ describe('TraceScrubber', () => {
     renderWithRouter(<TraceScrubber liveEvents={[]} liveBlackboard={null} traceData={{ header: {}, events }} />)
 
     // Seek to event index 2 (two nodes entered)
-    const slider = document.querySelector('.scrubberSlider') as HTMLInputElement
-    fireEvent.change(slider, { target: { value: '2' } })
+    const slider = document.querySelector('.scrubberSlider')
+    fireEvent.change(slider!, { target: { value: '2' } })
 
     expect(screen.getByText(/🌳 sequence.patrol/i)).toBeInTheDocument()
     expect(screen.getByText(/🌳 action.move-forward/i)).toBeInTheDocument()
@@ -193,8 +193,8 @@ describe('TraceScrubber', () => {
     renderWithRouter(<TraceScrubber liveEvents={[]} liveBlackboard={null} traceData={{ header: {}, events }} />)
 
     // At index 0 (just tick.start, no nodes entered yet)
-    const slider = document.querySelector('.scrubberSlider') as HTMLInputElement
-    fireEvent.change(slider, { target: { value: '0' } })
+    const slider = document.querySelector('.scrubberSlider')
+    fireEvent.change(slider!, { target: { value: '0' } })
 
     expect(screen.queryByText(/🌳/i)).not.toBeInTheDocument()
   })
@@ -236,14 +236,14 @@ describe('TraceScrubber', () => {
 
   it('applies drag-over style when dragging over scrubber', () => {
     const { container } = renderWithRouter(<TraceScrubber liveEvents={[]} liveBlackboard={null} />)
-    const scrubberEl = container.querySelector('.scrubber')!
+    const scrubberEl = container.querySelector('.scrubber') as HTMLElement
 
     // Initially no drag-over style
-    expect(scrubberEl.style.borderColor).toBe('')
+    expect((scrubberEl as HTMLElement).style.borderColor).toBe('')
 
     fireEvent.dragEnter(scrubberEl)
     // Border color should be set (CSS shorthand may return just the color)
-    expect(scrubberEl.style.borderColor).toContain('rgb(59, 130, 246)')
+    expect((scrubberEl as HTMLElement).style.borderColor).toContain('rgb(59, 130, 246)')
 
     fireEvent.dragLeave(scrubberEl)
     expect(scrubberEl.style.borderColor).toBe('')
@@ -251,7 +251,7 @@ describe('TraceScrubber', () => {
 
   it('applies drag-over background color when dragging over scrubber', () => {
     const { container } = renderWithRouter(<TraceScrubber liveEvents={[]} liveBlackboard={null} />)
-    const scrubberEl = container.querySelector('.scrubber')!
+    const scrubberEl = container.querySelector('.scrubber') as HTMLElement
 
     fireEvent.dragEnter(scrubberEl)
     // Background color should be set (CSS may use rgba or rgb)

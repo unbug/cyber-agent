@@ -38,6 +38,7 @@ import { PluginManagerPage } from './PluginManagerPage'
 import { EventSearchPanel } from '@/components/EventSearchPanel'
 import { ErrorTimelinePanel } from '@/components/ErrorTimelinePanel'
 import { DebugReportPanel } from '@/components/DebugReportPanel'
+import { EventTimelinePanel } from '@/components/EventTimelinePanel'
 import styles from './DebugPage.module.css'
 
 // ─── BT Tree Renderer ─────────────────────────────────────────
@@ -591,6 +592,11 @@ export function DebugPage() {
       {/* Event Search — unified search across all tracer events */}
       <CollapsibleSection sectionKey="eventsearch" title="Event Search" icon="🔍" defaultOpen={false}>
         <EventSearchPanel />
+      </CollapsibleSection>
+
+      {/* Unified Event Timeline — ALL event types on one time axis */}
+      <CollapsibleSection sectionKey="eventtimeline" title="Unified Event Timeline" icon="⏱" defaultOpen={true}>
+        <EventTimelinePanel />
       </CollapsibleSection>
 
       {/* Performance & Tracing */}

@@ -186,12 +186,6 @@ export function TraceScrubber({ liveEvents: _liveEvents, liveBlackboard, traceDa
     if (file) handleUpload(file)
   }, [handleUpload])
 
-  // Legacy upload handler for backward compat with old label
-  const handleLegacyUpload = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) handleUpload(file)
-  }, [handleUpload])
-
   // Drag-and-drop handlers
   const handleDragEnter = useCallback((e: DragEvent) => {
     e.preventDefault()
@@ -381,7 +375,10 @@ export function TraceScrubber({ liveEvents: _liveEvents, liveBlackboard, traceDa
           <input
             type="file"
             accept=".cybertrace,.cybertrace.gz,.jsonl,.json"
-            onChange={handleUpload}
+            onChange={(e) => {
+              const file = e.target.files?.[0]
+              if (file) handleUpload(file)
+            }}
             style={{ display: 'none' }}
           />
         </label>
@@ -433,8 +430,8 @@ export function TraceScrubber({ liveEvents: _liveEvents, liveBlackboard, traceDa
             <span className={styles.scrubberLabel}>
               {state.fileName && <span title={state.fileName}>📄 {state.fileName.slice(0, 20)}{state.fileName.length > 20 ? '…' : ''}</span>}
               {' '}{state.currentIndex + 1} / {state.events.length} events
-              {state.meta?.platform && <span title={`Platform: ${state.meta.platform}`}> · 🤖 {state.meta.platform as string}</span>}
-              {state.meta?.character && <span title={`Character: ${state.meta.character}`}> · 🎭 {state.meta.character as string}</span>}
+              {typeof state.meta?.platform === 'string' && <span title={`Platform: ${state.meta.platform}`}> · 🤖 {state.meta.platform}</span>}
+              {typeof state.meta?.character === 'string' && <span title={`Character: ${state.meta.character}`}> · 🎭 {state.meta.character}</span>}
             </span>
           </>
         )}
