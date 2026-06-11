@@ -42,8 +42,11 @@ const EVENT_COLORS: Record<string, string> = {
 }
 
 function getEventType(event: TracerEvent): string {
-  const base = event.type.split('.')[0]
-  return EVENT_COLORS[event.type] ? event.type : (EVENT_COLORS[base] ?? '#94a3b8')
+  const color = EVENT_COLORS[event.type]
+  if (color) return color
+  const base: string = (event.type.split('.')[0] as string) || ''
+  if (!base || !(base in EVENT_COLORS)) return '#94a3b8'
+  return EVENT_COLORS[base as keyof typeof EVENT_COLORS]!
 }
 
 // ─── Props ──────────────────────────────────────────────────────
@@ -71,7 +74,7 @@ export function EventTimelineScrubber({
   // Pan state
   const [isDragging, setIsDragging] = useState(false)
   const dragStartX = useRef(0)
-  const scrollOffset = useRef(0)
+
 
   // Zoom state (events per visible pixel row, higher = more zoomed in)
   const [zoomLevel, setZoomLevel] = useState(1) // 0.5x to 4x
@@ -128,6 +131,7 @@ export function EventTimelineScrubber({
       if (globalIndex >= events.length) break
 
       const evt = events[globalIndex]
+      if (!evt) continue
       const color = getEventType(evt)
       const x = 20 + i * barWidth
 
@@ -185,8 +189,11 @@ export function EventTimelineScrubber({
   function drawLegend(ctx: CanvasRenderingContext2D, width: number, visibleEvents: TracerEvent[]) {
     const typeCounts = new Map<string, number>()
     for (const evt of visibleEvents) {
-      const base = evt.type.split('.')[0]
-      const key = EVENT_COLORS[evt.type] ? evt.type : (EVENT_COLORS[base] ?? '#94a3b8')
+      const parts = evt.type.split('.')
+      const base = parts[0] ?? ''
+      const key: string = evt.type in EVENT_COLORS
+        ? evt.type
+        : (base && base in EVENT_COLORS ? base : '#94a3b8')
       typeCounts.set(key, (typeCounts.get(key) ?? 0) + 1)
     }
 
