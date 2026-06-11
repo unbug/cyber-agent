@@ -16,6 +16,7 @@ import { useState, useCallback, useRef, useEffect, type ChangeEvent, type DragEv
 import type { TracerEvent } from '@/engine/tracer'
 import { lintTrace, type ParsedTrace } from '@cyber-agent/sdk/trace'
 import styles from './DebugPage.module.css'
+import { EventTimelineScrubber } from '@/components/EventTimelineScrubber'
 
 // ─── State ───────────────────────────────────────────────────────
 
@@ -436,6 +437,16 @@ export function TraceScrubber({ liveEvents: _liveEvents, liveBlackboard, traceDa
           </>
         )}
       </div>
+
+      {/* Visual timeline scrubber */}
+      {state.status === 'ready' && state.events.length > 0 && (
+        <EventTimelineScrubber
+          events={state.events}
+          currentIndex={state.currentIndex}
+          onSeek={handleSeek}
+          isPlaying={state.isPlaying}
+        />
+      )}
 
       {/* Scrubber blackboard preview */}
       {state.isScrubbing && displayBlackboard && (
