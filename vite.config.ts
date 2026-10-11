@@ -28,7 +28,6 @@ export default defineConfig({
     environmentOptions: {
       jsdom: {
         resources: 'usable',
-        cookieJar: { allowSpecialUse: true },
       },
     },
     setupFiles: './src/test/setup.ts',

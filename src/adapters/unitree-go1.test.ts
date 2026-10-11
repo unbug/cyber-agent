@@ -760,7 +760,7 @@ describe('UnitreeGo1Adapter', () => {
   // ─── Factory ──────────────────────────────────────────────
 
   it('createUnitreeGo1Adapter returns a UnitreeGo1Adapter instance', () => {
-    const adapter = createUnitreeGo1Adapter({ relayUrl: 'ws://test:8081', autoConnect: false })
+    const adapter = createUnitreeGo1Adapter({ relayUrl: 'ws://localhost:8081', autoConnect: false })
     expect(adapter).toBeInstanceOf(UnitreeGo1Adapter)
     expect(adapter.type).toBe('unitree-go1')
   })
@@ -771,7 +771,7 @@ describe('UnitreeGo1Adapter', () => {
   })
 
   it('factory accepts go2 robot model', () => {
-    const adapter = createUnitreeGo1Adapter({ relayUrl: 'ws://test:8081', robot: 'go2', autoConnect: false })
+    const adapter = createUnitreeGo1Adapter({ relayUrl: 'ws://localhost:8081', robot: 'go2', autoConnect: false })
     expect(adapter.robot).toBe('go2')
   })
 })

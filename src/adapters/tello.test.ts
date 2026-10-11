@@ -47,13 +47,13 @@ describe('TelloAdapter — construction', () => {
   })
 
   it('creates adapter with factory', () => {
-    const adapter = createTelloAdapter({ url: 'ws://test:8080' })
+    const adapter = createTelloAdapter({ url: 'ws://test.local:8080' })
     expect(adapter.type).toBe('tello')
   })
 
   it('respects custom config values', () => {
     const adapter = createTelloAdapter({
-      url: 'ws://test:8080',
+      url: 'ws://test.local:8080',
       heartbeatInterval: 2000,
       reconnectInterval: 5000,
       maxReconnectAttempts: 5,

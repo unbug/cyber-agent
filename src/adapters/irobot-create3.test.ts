@@ -48,13 +48,13 @@ describe('IRobotCreate3Adapter — construction', () => {
   })
 
   it('creates adapter with factory', () => {
-    const adapter = createIRobotCreate3Adapter({ url: 'ws://test:8080' })
+    const adapter = createIRobotCreate3Adapter({ url: 'ws://test.local:8080' })
     expect(adapter.type).toBe('irobot-create3')
   })
 
   it('respects custom config values', () => {
     const adapter = createIRobotCreate3Adapter({
-      url: 'ws://test:8080',
+      url: 'ws://test.local:8080',
       heartbeatInterval: 2000,
       reconnectInterval: 5000,
       maxReconnectAttempts: 3,
@@ -256,7 +256,7 @@ describe('IRobotCreate3Adapter — commands', () => {
 
   it('respects queue max size', () => {
     const adapter = createIRobotCreate3Adapter({
-      url: 'ws://test:8080',
+      url: 'ws://test.local:8080',
       autoConnect: false,
       queueMaxSize: 3,
     })

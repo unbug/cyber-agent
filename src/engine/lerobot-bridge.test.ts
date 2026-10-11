@@ -36,12 +36,12 @@ describe('LeRobotBridge', () => {
     it('constructs with correct defaults', () => {
       const client = new LeRobotPolicyClient({
         modelId: 'openvla/openvla-7b',
-        serverUrl: 'ws://localhost:8080',
+        serverUrl: 'ws://test.local:8080',
         task: 'move_forward',
       })
 
       expect(client['modelId']).toBe('openvla/openvla-7b')
-      expect(client['serverUrl']).toBe('ws://localhost:8080')
+      expect(client['serverUrl']).toBe('ws://test.local:8080')
       expect(client['robotType']).toBe('custom')
       expect(client['robotId']).toBe('cyberagent')
       expect(client['task']).toBe('move_forward')
@@ -65,7 +65,7 @@ describe('LeRobotBridge', () => {
     it('has correct public API', () => {
       const client = new LeRobotPolicyClient({
         modelId: 'test',
-        serverUrl: 'ws://localhost:8080',
+        serverUrl: 'ws://test.local:8080',
         task: 'test',
       })
 
@@ -82,7 +82,7 @@ describe('LeRobotBridge', () => {
     it('close() does not throw when not connected', () => {
       const client = new LeRobotPolicyClient({
         modelId: 'test',
-        serverUrl: 'ws://localhost:8080',
+        serverUrl: 'ws://test.local:8080',
         task: 'test',
       })
 
@@ -92,7 +92,7 @@ describe('LeRobotBridge', () => {
     it('connected is false when not connected', () => {
       const client = new LeRobotPolicyClient({
         modelId: 'test',
-        serverUrl: 'ws://localhost:8080',
+        serverUrl: 'ws://test.local:8080',
         task: 'test',
       })
 
@@ -112,7 +112,7 @@ describe('LeRobotBridge', () => {
       const client = createLeRobotClient(config)
       expect(client).toBeInstanceOf(LeRobotPolicyClient)
       expect(client['modelId']).toBe('openvla/openvla-7b')
-      expect(client['serverUrl']).toBe('ws://localhost:8080')
+      expect(client['serverUrl']).toBe('ws://test.local:8080')
     })
 
     it('derives task from modelId', () => {

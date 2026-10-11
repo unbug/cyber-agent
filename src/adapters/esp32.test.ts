@@ -525,7 +525,7 @@ describe('ESP32Adapter', () => {
   // ─── Factory ──────────────────────────────────────────────
 
   it('createESP32Adapter returns an ESP32Adapter instance', () => {
-    const adapter = createESP32Adapter({ url: 'ws://test:8080', autoConnect: false })
+    const adapter = createESP32Adapter({ url: 'ws://test.local:8080', autoConnect: false })
     expect(adapter).toBeInstanceOf(ESP32Adapter)
     expect(adapter.type).toBe('esp32')
   })

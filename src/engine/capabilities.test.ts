@@ -106,7 +106,7 @@ describe('CanvasAdapter.capabilities()', () => {
 
 describe('WebSocketAdapter.capabilities()', () => {
   it('returns full capabilities (passthrough)', () => {
-    const adapter = new WebSocketAdapter({ url: 'ws://localhost:8080' })
+    const adapter = new WebSocketAdapter({ url: 'ws://test.local:8080' })
     const caps = adapter.capabilities()
     expect(caps.movement).toBe(true)
     expect(caps.led).toBe(true)

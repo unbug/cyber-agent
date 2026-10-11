@@ -4,11 +4,13 @@
  * Runs 1 character × 5 adapters for a configurable duration.
  *
  * Usage:
- *   # Quick verification (5 min):
- *   npx vitest run tests/soak/soak.test.ts --test-timeout=600000
+ *   # Quick verification is covered by quick-soak.test.ts (runs in `npm test`).
  *
- *   # Full 24-hour soak:
- *   SOAK_HOURS=24 npx vitest run tests/soak/soak.test.ts --test-timeout=90000000
+ *   # Full soak gate (opt-in; runs ~16.7 min at defaults):
+ *   RUN_SOAK=1 npx vitest run tests/soak/soak.test.ts --test-timeout=900000
+ *
+ *   # 24-hour soak:
+ *   RUN_SOAK=1 SOAK_HOURS=24 npx vitest run tests/soak/soak.test.ts --test-timeout=90000000
  *
  * Assertions:
  *   - Zero `error` events from tracer
@@ -26,7 +28,7 @@ import { getBehavior } from '../../src/agents'
 
 // ─── Configuration ──────────────────────────────────────────────
 
-const DEFAULT_TICKS = 10000 // ~1667 ticks at 100ms interval ≈ 27.8 min
+const DEFAULT_TICKS = Number(process.env.SOAK_TICKS ?? 10000) // ~1667 ticks at 100ms interval ≈ 27.8 min
 const TICK_INTERVAL_MS = 100
 
 // ─── Mock Adapters ──────────────────────────────────────────────
@@ -143,11 +145,19 @@ async function runSoak(
 // ─── Tests ──────────────────────────────────────────────────────
 
 describe('v1.0 Soak Test', () => {
+  // Full soak is a release gate, not a unit test: 5 adapters × 10 000 ticks
+  // × 100ms wall-clock ≈ 83 min total. It can never fit `npm test` budgets,
+  // so it is opt-in via RUN_SOAK=1 (quick-soak.test.ts covers the quick gate).
+  const runSoakEnabled = process.env.RUN_SOAK === '1'
+  if (!runSoakEnabled) {
+    console.log('  ⏭  Full soak skipped — set RUN_SOAK=1 to run the release-gate soak (see file header).')
+  }
+
   const characterId = 'fox'
   const tickCount = DEFAULT_TICKS
   const interval = TICK_INTERVAL_MS
 
-  it('runs 5 adapters for 10 000 ticks with zero errors', async () => {
+  it.skipIf(!runSoakEnabled)('runs 5 adapters for 10 000 ticks with zero errors', async () => {
     const adapters = [
       createMockAdapter('canvas', 'canvas-renderer'),
       createMockAdapter('websocket', 'ws-adapter'),

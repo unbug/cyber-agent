@@ -99,7 +99,7 @@ export interface LRobotStatus {
  *
  * Usage:
  *   const client = new LeRobotPolicyClient({
- *     serverUrl: 'ws://localhost:8080',
+ *     serverUrl: 'ws://test.local:8080',
  *     modelId: 'openvla/openvla-7b',
  *     robotType: 'so100_follower',
  *     cameras: { front: { type: 'opencv', index_or_path: 0, width: 640, height: 480, fps: 30 } },
@@ -402,7 +402,7 @@ export function createLeRobotClient(
     robotId?: string
   },
 ): LeRobotPolicyClient {
-  const serverUrl = options?.serverUrl ?? 'ws://localhost:8080'
+  const serverUrl = options?.serverUrl ?? 'ws://test.local:8080'
   const robotType = options?.robotType ?? 'custom'
   const robotId = options?.robotId ?? 'cyberagent'
 

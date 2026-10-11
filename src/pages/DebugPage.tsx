@@ -39,6 +39,7 @@ import { EventSearchPanel } from '@/components/EventSearchPanel'
 import { ErrorTimelinePanel } from '@/components/ErrorTimelinePanel'
 import { DebugReportPanel } from '@/components/DebugReportPanel'
 import { EventTimelinePanel } from '@/components/EventTimelinePanel'
+import { TraceQualityPanel } from '@/components/TraceQualityPanel'
 import styles from './DebugPage.module.css'
 
 // ─── BT Tree Renderer ─────────────────────────────────────────
@@ -597,6 +598,11 @@ export function DebugPage() {
       {/* Unified Event Timeline — ALL event types on one time axis */}
       <CollapsibleSection sectionKey="eventtimeline" title="Unified Event Timeline" icon="⏱" defaultOpen={true}>
         <EventTimelinePanel />
+      </CollapsibleSection>
+
+      {/* Trace Quality — live health score + recommendations */}
+      <CollapsibleSection sectionKey="tracequality" title="Trace Quality" icon="🩺" defaultOpen={false}>
+        <TraceQualityPanel />
       </CollapsibleSection>
 
       {/* Performance & Tracing */}

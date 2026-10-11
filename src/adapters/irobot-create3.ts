@@ -151,7 +151,9 @@ export class IRobotCreate3Adapter implements RobotAdapterV2 {
       queueMaxSize: config.queueMaxSize ?? DEFAULT_QUEUE_MAX_SIZE,
     }
     if (this.config.autoConnect) {
-      this.connect()
+      // Fire-and-forget: failures are handled via onclose → scheduleReconnect.
+      // Without the catch, every failed auto-connect becomes an unhandled rejection.
+      this.connect().catch(() => {})
     }
   }
 
@@ -398,7 +400,9 @@ export class IRobotCreate3Adapter implements RobotAdapterV2 {
 
     const delay = (this.config.reconnectInterval ?? DEFAULT_RECONNECT_INTERVAL) * Math.pow(2, this.reconnectAttempts)
     this.reconnectAttempts++
-    setTimeout(() => this.connect(), delay)
+    setTimeout(() => {
+      this.connect().catch(() => {})
+    }, delay)
   }
 
   // ─── Capabilities ───────────────────────────────────────────────
