@@ -299,7 +299,9 @@ export class ESP32PerceptionRelay {
     )
     this.reconnectAttempt++
     this.reconnectInterval = setTimeout(() => {
-      this.connect()
+      this.connect().catch(() => {
+        /* surfaced via onerror/onclose + reconnect */
+      })
     }, interval)
   }
 

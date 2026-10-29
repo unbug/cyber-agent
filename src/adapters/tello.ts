@@ -162,7 +162,9 @@ export class TelloAdapter implements RobotAdapterV2 {
       queueMaxSize: config.queueMaxSize ?? DEFAULT_QUEUE_MAX_SIZE,
     }
     if (this.config.autoConnect) {
-      this.connect()
+      this.connect().catch(() => {
+        /* surfaced via onerror/onclose + reconnect */
+      })
     }
   }
 
@@ -470,7 +472,11 @@ export class TelloAdapter implements RobotAdapterV2 {
 
     const delay = (this.config.reconnectInterval ?? DEFAULT_RECONNECT_INTERVAL) * Math.pow(2, this.reconnectAttempts)
     this.reconnectAttempts++
-    setTimeout(() => this.connect(), delay)
+    setTimeout(() => {
+      this.connect().catch(() => {
+        /* surfaced via onerror/onclose + reconnect */
+      })
+    }, delay)
   }
 
   // ─── Capabilities ───────────────────────────────────────────────

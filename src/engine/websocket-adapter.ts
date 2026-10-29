@@ -49,7 +49,9 @@ export class WebSocketAdapter implements RobotAdapterV2 {
     }
     
     if (this.config.autoConnect) {
-      this.connect()
+      this.connect().catch(() => {
+        /* connection failures surface via onerror/onclose + reconnect */
+      })
     }
   }
   
@@ -106,7 +108,9 @@ export class WebSocketAdapter implements RobotAdapterV2 {
     
     this.reconnectTimer = setTimeout(() => {
       this.reconnectTimer = null
-      this.connect()
+      this.connect().catch(() => {
+        /* surfaced via onerror/onclose; scheduleReconnect already ran */
+      })
     }, delay)
   }
   

@@ -39,7 +39,9 @@ jobs:
           npm test > /tmp/test.log 2>&1 || rc=$?
           echo "node=$(node -v) kernel=$(uname -sr) cpus=$(nproc)"
           if [ "$rc" -ne 0 ]; then
-            grep -E "FAIL |Failed Tests|Unhandled|Errors" /tmp/test.log | head -40 \
+            grep -A8 "Unhandled Rejection" /tmp/test.log | head -80 \
+              | while IFS= read -r l; do echo "::error::$(echo "$l" | sed 's/^[[:space:]]*//; s/%/%25/g')"; done
+            grep -E "FAIL |Failed Tests|Errors " /tmp/test.log | head -30 \
               | while IFS= read -r l; do echo "::error::$(echo "$l" | sed 's/^[[:space:]]*//; s/%/%25/g')"; done
             echo "----- last 80 lines of test log -----"
             tail -80 /tmp/test.log

@@ -147,7 +147,9 @@ class HeartbeatSystem {
     const delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts), 30000);
     console.log(`[RoboMasterV2] Reconnect attempt ${this.reconnectAttempts} in ${delay}ms`);
     this.reconnectTimer = window.setTimeout(() => {
-      this.connect();
+      this.connect().catch(() => {
+        /* surfaced via onerror/onclose + reconnect */
+      });
     }, delay);
   }
   
