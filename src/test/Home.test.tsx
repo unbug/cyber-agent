@@ -36,7 +36,13 @@ describe('Home page', () => {
 
   it('renders CTA link to gallery', () => {
     renderWithRouter(<Home />);
-    const link = screen.getByRole('link', { name: /home.hero_cta/i });
+    const link = screen.getByRole('link', { name: 'home.hero_cta' });
     expect(link).toHaveAttribute('href', '/gallery');
+  });
+
+  it('renders CTA link to connect (magic loop)', () => {
+    renderWithRouter(<Home />);
+    const link = screen.getByRole('link', { name: 'home.hero_cta_connect' });
+    expect(link).toHaveAttribute('href', '/connect');
   });
 });

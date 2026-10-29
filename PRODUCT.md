@@ -2,6 +2,50 @@
 
 > "Give your robot a soul."
 
+## 🧭 2026-10-29 — Goal Reset (the Magic Loop is the product)
+
+**Honest diagnosis.** Somewhere along the way the project drifted: months went
+into observability meta-tools (trace scrubbers, trace-quality panels, plugin
+sandboxes, marketplace bundles) and roadmap checkboxes, while the one promise
+the site actually makes — *"Pick a personality, connect your robot, and watch
+it come alive"* — **had never been built as a user-facing flow**. There was no
+page where a normal person could connect a real robot. The excuse on file was
+"release gates blocked by hardware"; that was false — the hardware (CyberBrick
+Mini T, RoboMaster EP/S1) sits in this house.
+
+**The goal, restated:** every step below must work for a non-engineer in under
+5 minutes, on a real robot:
+
+1. **Open** the site → instantly *see* characters alive (not a feature grid).
+2. **Pick** a character → watch its personality run live in the browser.
+3. **Connect** your robot (`/connect`) → pick platform, enter bridge address.
+4. **Deploy** → your robot *is* that character: moves, turns, LEDs show emotion.
+5. **Stay safe** → one big E-STOP; the bridge failsafe-stops on any dropout.
+
+**What shipped in the reset (v4 "Magic Loop"):**
+
+- `EmbodimentAdapter` — translates any character's blackboard motion (x/y/
+  rotation/emotion) into differential-drive + LED commands. This is the
+  missing link: all 70+ characters are now deployable on any robot, zero
+  behavior-tree changes.
+- `/connect` — the first-class Deploy page: character picker → robot picker →
+  live command feed + E-STOP. Includes a **Demo Robot** mode so the loop is
+  demoable with zero hardware.
+- `bridge/robot_bridge.py` — one-command WebSocket bridge to real hardware
+  (CyberBrick serial, RoboMaster SDK, dummy), with disconnect-failsafe stops.
+
+**Standing priority rule (replaces checkbox-chasing):** any proposed feature
+must answer *"does it make the Loop faster, safer, or more magical?"* Debug
+panels, SDK, marketplace, playground stay — but they are backstage, not the
+show: removed from the main nav, reachable at `/debug` etc. Daily work now
+starts from the Loop, not the roadmap file.
+
+**Next on the Loop:** publish the bridge to real CyberBrick + RoboMaster and
+capture the demo video (this closes the long-stalled "release gates" for real,
+not on paper); one-bridge-discovery on LAN; mobile pairing page.
+
+---
+
 ## Mission
 
 Make character-driven AI accessible to every robot builder in the world. CyberAgent is the personality layer between hardware and intelligence — an open platform where anyone can create, share, and deploy AI characters onto physical robots.

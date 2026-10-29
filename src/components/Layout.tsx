@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useOutlet, Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Bot, BookOpen, Grid3X3, Star, ShoppingBag, Github, Sun, Moon, Monitor, Bug } from 'lucide-react'
+import { Bot, BookOpen, Grid3X3, ShoppingBag, Github, Sun, Moon, Monitor, Plug } from 'lucide-react'
 import { useTheme, type Theme } from '@/hooks/useTheme'
 import { useI18n } from '@/i18n'
 import { LanguageToggle } from './LanguageToggle'
@@ -16,10 +16,9 @@ function FrozenOutlet() {
 
 const NAV_ITEMS = [
   { path: '/', label: 'nav.home', icon: Bot },
-  { path: '/marketplace', label: 'nav.marketplace', icon: ShoppingBag },
   { path: '/gallery', label: 'nav.gallery', icon: Grid3X3 },
-  { path: '/challenge', label: 'nav.challenge', icon: Star },
-  { path: '/debug', label: 'nav.debug', icon: Bug },
+  { path: '/connect', label: 'nav.connect', icon: Plug },
+  { path: '/marketplace', label: 'nav.marketplace', icon: ShoppingBag },
   { path: '/docs', label: 'nav.docs', icon: BookOpen },
 ]
 

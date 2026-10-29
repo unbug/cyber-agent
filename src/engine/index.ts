@@ -40,6 +40,8 @@ export { CanvasAdapter } from './canvas-adapter'
 
 // WebSocket adapter
 export { WebSocketAdapter, createWebSocketAdapter } from './websocket-adapter'
+export { EmbodimentAdapter, LoopbackRobotAdapter, EMOTION_LED } from './embodiment'
+export type { EmbodimentConfig } from './embodiment'
 
 // RoboMaster motion adapter
 export { RoboMasterMotionAdapter, createRoboMasterAdapter, createRoboMasterWebSocketAdapter, motionPrimitive } from './robomaster-robot-adaptor'

@@ -5,7 +5,8 @@
     "docs": "文档",
     "challenge": "挑战",
     "marketplace": "角色市场",
-    "debug": "调试器"
+    "debug": "调试器",
+    "connect": "连接机器人"
   },
   "home": {
     "hero_title": "为真实机器人打造的 AI 角色",
@@ -46,7 +47,8 @@
     "code_desc": "用一棵行为树定义角色的全部个性，使用可视化编辑器或直接编写 DSL。",
     "open_editor": "打开编辑器",
     "read_docs": "阅读文档",
-    "how_result": "无需硬件编程，只需定义角色个性。"
+    "how_result": "无需硬件编程，只需定义角色个性。",
+    "hero_cta_connect": "连接你的机器人"
   },
   "gallery": {
     "title": "角色图鉴",
@@ -94,7 +96,8 @@
     "sim_mode": "仿真器",
     "start_bt": "启动行为树",
     "canvas_hint": "在画布上移动鼠标以交互",
-    "controls": "控制"
+    "controls": "控制",
+    "deploy": "部署到我的机器人"
   },
   "docs": {
     "title": "文档",
@@ -173,5 +176,29 @@
     "view_agent": "查看角色",
     "edit_bt": "编辑行为树",
     "download": "下载 JSON"
+  },
+  "connect": {
+    "title": "让你的机器人活过来",
+    "subtitle": "选一个角色，选一台机器人，点击部署。性格在浏览器里运行，身体就是你的机器人。",
+    "step_character": "选角色",
+    "step_robot": "选机器人",
+    "step_live": "活过来",
+    "search_placeholder": "搜索角色…",
+    "bridge_hint": "在机器人旁边的电脑上启动桥接程序，然后回来部署：",
+    "deploy": "部署，活过来",
+    "deploying": "连接中…",
+    "deployed_on": "正生活在",
+    "status_idle": "先选一个角色",
+    "status_connecting": "正在连接机器人…",
+    "status_error": "部署失败",
+    "tps": "tick/秒",
+    "emotion": "情绪",
+    "position": "虚拟坐标",
+    "recent_commands": "实时机器人指令",
+    "no_commands": "等角色动起来…",
+    "estop": "紧急停止",
+    "undeploy": "撤回并断开",
+    "safety_note": "安全提示：桥接程序在连接断开时会自动停车。在信任这个角色之前，手请放在急停按钮上。",
+    "browse_hint": "想先认识一下大家？去"
   }
 }

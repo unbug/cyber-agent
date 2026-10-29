@@ -49,6 +49,9 @@ export function HomePage() {
             <Link to="/gallery" className={styles.btnPrimary}>
               {t('home.hero_cta')} <ArrowRight size={15} />
             </Link>
+            <Link to="/connect" className={styles.btnPrimary}>
+              {t('home.hero_cta_connect')} <ArrowRight size={15} />
+            </Link>
             <a
               href="https://github.com/unbug/cyber-agent"
               target="_blank"

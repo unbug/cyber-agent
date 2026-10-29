@@ -6,6 +6,28 @@ An open-source platform for creating character-driven AI agents that bring physi
 
 **Live Demo:** https://unbug.github.io/cyber-agent/
 
+## Bring Your Robot to Life (the Magic Loop)
+
+1. Open **https://unbug.github.io/cyber-agent/connect**
+2. Pick a character (🐶 puppy, 🦁 lion, 70+ more) and a robot platform
+3. On the computer next to your robot, start the bridge:
+
+```bash
+pip install websockets pyserial          # robomaster platform needs `robomaster`
+python3 bridge/robot_bridge.py --platform cyberbrick   # ws://127.0.0.1:8765
+python3 bridge/robot_bridge.py --platform robomaster   # ws://127.0.0.1:8766
+python3 bridge/robot_bridge.py --platform dummy        # no hardware, just watch
+```
+
+4. Click **Deploy** — the character's behavior tree runs in your browser and
+   its body is your robot: movement, steering, emotion LEDs, big red E-STOP.
+   No hardware? Choose **Demo Robot** and watch the live command stream.
+
+Robot protocol (any WebSocket robot can join): JSON
+`{type,payload}` — `motors{left,right}`, `led{r,g,b}`, `sound{frequency,duration}`,
+`stop`, `heartbeat`. The bridge failsafe-stops the robot on any connection
+dropout.
+
 ## Quick Start
 
 ```bash

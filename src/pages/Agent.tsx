@@ -1,7 +1,7 @@
 import { useParams, Link } from 'react-router-dom'
 import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowLeft, Play, Square, Pause, Zap, Activity, Layers, Box } from 'lucide-react'
+import { ArrowLeft, Play, Square, Pause, Zap, Activity, Layers, Box, Plug } from 'lucide-react'
 import type { EpisodeMeta, Dataset } from '@/dataset/recorder'
 import { HoverBeam } from '@/components/HoverBeam'
 import { TelemetryDashboard } from '@/components/TelemetryDashboard'
@@ -258,6 +258,14 @@ export function AgentPage() {
                     {snapshot ? ` — ${snapshot.ticksPerSecond} tps` : ''}
                   </span>
                 </div>
+                <Link
+                  to={`/connect?character=${character.id}`}
+                  className={styles.connectBtn}
+                  style={{ marginTop: 'var(--space-3)', display: 'inline-flex' }}
+                >
+                  <Plug size={16} />
+                  <span>{t('agent.deploy')}</span>
+                </Link>
               </div>
             </HoverBeam>
 

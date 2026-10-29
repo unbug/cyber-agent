@@ -5,17 +5,18 @@
     "docs": "Docs",
     "challenge": "Challenge",
     "marketplace": "Marketplace",
-    "debug": "Debugger"
+    "debug": "Debugger",
+    "connect": "Connect"
   },
   "home": {
     "hero_title": "AI Characters for Physical Robots",
-    "hero_subtitle": "CyberAgent is an open-source library of 70+ AI agent personalities. Each character runs a behavior tree that drives a real robot \u2014 RoboMaster, mBot, and more.",
+    "hero_subtitle": "CyberAgent is an open-source library of 70+ AI agent personalities. Each character runs a behavior tree that drives a real robot — RoboMaster, mBot, and more.",
     "hero_cta": "Explore Gallery",
     "features_title": "Why CyberAgent?",
     "feature_agents_title": "Virtual Agent Ecosystem",
     "feature_agents_desc": "Each agent has unique behavior trees defining personality, reactions, and movement patterns.",
     "feature_robot_title": "Robot Integration",
-    "feature_robot_desc": "Bridge virtual agents to physical hardware \u2014 RoboMaster, LEGO, and more.",
+    "feature_robot_desc": "Bridge virtual agents to physical hardware — RoboMaster, LEGO, and more.",
     "feature_evolve_title": "Self-Evolving Platform",
     "feature_evolve_desc": "Every day, autonomously review, iterate, and improve the platform.",
     "agents_title": "Virtual Agents",
@@ -46,11 +47,12 @@
     "code_desc": "Define a character's entire personality in a single behavior tree. Use the visual editor or write the DSL directly.",
     "open_editor": "Open Editor",
     "read_docs": "Read Docs",
-    "how_result": "No hardware coding. Just define the personality."
+    "how_result": "No hardware coding. Just define the personality.",
+    "hero_cta_connect": "Connect your robot"
   },
   "gallery": {
     "title": "Agent Gallery",
-    "subtitle": "Explore all 70+ AI characters. Click any card to preview behavior, personality, and tags \u2014 then launch one in the playground.",
+    "subtitle": "Explore all 70+ AI characters. Click any card to preview behavior, personality, and tags — then launch one in the playground.",
     "search_placeholder": "Search by name or tag...",
     "no_results": "No agents found matching your search.",
     "all": "All",
@@ -94,7 +96,8 @@
     "sim_mode": "Simulator",
     "start_bt": "Start Behavior Tree",
     "canvas_hint": "Move your mouse over the canvas to interact",
-    "controls": "Controls"
+    "controls": "Controls",
+    "deploy": "Deploy to my robot"
   },
   "docs": {
     "title": "Documentation",
@@ -111,7 +114,7 @@
     "agents_guide": "Agent Creation Guide",
     "agents_guide_desc": "How to create custom virtual agents.",
     "on_this_page": "On this page",
-    "migration": "Migration (0.x \u2192 1.0)",
+    "migration": "Migration (0.x → 1.0)",
     "migration_desc": "Breaking changes and how to upgrade.",
     "perception_bus": "Perception Bus (v1.1)",
     "perception_bus_desc": "Sensor-driven behavior: webcam, microphone, ESP32 relay."
@@ -121,7 +124,7 @@
   },
   "language": {
     "en": "EN",
-    "zh": "\u4e2d\u6587"
+    "zh": "中文"
   },
   "telemetry": {
     "emotion": "Emotion",
@@ -173,5 +176,29 @@
     "view_agent": "View Agent",
     "edit_bt": "Edit Behavior Tree",
     "download": "Download JSON"
+  },
+  "connect": {
+    "title": "Bring your robot to life",
+    "subtitle": "Pick a character, pick your robot, and deploy. Its personality runs right here in your browser — its body is your robot.",
+    "step_character": "Pick a character",
+    "step_robot": "Pick a robot",
+    "step_live": "Alive",
+    "search_placeholder": "Search characters…",
+    "bridge_hint": "Run the robot bridge on the computer next to your robot, then deploy here:",
+    "deploy": "Deploy & come alive",
+    "deploying": "Connecting…",
+    "deployed_on": "living on",
+    "status_idle": "Pick a character to begin",
+    "status_connecting": "Connecting to robot…",
+    "status_error": "Deployment failed",
+    "tps": "ticks/s",
+    "emotion": "emotion",
+    "position": "virtual pos",
+    "recent_commands": "Live robot commands",
+    "no_commands": "waiting for the character to move…",
+    "estop": "EMERGENCY STOP",
+    "undeploy": "Undeploy & disconnect",
+    "safety_note": "Safety: the bridge stops all motors when the connection drops. Keep your hand near the E-STOP until you trust the character.",
+    "browse_hint": "Want to meet the cast first? Browse the"
   }
 }
