@@ -241,8 +241,11 @@ no networking knowledge, and turned the phone into a first-class controller:
   `/connect` walking the living room; RoboMaster EP same. This closes the
   v0.4/v3.0 hardware release gates for real. (Needs the robot powered on —
   one user action.)
-- **M3 Trust & safety v1** — speed limiter presets (kitchen/yard), child-lock
-  PIN on the phone remote, per-robot capability gating (no-fire/fire-allowed).
+- **M3 ✅ (2026-10-30) Trust & safety v1** — speed limiter presets (turtle/
+  walk/rabbit on /connect), bridge-side hard cap (`--max-speed`, clamps every
+  motors command regardless of client), child-lock PIN on the phone remote
+  (web app exempt via `?role=browser`). Capability gating stays on the list
+  for M5 (needs multi-robot capability model).
 - **M4 Character portability** — export/import a character + its embodied
   tuning (drive-gain presets per robot model) in one bundle; "works the same
   on my friend's Mini T".
