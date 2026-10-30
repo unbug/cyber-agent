@@ -11,10 +11,17 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Ban, Plug, Power, Bot } from 'lucide-react'
+import { Ban, Plug, Power, Bot, Radar, History } from 'lucide-react'
 import { characters, getCharacter, getBehavior } from '@/agents'
 import { EmbodimentAdapter, LoopbackRobotAdapter, BehaviorTreeRunner } from '@/engine'
 import { WebSocketAdapter } from '@/engine/websocket-adapter'
+import {
+  scanBridges,
+  rememberBridge,
+  getRecentBridges,
+  forgetBridge,
+  type BridgeInfo,
+} from '@/engine/bridge-discovery'
 import type { RunnerSnapshot } from '@/engine'
 import type { AdapterCommand, Emotion } from '@/engine/types'
 import type {
@@ -149,6 +156,10 @@ export function ConnectPage() {
   const [snapshot, setSnapshot] = useState<RunnerSnapshot | null>(null)
   const [commands, setCommands] = useState<AdapterCommand[]>([])
   const [telemetry, setTelemetry] = useState<TelemetryEvent | null>(null)
+  const [scanning, setScanning] = useState(false)
+  const [found, setFound] = useState<BridgeInfo[]>([])
+  const [noResults, setNoResults] = useState(false)
+  const [recent, setRecent] = useState<BridgeInfo[]>(() => getRecentBridges())
 
   const runnerRef = useRef<BehaviorTreeRunner | null>(null)
   const teeRef = useRef<CommandTee | null>(null)
@@ -237,6 +248,14 @@ export function ConnectPage() {
 
       await emb.connect()
       tee.onTelemetry(setTelemetry)
+      if (!platform.loopback) {
+        rememberBridge({
+          url: urlByPlatform[platform.id] || platform.url,
+          platform: platform.id,
+          name: platform.name,
+        })
+        setRecent(getRecentBridges())
+      }
 
       const runner = new BehaviorTreeRunner(behavior, emb)
       runner.setCanvasSize(800, 600) // virtual world for the BT
@@ -250,6 +269,25 @@ export function ConnectPage() {
       setPhase('error')
     }
   }, [character, platform, urlByPlatform])
+
+  const scan = useCallback(async () => {
+    setScanning(true)
+    setNoResults(false)
+    setFound([])
+    const current = (urlByPlatform[platform.id] || platform.url || '').trim()
+    const hits = await scanBridges(current ? [current] : [], 1200)
+    setFound(hits)
+    setNoResults(hits.length === 0)
+    setScanning(false)
+  }, [platform, urlByPlatform])
+
+  const useBridge = useCallback((info: BridgeInfo) => {
+    const match = PLATFORMS.find((p) => p.id === info.platform)
+    setPlatformId(match ? match.id : 'ws')
+    setUrlByPlatform((m) => ({ ...m, [match ? match.id : 'ws']: info.url }))
+    rememberBridge({ url: info.url, platform: info.platform, name: info.name })
+    setRecent(getRecentBridges())
+  }, [])
 
   const estop = useCallback(() => {
     hardStop()
@@ -354,6 +392,58 @@ export function ConnectPage() {
                       spellCheck={false}
                     />
                   </div>
+                  <div className={styles.scanRow}>
+                    <button
+                      type="button"
+                      className={styles.scanBtn}
+                      onClick={() => void scan()}
+                      disabled={scanning}
+                    >
+                      <Radar size={14} style={{ verticalAlign: -2 }} />
+                      {scanning ? t('connect.scanning') : t('connect.scan')}
+                    </button>
+                  </div>
+                  {found.length > 0 && (
+                    <div className={styles.foundList} data-testid="found-bridges">
+                      <div className={styles.foundTitle}>{t('connect.found_robots')}</div>
+                      {found.map((f) => (
+                        <button
+                          key={f.url}
+                          type="button"
+                          className={styles.foundBtn}
+                          onClick={() => useBridge(f)}
+                        >
+                          🤖 {f.name} <code>{f.url}</code>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  {noResults && (
+                    <div className={styles.noResults}>{t('connect.no_robots')}</div>
+                  )}
+                  {recent.length > 0 && (
+                    <div className={styles.recentRow}>
+                      <span className={styles.recentLabel}>
+                        <History size={12} style={{ verticalAlign: -2 }} /> {t('connect.recent_robots')}
+                      </span>
+                      {recent.map((r) => (
+                        <button
+                          key={r.url}
+                          type="button"
+                          className={styles.recentBtn}
+                          onClick={() => useBridge(r)}
+                          onContextMenu={(e) => {
+                            e.preventDefault()
+                            forgetBridge(r.url)
+                            setRecent(getRecentBridges())
+                          }}
+                          title={r.url}
+                        >
+                          {r.name}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                   <div className={styles.bridgeHint}>
                     {t('connect.bridge_hint')}
                     {platform.bridgeCmd && <code className={styles.bridgeCmd}>{platform.bridgeCmd}</code>}

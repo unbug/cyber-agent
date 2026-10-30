@@ -211,3 +211,48 @@ Every quarter:
 ---
 
 *This document is the north star. Update it quarterly. Never lose sight of the 10-year horizon while shipping weekly.*
+
+## 🚀 2026-10-30 — M1 shipped: zero-typing pairing + phone remote
+
+M1 made step 3 of the Magic Loop ("connect your robot") require no typing and
+no networking knowledge, and turned the phone into a first-class controller:
+
+- **Bridge hello**: every bridge now self-identifies on connect
+  (`{platform, name, port, remote_url}`) — the web app knows *which* robot it
+  reached before deploying. Verified end-to-end on the dummy platform.
+- **One-tap discovery** (`src/engine/bridge-discovery.ts`): browsers can't do
+  mDNS, but they can open WebSockets — `/connect` probes recent + default
+  bridge URLs in parallel (1.2 s), lists live robots, tap to use. Dead URLs
+  silently drop. 13 tests.
+- **Recent robots** chips (localStorage, capped, right-click to forget):
+  returning users deploy in two taps, zero typing.
+- **Phone touch remote** (`bridge/remote.html`): the bridge serves a mobile
+  D-pad + E-STOP page on `ws_port + 1000`; touch-to-drive with 450 ms
+  re-issue matching the web client, release-to-stop, auto-reconnect. Works
+  over plain HTTP on the LAN, so no mixed-content/TLS story needed.
+  Startup prints the phone URL (`[bridge] 📱 phone remote: http://<lan-ip>:…`).
+
+### Milestone roadmap (10-year plan, next 12 months)
+
+**North star unchanged:** non-engineer, real robot, under 5 minutes, magical.
+
+- **M1 ✅ (2026-10-30) Zero-friction pairing** — discovery, hello, recents, phone remote.
+- **M2 (next) Physical proof** — Mini T demo video: Puppy deployed from
+  `/connect` walking the living room; RoboMaster EP same. This closes the
+  v0.4/v3.0 hardware release gates for real. (Needs the robot powered on —
+  one user action.)
+- **M3 Trust & safety v1** — speed limiter presets (kitchen/yard), child-lock
+  PIN on the phone remote, per-robot capability gating (no-fire/fire-allowed).
+- **M4 Character portability** — export/import a character + its embodied
+  tuning (drive-gain presets per robot model) in one bundle; "works the same
+  on my friend's Mini T".
+- **M5 Multi-robot rooms** — two characters, two robots, one page; simple
+  social events between them (already have the BT social layer).
+- **M6 Zero-install bridge** — one-command installer (`curl … | sh`) + auto
+  launch on laptop lid-open; mDNS registration so future browsers with
+  WebLL/mDNS-DNS get true auto-discovery.
+- **M7 (12-month) Beta community loop** — 10 external users pairing their own
+  robots unassisted; funnel telemetry (anonymous) on where the 5 minutes goes.
+
+**Standing product rule:** every feature must make the Loop faster, safer, or
+more magical. Debug/marketplace features only ship if they serve M2–M7.

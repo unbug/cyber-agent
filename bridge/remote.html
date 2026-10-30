@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover">
+<title>__ROBOT_NAME__ — CyberAgent Remote</title>
+<style>
+  :root { --bg:#0b0e14; --panel:#151a24; --accent:#5b8cff; --stop:#ff4d5e; }
+  * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+  html,body { height:100%; }
+  body { background:var(--bg); color:#e8ecf4; font-family:-apple-system,"Segoe UI",Roboto,sans-serif;
+         display:flex; flex-direction:column; align-items:center; touch-action:none;
+         user-select:none; -webkit-user-select:none; padding:env(safe-area-inset-top) 16px env(safe-area-inset-bottom); }
+  header { width:100%; max-width:480px; display:flex; align-items:center; justify-content:space-between; padding:14px 2px; }
+  h1 { font-size:18px; font-weight:650; }
+  #state { font-size:12px; padding:4px 10px; border-radius:999px; background:var(--panel); color:#8b93a7; }
+  #state.on { color:#4ade80; } #state.off { color:var(--stop); }
+  main { flex:1; width:100%; max-width:480px; display:flex; flex-direction:column; gap:18px;
+         align-items:center; justify-content:center; }
+  #pad { display:grid; grid-template-columns:repeat(3,88px); grid-template-rows:repeat(3,88px); gap:10px; }
+  .key { background:var(--panel); border:1px solid #232b3a; border-radius:18px; display:flex;
+         align-items:center; justify-content:center; font-size:30px; color:#cdd5e4; }
+  .key.held { background:var(--accent); border-color:var(--accent); color:#fff; }
+  .blank { visibility:hidden; }
+  #stop { width:min(100%,440px); padding:26px 0; border:0; border-radius:22px; background:var(--stop);
+          color:#fff; font-size:22px; font-weight:800; letter-spacing:2px; box-shadow:0 8px 30px rgba(255,77,94,.35); }
+  #stop:active { transform:scale(.97); }
+  footer { font-size:11px; color:#5b6376; padding:10px 0 14px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>🛞 __ROBOT_NAME__</h1>
+  <span id="state">connecting…</span>
+</header>
+<main>
+  <div id="pad">
+    <div class="key blank"></div>
+    <div class="key" data-l="0.6" data-r="1">▲</div>
+    <div class="key blank"></div>
+    <div class="key" data-l="-1" data-r="0.4">↺</div>
+    <div class="key" data-l="0" data-r="0">■</div>
+    <div class="key" data-l="0.4" data-r="-1">↻</div>
+    <div class="key blank"></div>
+    <div class="key" data-l="-1" data-r="-0.6">▼</div>
+    <div class="key blank"></div>
+  </div>
+  <button id="stop">E-STOP</button>
+</main>
+<footer>CyberAgent phone remote · send motors, release = stop</footer>
+<script>
+(function () {
+  var WS_PORT = "__WS_PORT__";
+  var url = "ws://" + location.hostname + ":" + WS_PORT;
+  var stateEl = document.getElementById("state");
+  var ws = null, held = null, holdTimer = 0;
+
+  function send(obj) { if (ws && ws.readyState === 1) ws.send(JSON.stringify(obj)); }
+  function motors(l, r) { send({ type: "motors", payload: { left: l, right: r } }); }
+  function stop(x3) {
+    send({ type: "stop", payload: {} });
+    if (x3) { setTimeout(function () { send({ type: "stop", payload: {} }); }, 120);
+              setTimeout(function () { send({ type: "stop", payload: {} }); }, 240); }
+  }
+  function connect() {
+    ws = new WebSocket(url);
+    ws.onopen = function () { stateEl.textContent = "connected"; stateEl.className = "on"; };
+    ws.onclose = function () { stateEl.textContent = "disconnected — retrying"; stateEl.className = "off";
+                               setTimeout(connect, 1500); };
+    ws.onerror = function () { try { ws.close(); } catch (e) {} };
+  }
+  connect();
+
+  var keys = document.querySelectorAll(".key[data-l]");
+  function press(el) {
+    release();
+    held = el; el.classList.add("held");
+    var l = parseFloat(el.dataset.l), r = parseFloat(el.dataset.r);
+    if (l === 0 && r === 0) { stop(true); return; }
+    motors(l, r);
+    // re-issue like the web app does (bridge failsafe = 2 s)
+    holdTimer = setInterval(function () { motors(l, r); }, 450);
+  }
+  function release() {
+    if (holdTimer) { clearInterval(holdTimer); holdTimer = 0; }
+    if (held) { held.classList.remove("held");
+                if (!(parseFloat(held.dataset.l) === 0 && parseFloat(held.dataset.r) === 0)) stop();
+                held = null; }
+  }
+  keys.forEach(function (el) {
+    el.addEventListener("touchstart", function (e) { e.preventDefault(); press(el); }, { passive: false });
+    el.addEventListener("touchend", function (e) { e.preventDefault(); release(); });
+    el.addEventListener("touchcancel", release);
+    el.addEventListener("mousedown", function () { press(el); });
+    el.addEventListener("mouseup", release);
+    el.addEventListener("mouseleave", function () { if (held === el) release(); });
+  });
+  document.getElementById("stop").addEventListener("click", function () { release(); stop(true); });
+  window.addEventListener("blur", release);
+  document.addEventListener("visibilitychange", function () { if (document.hidden) release(); });
+})();
+</script>
+</body>
+</html>

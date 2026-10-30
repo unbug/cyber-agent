@@ -16,6 +16,7 @@ Browser → bridge protocol (plain JSON, one message per line):
     {"type": "heartbeat", "payload": {}}
 
 Bridge → browser:
+    {"type": "hello",     "payload": {"platform": ..., "name": ..., "port": ..., "remote_url": ...}}
     {"type": "telemetry", "payload": {...}, "t": <epoch ms>}
     {"type": "status",    "payload": {"platform": ..., "state": ...}}
 
@@ -23,6 +24,10 @@ Safety model:
     * If the WebSocket drops, the robot is stopped immediately (3×).
     * If no message arrives for FAILSAFE_S seconds, the robot is stopped.
     * Ctrl-C always stops the robot before exiting.
+
+Phone remote: the bridge also serves a touch-remote page over HTTP on
+--http-port (default ws_port + 1000). A phone on the same LAN opens
+http://<bridge-ip>:<http-port>/ to drive the robot manually. No app.
 
 Usage:
     python3 bridge/robot_bridge.py --platform cyberbrick    # port 8765
@@ -43,6 +48,7 @@ import importlib.util
 import json
 import math
 import os
+import socket
 import sys
 import threading
 import time
@@ -238,6 +244,61 @@ class RoboMasterRobot:
             pass
 
 
+
+# ─── Phone touch remote (HTTP) ────────────────────────────────────
+
+HELLO_INFO = {}  # filled in main(): {"ws_port", "remote_url"}
+
+
+def lan_ip():
+    """Best-effort LAN IP of this machine (no traffic actually sent)."""
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        s.connect(("8.8.8.8", 80))
+        return s.getsockname()[0]
+    except Exception:
+        return "127.0.0.1"
+    finally:
+        s.close()
+
+
+def start_remote_http(html_path, host, http_port, ws_port, robot_name):
+    """Serve bridge/remote.html so a phone on the LAN becomes a remote."""
+    from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+
+    try:
+        with open(html_path, "r", encoding="utf-8") as f:
+            html = f.read()
+    except OSError:
+        print(f"[bridge] remote page not found at {html_path} — HTTP remote disabled")
+        return None
+
+    page = (html
+            .replace("__WS_PORT__", str(ws_port))
+            .replace("__ROBOT_NAME__", robot_name))
+
+    class Handler(BaseHTTPRequestHandler):
+        def do_GET(self):
+            if self.path in ("/", "/remote", "/index.html"):
+                body = page.encode("utf-8")
+                self.send_response(200)
+                self.send_header("Content-Type", "text/html; charset=utf-8")
+                self.send_header("Cache-Control", "no-store")
+                self.send_header("Content-Length", str(len(body)))
+                self.end_headers()
+                self.wfile.write(body)
+            else:
+                self.send_error(404)
+
+        def log_message(self, fmt, *args):
+            pass  # keep bridge console clean
+
+    bind = "0.0.0.0" if host in ("0.0.0.0", "") else host
+    srv = ThreadingHTTPServer((bind, http_port), Handler)
+    threading.Thread(target=srv.serve_forever, daemon=True).start()
+    return srv
+
+
 # ─── Bridge server ────────────────────────────────────────────────
 
 
@@ -286,6 +347,15 @@ async def session(websockets_like, robot, path=None):
         await ws.send(json.dumps({
             "type": "status",
             "payload": {"platform": robot.name, "state": "ready"},
+        }))
+        await ws.send(json.dumps({
+            "type": "hello",
+            "payload": {
+                "platform": robot.name,
+                "name": robot.name,
+                "port": HELLO_INFO.get("ws_port"),
+                "remote_url": HELLO_INFO.get("remote_url"),
+            },
         }))
         async for raw in ws:
             last_rx = time.time()
@@ -336,6 +406,9 @@ async def main():
     ap.add_argument("--host", default="127.0.0.1",
                     help="use LAN IP or 0.0.0.0 to reach the site from another device")
     ap.add_argument("--serial-port", default=None, help="cyberbrick serial device")
+    ap.add_argument("--http-port", type=int, default=None,
+                    help="phone touch-remote HTTP port (default ws_port + 1000)")
+    ap.add_argument("--no-remote", action="store_true", help="disable the phone remote page")
     args = ap.parse_args()
 
     port = args.port or DEFAULT_PORT[args.platform]
@@ -351,7 +424,21 @@ async def main():
     except Exception as e:
         sys.exit(f"[bridge] robot connect failed: {e}")
 
+    global HELLO_INFO
     state = {"last_rx": 0.0}
+    http_port = args.http_port or (port + 1000)
+    remote_srv = None
+    if not args.no_remote:
+        html_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "remote.html")
+        try:
+            remote_srv = start_remote_http(html_path, args.host, http_port, port, robot.name)
+        except OSError as e:
+            print(f"[bridge] phone remote disabled: {e}")
+        if remote_srv:
+            HELLO_INFO = {
+                "ws_port": port,
+                "remote_url": f"http://{lan_ip()}:{http_port}/remote",
+            }
 
     async def handler(ws, *_args):
         state["last_rx"] = time.time()
@@ -366,12 +453,16 @@ async def main():
         async with websockets.serve(handler, args.host, port):
             print(f"[bridge] {robot.name} listening on ws://{args.host}:{port}")
             print("[bridge] open https://unbug.github.io/cyber-agent/connect in the browser")
+            if remote_srv:
+                print(f"[bridge] 📱 phone remote: {HELLO_INFO.get('remote_url')}")
             fs_task = asyncio.create_task(failsafe_loop(robot, state))
             try:
                 await asyncio.Future()  # serve until Ctrl-C
             finally:
                 fs_task.cancel()
     finally:
+        if remote_srv:
+            remote_srv.shutdown()
         robot.close()
         print("[bridge] robot closed")
 

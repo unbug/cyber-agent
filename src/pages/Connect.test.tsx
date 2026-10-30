@@ -68,6 +68,24 @@ describe('ConnectPage', () => {
     )
   })
 
+  it('shows scan + recent controls for hardware platforms', () => {
+    localStorage.setItem(
+      'cyberagent.recentBridges',
+      JSON.stringify([{ url: 'ws://192.168.1.42:8765', platform: 'cyberbrick', name: 'Mini T', discoveredAt: 1 }]),
+    )
+    renderAt()
+    // Demo platform has no URL bar — scan control hidden
+    expect(screen.queryByText('Scan for robots')).toBeNull()
+
+    fireEvent.click(screen.getByText('CyberBrick Mini T'))
+    expect(screen.getByText('Scan for robots')).toBeTruthy()
+
+    // Recent chip from localStorage: one tap fills the URL
+    fireEvent.click(screen.getByText('Mini T'))
+    expect(screen.getByDisplayValue('ws://192.168.1.42:8765')).toBeTruthy()
+    localStorage.removeItem('cyberagent.recentBridges')
+  })
+
   it('shows bridge command hint for hardware platforms', () => {
     renderAt()
     fireEvent.click(screen.getByText('CyberBrick Mini T'))

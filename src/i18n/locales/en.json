@@ -199,6 +199,11 @@
     "estop": "EMERGENCY STOP",
     "undeploy": "Undeploy & disconnect",
     "safety_note": "Safety: the bridge stops all motors when the connection drops. Keep your hand near the E-STOP until you trust the character.",
-    "browse_hint": "Want to meet the cast first? Browse the"
+    "browse_hint": "Want to meet the cast first? Browse the",
+    "scan": "Scan for robots",
+    "scanning": "Scanning…",
+    "found_robots": "Robots found — tap to use",
+    "no_robots": "No robots found. Start the bridge on a machine in this network, or check the URL.",
+    "recent_robots": "Recent"
   }
 }
