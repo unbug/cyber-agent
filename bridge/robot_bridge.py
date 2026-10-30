@@ -310,7 +310,7 @@ def make_robot(platform, args):
     return DummyRobot()
 
 
-def handle_command(robot, raw):
+def handle_command(robot, raw, max_speed=1.0):
     try:
         msg = json.loads(raw)
     except (json.JSONDecodeError, TypeError):
@@ -318,7 +318,10 @@ def handle_command(robot, raw):
     ctype = msg.get("type")
     p = msg.get("payload") or {}
     if ctype == "motors":
-        robot.motors(float(p.get("left", 0)), float(p.get("right", 0)))
+        cap = clamp(float(max_speed), 0.0, 1.0)
+        left = clamp(float(p.get("left", 0)), -1.0, 1.0) * cap
+        right = clamp(float(p.get("right", 0)), -1.0, 1.0) * cap
+        robot.motors(left, right)
     elif ctype == "led":
         robot.led(int(p.get("r", 0)), int(p.get("g", 0)), int(p.get("b", 0)))
     elif ctype == "sound":
@@ -337,10 +340,22 @@ def handle_command(robot, raw):
     return True
 
 
-async def session(websockets_like, robot, path=None):
+def is_browser_role(ws):
+    """The web app connects with ?role=browser; phone remotes do not."""
+    try:
+        return "role=browser" in (ws.request.path or "")
+    except AttributeError:
+        try:
+            return "role=browser" in (ws.path or "")
+        except AttributeError:
+            return False
+
+
+async def session(websockets_like, robot, path=None, remote_pin=None, max_speed=1.0):
     ws = websockets_like
     peer = getattr(getattr(ws, "remote_address", None), "__str__", lambda: "?")()
     print(f"[bridge] browser connected: {peer}")
+    locked = remote_pin is not None and not is_browser_role(ws)
     last_rx = time.time()
     failsafe_fired = False
     try:
@@ -355,12 +370,28 @@ async def session(websockets_like, robot, path=None):
                 "name": robot.name,
                 "port": HELLO_INFO.get("ws_port"),
                 "remote_url": HELLO_INFO.get("remote_url"),
+                "max_speed": HELLO_INFO.get("max_speed", 1.0),
+                "remote_lock": HELLO_INFO.get("remote_lock", False),
             },
         }))
+        if locked:
+            await ws.send(json.dumps({"type": "locked", "payload": {}}))
         async for raw in ws:
             last_rx = time.time()
             failsafe_fired = False
-            handled = await asyncio.to_thread(handle_command, robot, raw)
+            if locked:
+                try:
+                    m = json.loads(raw)
+                except (json.JSONDecodeError, TypeError):
+                    continue
+                if m.get("type") == "unlock" and str((m.get("payload") or {}).get("pin")) == str(remote_pin):
+                    locked = False
+                    await ws.send(json.dumps({"type": "unlocked", "payload": {}}))
+                    print("[bridge] remote unlocked")
+                elif m.get("type") == "stop":
+                    await asyncio.to_thread(robot.stop)
+                continue
+            handled = await asyncio.to_thread(handle_command, robot, raw, max_speed)
             if not handled:
                 pass
         # normal close
@@ -406,6 +437,11 @@ async def main():
     ap.add_argument("--host", default="127.0.0.1",
                     help="use LAN IP or 0.0.0.0 to reach the site from another device")
     ap.add_argument("--serial-port", default=None, help="cyberbrick serial device")
+    ap.add_argument("--max-speed", type=float, default=1.0,
+                    help="hard cap 0..1 applied to every motors command")
+    ap.add_argument("--remote-pin", default=None,
+                    help="require this PIN from phone remotes (child lock); "
+                         "web app is exempt via ?role=browser")
     ap.add_argument("--http-port", type=int, default=None,
                     help="phone touch-remote HTTP port (default ws_port + 1000)")
     ap.add_argument("--no-remote", action="store_true", help="disable the phone remote page")
@@ -440,11 +476,16 @@ async def main():
                 "remote_url": f"http://{lan_ip()}:{http_port}/remote",
             }
 
+    max_speed = clamp(args.max_speed, 0.0, 1.0)
+    HELLO_INFO.setdefault("max_speed", max_speed)
+    HELLO_INFO.setdefault("remote_lock", args.remote_pin is not None)
+    print(f"[bridge] max_speed={max_speed}" + (f" remote_pin={'*' * 4}" if args.remote_pin else ""))
+
     async def handler(ws, *_args):
         state["last_rx"] = time.time()
         tel_task = asyncio.create_task(telemetry_loop(ws, robot))
         try:
-            await session(ws, robot)
+            await session(ws, robot, remote_pin=args.remote_pin, max_speed=max_speed)
         finally:
             state["last_rx"] = 0.0
             tel_task.cancel()

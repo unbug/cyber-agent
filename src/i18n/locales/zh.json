@@ -204,6 +204,10 @@
     "scanning": "扫描中…",
     "found_robots": "发现的机器人 — 点击使用",
     "no_robots": "未发现机器人。请在局域网内的机器上启动桥接程序，或检查 URL。",
-    "recent_robots": "最近使用"
+    "recent_robots": "最近使用",
+    "speed_label": "限速",
+    "speed_slow": "慢速",
+    "speed_normal": "标准",
+    "speed_turbo": "疾速"
   }
 }

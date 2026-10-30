@@ -484,3 +484,12 @@
   cursor: pointer;
 }
 .recentBtn:hover { border-color: var(--accent); color: var(--accent); }
+
+.speedRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: var(--space-3);
+}
+.speedBtnActive { border-color: var(--accent); color: var(--accent); background: rgba(91, 140, 255, 0.1); }

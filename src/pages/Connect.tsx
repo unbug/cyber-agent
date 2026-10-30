@@ -134,9 +134,22 @@ class CommandTee implements RobotAdapterV2 {
   }
 }
 
+/** Mark our session so bridge child-lock (phone remotes) exempts the web app. */
+export function browserRoleUrl(url: string): string {
+  return url.includes('role=') ? url : url + (url.includes('?') ? '&' : '?') + 'role=browser'
+}
+
 // ─── Page ─────────────────────────────────────────────────────────
 
 type Phase = 'idle' | 'deploying' | 'deployed' | 'error'
+
+/** M3 safety: speed presets → EmbodimentAdapter maxSpeed (0..1 motor fraction). */
+export const SPEED_KEY = 'cyberag' + 'ent.speedPreset'
+export const SPEED_PRESETS = [
+  { id: 'slow', maxSpeed: 0.25, emoji: '🐢' },
+  { id: 'normal', maxSpeed: 0.5, emoji: '🚶' },
+  { id: 'turbo', maxSpeed: 0.9, emoji: '🐇' },
+] as const
 
 export function ConnectPage() {
   const { t } = useI18n()
@@ -160,6 +173,9 @@ export function ConnectPage() {
   const [found, setFound] = useState<BridgeInfo[]>([])
   const [noResults, setNoResults] = useState(false)
   const [recent, setRecent] = useState<BridgeInfo[]>(() => getRecentBridges())
+  const [speedPreset, setSpeedPreset] = useState<string>(
+    () => localStorage.getItem(SPEED_KEY) || 'normal',
+  )
 
   const runnerRef = useRef<BehaviorTreeRunner | null>(null)
   const teeRef = useRef<CommandTee | null>(null)
@@ -240,11 +256,12 @@ export function ConnectPage() {
       const inner: RobotAdapterV2 = platform.loopback
         ? new LoopbackRobotAdapter()
         : new WebSocketAdapter({
-            url: urlByPlatform[platform.id] || platform.url,
+            url: browserRoleUrl(urlByPlatform[platform.id] || platform.url),
             autoConnect: false,
           })
       const tee = new CommandTee(inner)
-      const emb = new EmbodimentAdapter(tee)
+      const preset = SPEED_PRESETS.find((p) => p.id === speedPreset) ?? SPEED_PRESETS[1]!
+      const emb = new EmbodimentAdapter(tee, { maxSpeed: preset.maxSpeed })
 
       await emb.connect()
       tee.onTelemetry(setTelemetry)
@@ -268,7 +285,7 @@ export function ConnectPage() {
       setError(err instanceof Error ? err.message : String(err))
       setPhase('error')
     }
-  }, [character, platform, urlByPlatform])
+  }, [character, platform, urlByPlatform, speedPreset])
 
   const scan = useCallback(async () => {
     setScanning(true)
@@ -451,6 +468,24 @@ export function ConnectPage() {
                 </>
               )}
 
+              <div className={styles.speedRow} role="radiogroup" aria-label={t('connect.speed_label')}>
+                <span className={styles.recentLabel}>{t('connect.speed_label')}</span>
+                {SPEED_PRESETS.map((p) => (
+                  <button
+                    key={p.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={speedPreset === p.id}
+                    className={`${styles.recentBtn} ${speedPreset === p.id ? styles.speedBtnActive : ''}`}
+                    onClick={() => {
+                      setSpeedPreset(p.id)
+                      try { localStorage.setItem(SPEED_KEY, p.id) } catch { /* ignore */ }
+                    }}
+                  >
+                    {p.emoji} {t(`connect.speed_${p.id}`)}
+                  </button>
+                ))}
+              </div>
               <button
                 type="button"
                 className={styles.deployBtn}

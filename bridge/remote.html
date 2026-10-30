@@ -26,6 +26,15 @@
           color:#fff; font-size:22px; font-weight:800; letter-spacing:2px; box-shadow:0 8px 30px rgba(255,77,94,.35); }
   #stop:active { transform:scale(.97); }
   footer { font-size:11px; color:#5b6376; padding:10px 0 14px; }
+  #lock { position:fixed; inset:0; background:rgba(11,14,20,.96); display:none; z-index:9;
+          flex-direction:column; align-items:center; justify-content:center; gap:16px; }
+  #lock.show { display:flex; }
+  #lock h2 { font-size:18px; }
+  #lock input { width:180px; padding:14px; font-size:22px; text-align:center; letter-spacing:8px;
+                border-radius:14px; border:1px solid #2a3346; background:var(--panel); color:#fff; }
+  #lock button { padding:12px 34px; border:0; border-radius:14px; background:var(--accent);
+                 color:#fff; font-size:16px; font-weight:700; }
+  #lock .hint { font-size:12px; color:#8b93a7; }
 </style>
 </head>
 <body>
@@ -48,6 +57,12 @@
   <button id="stop">E-STOP</button>
 </main>
 <footer>CyberAgent phone remote · send motors, release = stop</footer>
+<div id="lock">
+  <h2>🔒 Child lock is ON</h2>
+  <input id="pin" type="password" inputmode="numeric" maxlength="8" placeholder="PIN" autocomplete="off">
+  <button id="unlock">Unlock</button>
+  <div class="hint">Ask an adult for the PIN set on the bridge (--remote-pin)</div>
+</div>
 <script>
 (function () {
   var WS_PORT = "__WS_PORT__";
@@ -62,9 +77,22 @@
     if (x3) { setTimeout(function () { send({ type: "stop", payload: {} }); }, 120);
               setTimeout(function () { send({ type: "stop", payload: {} }); }, 240); }
   }
+  var lockEl = document.getElementById("lock");
+  function setLocked(on) { lockEl.classList.toggle("show", !!on); if (on) release(); }
+  setLocked(sessionStorage.getItem("locked") === "1");
+  document.getElementById("unlock").addEventListener("click", function () {
+    send({ type: "unlock", payload: { pin: document.getElementById("pin").value } });
+  });
   function connect() {
     ws = new WebSocket(url);
     ws.onopen = function () { stateEl.textContent = "connected"; stateEl.className = "on"; };
+    ws.onmessage = function (ev) {
+      try {
+        var m = JSON.parse(ev.data);
+        if (m.type === "locked") { sessionStorage.setItem("locked", "1"); setLocked(true); }
+        if (m.type === "unlocked") { sessionStorage.removeItem("locked"); setLocked(false); }
+      } catch (e) {}
+    };
     ws.onclose = function () { stateEl.textContent = "disconnected — retrying"; stateEl.className = "off";
                                setTimeout(connect, 1500); };
     ws.onerror = function () { try { ws.close(); } catch (e) {} };

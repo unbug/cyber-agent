@@ -204,6 +204,10 @@
     "scanning": "Scanning…",
     "found_robots": "Robots found — tap to use",
     "no_robots": "No robots found. Start the bridge on a machine in this network, or check the URL.",
-    "recent_robots": "Recent"
+    "recent_robots": "Recent",
+    "speed_label": "Speed limit",
+    "speed_slow": "Slow",
+    "speed_normal": "Normal",
+    "speed_turbo": "Turbo"
   }
 }

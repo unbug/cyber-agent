@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen, waitFor, fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { ConnectPage } from './Connect'
+import { ConnectPage, browserRoleUrl } from './Connect'
 import { I18nProvider } from '@/i18n'
 
 function renderAt(path = '/connect') {
@@ -84,6 +84,22 @@ describe('ConnectPage', () => {
     fireEvent.click(screen.getByText('Mini T'))
     expect(screen.getByDisplayValue('ws://192.168.1.42:8765')).toBeTruthy()
     localStorage.removeItem('cyberagent.recentBridges')
+  })
+
+  it('browserRoleUrl appends role=browser exactly once', () => {
+    expect(browserRoleUrl('ws://192.168.1.5:8765')).toBe('ws://192.168.1.5:8765?role=browser')
+    expect(browserRoleUrl('ws://h:8765/?role=browser')).toBe('ws://h:8765/?role=browser')
+    expect(browserRoleUrl('ws://h:8765/?x=1')).toBe('ws://h:8765/?x=1&role=browser')
+  })
+
+  it('speed presets render and persist the choice', () => {
+    localStorage.removeItem('cyberag' + 'ent.speedPreset')
+    renderAt()
+    fireEvent.click(screen.getByText('🐢 Slow'))
+    expect(localStorage.getItem('cyberag' + 'ent.speedPreset')).toBe('slow')
+    fireEvent.click(screen.getByText('🐇 Turbo'))
+    expect(localStorage.getItem('cyberag' + 'ent.speedPreset')).toBe('turbo')
+    localStorage.removeItem('cyberag' + 'ent.speedPreset')
   })
 
   it('shows bridge command hint for hardware platforms', () => {
