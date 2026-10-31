@@ -22,6 +22,7 @@ import {
   forgetBridge,
   type BridgeInfo,
 } from '@/engine/bridge-discovery'
+import { getTuningFor, resolveEmbodimentConfig } from '@/engine/drive-tuning'
 import type { RunnerSnapshot } from '@/engine'
 import type { AdapterCommand, Emotion } from '@/engine/types'
 import type {
@@ -261,7 +262,10 @@ export function ConnectPage() {
           })
       const tee = new CommandTee(inner)
       const preset = SPEED_PRESETS.find((p) => p.id === speedPreset) ?? SPEED_PRESETS[1]!
-      const emb = new EmbodimentAdapter(tee, { maxSpeed: preset.maxSpeed })
+      // M4: per-robot drive tuning shipped/imported with the character.
+      // The speed preset stays a hard cap on top of it.
+      const tuning = getTuningFor(character.id, platform.id)
+      const emb = new EmbodimentAdapter(tee, resolveEmbodimentConfig(preset.maxSpeed, tuning))
 
       await emb.connect()
       tee.onTelemetry(setTelemetry)

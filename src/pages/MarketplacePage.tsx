@@ -65,7 +65,7 @@ export function MarketplacePage() {
   const [publishedBundles, setPublishedBundles] = useState<StoredBundle[]>([])
   const [importModalOpen, setImportModalOpen] = useState(false)
   const [importJson, setImportJson] = useState('')
-  const [importResult, setImportResult] = useState<{ ok: boolean; error?: string; verified?: boolean } | null>(null)
+  const [importResult, setImportResult] = useState<{ ok: boolean; error?: string; verified?: boolean; tunings?: number } | null>(null)
   const [verifyingId, setVerifyingId] = useState<string | null>(null)
 
   const loadBundles = useCallback(async () => {
@@ -102,7 +102,7 @@ export function MarketplacePage() {
     if (result.error) {
       setImportResult({ ok: false, error: result.error })
     } else {
-      setImportResult({ ok: true, verified: result.verified })
+      setImportResult({ ok: true, verified: result.verified, tunings: result.appliedTunings ?? 0 })
       await loadBundles()
       setImportJson('')
       setImportModalOpen(false)
@@ -118,7 +118,7 @@ export function MarketplacePage() {
     if (result.error) {
       setImportResult({ ok: false, error: result.error })
     } else {
-      setImportResult({ ok: true, verified: result.verified })
+      setImportResult({ ok: true, verified: result.verified, tunings: result.appliedTunings ?? 0 })
       await loadBundles()
       setImportModalOpen(false)
     }
@@ -458,7 +458,10 @@ export function MarketplacePage() {
                 {importResult.ok ? (
                   <>
                     <ShieldCheck size={16} />
-                    <span>{importResult.verified ? 'Bundle verified and imported!' : 'Bundle imported (signature check skipped)'}</span>
+                    <span>
+                  {importResult.verified ? 'Bundle verified and imported!' : 'Bundle imported (signature check skipped)'}
+                  {!!importResult.tunings && ` · ${importResult.tunings} drive tuning(s) applied`}
+                </span>
                   </>
                 ) : (
                   <>

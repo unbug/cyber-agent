@@ -36,12 +36,47 @@ export interface CharacterBundleMetadata {
   tags?: string[]
 }
 
+export type BundleSchema = 'cyberagent/character-bundle/v1' | 'cyberagent/character-bundle/v2'
+
+/** Per-robot-platform drive gains shipped with the character (v2). */
+export type BundleDriveTuning = Record<string, {
+  maxSpeed?: number
+  maxSteer?: number
+  speedRefPx?: number
+  yawRefDeg?: number
+}>
+
 export interface SignedCharacterBundle {
-  $schema: 'cyberagent/character-bundle/v1'
-  version: '1'
+  $schema: BundleSchema
+  version: '1' | '2'
   character: Record<string, unknown>
+  /** v2 only: platformId → embodied drive gains */
+  driveTuning?: BundleDriveTuning
   signature: CharacterSignature
   metadata: CharacterBundleMetadata
+}
+
+/** Recursive key-sorted JSON — deterministic across writers/loaders. */
+export function canonicalStringify(value: unknown): string {
+  if (value === null || typeof value !== 'object') return JSON.stringify(value) ?? 'null'
+  if (Array.isArray(value)) return `[${value.map(canonicalStringify).join(',')}]`
+  const entries = Object.keys(value as Record<string, unknown>)
+    .sort()
+    .map((k) => `${JSON.stringify(k)}:${canonicalStringify((value as Record<string, unknown>)[k])}`)
+  return `{${entries.join(',')}}`
+}
+
+/** The exact bytes that get signed/verified for a bundle payload. */
+function signatureInput(
+  schema: BundleSchema,
+  character: Record<string, unknown>,
+  driveTuning?: BundleDriveTuning,
+): string {
+  if (schema === 'cyberagent/character-bundle/v2') {
+    return canonicalStringify({ c: character, t: driveTuning ?? null })
+  }
+  // v1 legacy: shallow key sort over character only
+  return JSON.stringify(character, Object.keys(character).sort())
 }
 
 export interface UnpackedCharacterBundle {
@@ -102,13 +137,16 @@ async function getOrCreateKeyPair(): Promise<CryptoKeyPair> {
 export async function signCharacterBundle(
   character: Record<string, unknown>,
   metadata: CharacterBundleMetadata = {},
+  driveTuning?: BundleDriveTuning,
 ): Promise<SignedCharacterBundle> {
   const kp = await getOrCreateKeyPair()
 
-  // Deterministic signature input: stringify character, sort keys
-  const characterStr = JSON.stringify(character, Object.keys(character).sort())
+  const hasTuning = !!driveTuning && Object.keys(driveTuning).length > 0
+  const schema: BundleSchema = hasTuning
+    ? 'cyberagent/character-bundle/v2'
+    : 'cyberagent/character-bundle/v1'
   const encoder = new TextEncoder()
-  const data = encoder.encode(characterStr)
+  const data = encoder.encode(signatureInput(schema, character, driveTuning))
 
   const signature = await crypto.subtle.sign(
     { name: 'ECDSA', hash: 'SHA-256' },
@@ -119,9 +157,10 @@ export async function signCharacterBundle(
   const pubRaw = await crypto.subtle.exportKey('spki', kp.publicKey)
 
   return {
-    $schema: 'cyberagent/character-bundle/v1',
-    version: '1',
+    $schema: schema,
+    version: hasTuning ? '2' : '1',
     character,
+    ...(hasTuning ? { driveTuning } : {}),
     signature: {
       algorithm: 'ES256',
       publicKey: btoa(String.fromCharCode(...new Uint8Array(pubRaw))),
@@ -137,7 +176,7 @@ export async function signCharacterBundle(
 /** Verify a signed character bundle */
 export async function verifyBundle(bundle: SignedCharacterBundle): Promise<boolean> {
   try {
-    const { signature, character } = bundle
+    const { signature, character, driveTuning, $schema } = bundle
     if (signature.algorithm !== 'ES256') return false
 
     const pubRaw = Uint8Array.from(atob(signature.publicKey), c => c.charCodeAt(0))
@@ -148,8 +187,7 @@ export async function verifyBundle(bundle: SignedCharacterBundle): Promise<boole
       true, ['verify'],
     )
 
-    const characterStr = JSON.stringify(character, Object.keys(character).sort())
-    const data = new TextEncoder().encode(characterStr)
+    const data = new TextEncoder().encode(signatureInput($schema, character, driveTuning))
 
     return await crypto.subtle.verify(
       { name: 'ECDSA', hash: 'SHA-256' },
@@ -179,7 +217,10 @@ export function downloadBundle(bundle: SignedCharacterBundle, filename?: string)
 export function parseBundle(json: string): { bundle: SignedCharacterBundle; error?: string } {
   try {
     const data = JSON.parse(json)
-    if (data.$schema !== 'cyberagent/character-bundle/v1') {
+    if (
+      data.$schema !== 'cyberagent/character-bundle/v1' &&
+      data.$schema !== 'cyberagent/character-bundle/v2'
+    ) {
       return { bundle: data as unknown as SignedCharacterBundle, error: 'Unknown schema version' }
     }
     if (!data.version || !data.character || !data.signature) {

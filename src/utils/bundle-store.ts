@@ -132,6 +132,7 @@ export async function reverifyBundle(id: string): Promise<boolean> {
 export async function importBundle(json: string): Promise<{
   bundle: StoredBundle
   verified: boolean
+  appliedTunings?: number
   error?: string
 }> {
   const { parseBundle, verifyBundle } = await import('./character-bundle')
@@ -140,10 +141,21 @@ export async function importBundle(json: string): Promise<{
 
   const verified = await verifyBundle(parsed.bundle)
 
+  // M4: an imported bundle can carry per-robot drive tunings. Apply them
+  // only when the signature actually covers them (v2 bundles).
+  let appliedTunings = 0
+  const raw = parsed.bundle as unknown as Record<string, unknown>
+  const charId = (parsed.bundle.character?.id as string) || ''
+  if (verified && parsed.bundle.driveTuning && charId) {
+    const { applyImportedTunings } = await import('@/engine/drive-tuning')
+    appliedTunings = applyImportedTunings(charId, raw.driveTuning)
+  }
+
   const stored = await publishBundle(parsed.bundle as unknown as Record<string, unknown>)
   return {
     bundle: { ...stored, verified, lastVerifiedAt: new Date().toISOString() },
     verified,
+    appliedTunings,
   }
 }
 
