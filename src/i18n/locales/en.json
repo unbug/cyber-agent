@@ -6,7 +6,8 @@
     "challenge": "Challenge",
     "marketplace": "Marketplace",
     "debug": "Debugger",
-    "connect": "Connect"
+    "connect": "Connect",
+    "room": "Room"
   },
   "home": {
     "hero_title": "AI Characters for Physical Robots",
@@ -209,5 +210,19 @@
     "speed_slow": "Slow",
     "speed_normal": "Normal",
     "speed_turbo": "Turbo"
+  },
+  "room": {
+    "title": "Multi-Robot Room",
+    "subtitle": "Several characters, one shared world, their own robots",
+    "character": "Character",
+    "demo": "Demo",
+    "bridge": "Robot bridge",
+    "add": "Add member",
+    "start": "Start room",
+    "stop": "Pause room",
+    "estop": "E-STOP ALL",
+    "idle": "paused",
+    "empty": "Add at least one member — mix demo and real robots.",
+    "hint": "Members share a world: they can see each other and exchange signals. Each robot keeps its own E-STOP via the bridge failsafe."
   }
 }

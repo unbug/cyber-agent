@@ -23,15 +23,10 @@ import {
   type BridgeInfo,
 } from '@/engine/bridge-discovery'
 import { getTuningFor, resolveEmbodimentConfig } from '@/engine/drive-tuning'
+import { CommandTee } from '@/engine/command-tee'
 import type { RunnerSnapshot } from '@/engine'
 import type { AdapterCommand, Emotion } from '@/engine/types'
-import type {
-  RobotAdapterV2,
-  RobotCapabilitiesV2,
-  SelfTestReport,
-  TelemetryEvent,
-} from '@cyber-agent/sdk/adapter/contract'
-import type { Blackboard } from '@/engine/types'
+import type { RobotAdapterV2, TelemetryEvent } from '@cyber-agent/sdk/adapter/contract'
 import { useI18n } from '@/i18n'
 import styles from './Connect.module.css'
 
@@ -93,54 +88,12 @@ const EMOTION_EMOJI: Record<Emotion, string> = {
 
 // ─── Command tee (visibility without touching adapters) ──────────
 
-class CommandTee implements RobotAdapterV2 {
-  readonly type: string
-  readonly name: string
-  readonly contractVersion = 'v2' as const
-  readonly log: AdapterCommand[] = []
-
-  constructor(private inner: RobotAdapterV2) {
-    this.type = inner.type
-    this.name = inner.name
-  }
-
-  init(bb: Blackboard): void {
-    this.inner.init(bb)
-  }
-  update(bb: Blackboard): void {
-    this.inner.update(bb)
-  }
-  destroy(): void {
-    this.inner.destroy()
-  }
-  sendCommand(c: AdapterCommand): void {
-    this.log.push({ ...c, payload: { ...c.payload } })
-    if (this.log.length > 200) this.log.splice(0, this.log.length - 200)
-    this.inner.sendCommand(c)
-  }
-  capabilities(): RobotCapabilitiesV2 {
-    return this.inner.capabilities()
-  }
-  connect(): Promise<void> {
-    return this.inner.connect()
-  }
-  disconnect(): Promise<void> {
-    return this.inner.disconnect()
-  }
-  onTelemetry(cb: (e: TelemetryEvent) => void): () => void {
-    return this.inner.onTelemetry(cb)
-  }
-  selfTest(): SelfTestReport {
-    return this.inner.selfTest()
-  }
-}
+// ─── Page ─────────────────────────────────────────────────────────
 
 /** Mark our session so bridge child-lock (phone remotes) exempts the web app. */
 export function browserRoleUrl(url: string): string {
   return url.includes('role=') ? url : url + (url.includes('?') ? '&' : '?') + 'role=browser'
 }
-
-// ─── Page ─────────────────────────────────────────────────────────
 
 type Phase = 'idle' | 'deploying' | 'deployed' | 'error'
 

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useOutlet, Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Bot, BookOpen, Grid3X3, ShoppingBag, Github, Sun, Moon, Monitor, Plug } from 'lucide-react'
+import { Bot, BookOpen, Grid3X3, ShoppingBag, Github, Sun, Moon, Monitor, Plug, Users } from 'lucide-react'
 import { useTheme, type Theme } from '@/hooks/useTheme'
 import { useI18n } from '@/i18n'
 import { LanguageToggle } from './LanguageToggle'
@@ -18,6 +18,7 @@ const NAV_ITEMS = [
   { path: '/', label: 'nav.home', icon: Bot },
   { path: '/gallery', label: 'nav.gallery', icon: Grid3X3 },
   { path: '/connect', label: 'nav.connect', icon: Plug },
+  { path: '/room', label: 'nav.room', icon: Users },
   { path: '/marketplace', label: 'nav.marketplace', icon: ShoppingBag },
   { path: '/docs', label: 'nav.docs', icon: BookOpen },
 ]

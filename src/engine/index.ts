@@ -82,3 +82,6 @@ export type {
   TiledMap,
   ImportOptions,
 } from './scenes'
+
+export { RoomSession } from './room'
+export type { RoomMemberOptions, RoomSnapshot, RoomMemberSnapshot, RoomTransport } from './room'

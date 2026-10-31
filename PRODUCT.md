@@ -253,8 +253,14 @@ no networking knowledge, and turned the phone into a first-class controller:
   import applies tunings only when the signature covers them; the /connect
   speed preset stays a hard cap over any imported tuning; hostile imports
   clamped to safe physical ranges.
-- **M5 Multi-robot rooms** — two characters, two robots, one page; simple
-  social events between them (already have the BT social layer).
+- **M5 ✅ (2026-10-31) Multi-robot rooms (first cut)** — `RoomSession`
+  (engine, transport-injected, 6 tests) + `/room` page: several characters
+  share one virtual World (bb.world attached so isCloseTo/emitSignal social
+  primitives work across them) while each member is embodied on its own
+  robot bridge or a demo loopback. Per-member link status, live commands,
+  remove-with-stop, room-wide E-STOP, deep links `?a=puppy&b=cat`.
+  CommandTee extracted to `engine/command-tee.ts` (shared by /connect).
+  Next for M5: per-room speed presets and friend-joinable rooms.
 - **M6 Zero-install bridge** — one-command installer (`curl … | sh`) + auto
   launch on laptop lid-open; mDNS registration so future browsers with
   WebLL/mDNS-DNS get true auto-discovery.

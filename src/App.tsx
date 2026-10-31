@@ -9,6 +9,7 @@ import { MarketplacePage } from './pages/MarketplacePage'
 import { DebugPage } from './pages/DebugPage'
 import { PlaygroundPage } from './pages/PlaygroundPage'
 import { ConnectPage } from './pages/Connect'
+import { RoomPage } from './pages/Room'
 import CharacterEditor from './pages/CharacterEditor'
 import BTGraphEditor from './pages/BTGraphEditor'
 import { useState } from 'react'
@@ -31,6 +32,7 @@ export function App() {
         <Route path="/editor" element={<BTGraphEditorPage />} />
         <Route path="/playground" element={<PlaygroundPage />} />
         <Route path="/connect" element={<ConnectPage />} />
+        <Route path="/room" element={<RoomPage />} />
       </Route>
     </Routes>
   )

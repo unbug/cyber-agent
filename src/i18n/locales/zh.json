@@ -6,7 +6,8 @@
     "challenge": "挑战",
     "marketplace": "角色市场",
     "debug": "调试器",
-    "connect": "连接机器人"
+    "connect": "连接机器人",
+    "room": "机器人房间"
   },
   "home": {
     "hero_title": "为真实机器人打造的 AI 角色",
@@ -209,5 +210,19 @@
     "speed_slow": "慢速",
     "speed_normal": "标准",
     "speed_turbo": "疾速"
+  },
+  "room": {
+    "title": "多机器人房间",
+    "subtitle": "多个角色共享一个世界，各自驱动自己的机器人",
+    "character": "角色",
+    "demo": "演示",
+    "bridge": "机器人桥",
+    "add": "添加成员",
+    "start": "开房",
+    "stop": "暂停",
+    "estop": "全员急停",
+    "idle": "已暂停",
+    "empty": "先添加至少一个成员——演示和真机可以混搭。",
+    "hint": "成员共享同一个世界：能互相看见、互发信号。每台机器人都有桥端超时急停兜底。"
   }
 }
