@@ -246,9 +246,13 @@ no networking knowledge, and turned the phone into a first-class controller:
   motors command regardless of client), child-lock PIN on the phone remote
   (web app exempt via `?role=browser`). Capability gating stays on the list
   for M5 (needs multi-robot capability model).
-- **M4 Character portability** — export/import a character + its embodied
-  tuning (drive-gain presets per robot model) in one bundle; "works the same
-  on my friend's Mini T".
+- **M4 ✅ (2026-10-31) Character portability** — `drive-tuning.ts`: per
+  (character, robot-platform) embodied gains (maxSpeed/maxSteer/speedRefPx/
+  yawRefDeg), signed inside bundles via the new `character-bundle/v2` schema
+  (tamper → verify fails; canonical JSON so key order never breaks sigs);
+  import applies tunings only when the signature covers them; the /connect
+  speed preset stays a hard cap over any imported tuning; hostile imports
+  clamped to safe physical ranges.
 - **M5 Multi-robot rooms** — two characters, two robots, one page; simple
   social events between them (already have the BT social layer).
 - **M6 Zero-install bridge** — one-command installer (`curl … | sh`) + auto
