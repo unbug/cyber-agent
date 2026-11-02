@@ -261,9 +261,14 @@ no networking knowledge, and turned the phone into a first-class controller:
   remove-with-stop, room-wide E-STOP, deep links `?a=puppy&b=cat`.
   CommandTee extracted to `engine/command-tee.ts` (shared by /connect).
   Next for M5: per-room speed presets and friend-joinable rooms.
-- **M6 Zero-install bridge** — one-command installer (`curl … | sh`) + auto
-  launch on laptop lid-open; mDNS registration so future browsers with
-  WebLL/mDNS-DNS get true auto-discovery.
+- **M6 ✅ (first cut, 2026-10-31→11-02) Zero-install bridge** —
+  `bridge/install.sh` (venv + deps + repo clone + dialout hint, idempotent,
+  curl-able); `bridge/selftest.sh` diagnoses the whole chain read-only
+  (python, deps across venvs, serial device incl. charge-only-cable hint,
+  permissions incl. usermod fix, network incl. broken-trust-store fallback,
+  bridge syntax); serial port auto-detection (`--serial-port auto` default,
+  /dev/serial/by-id preferred); optional mDNS registration via zeroconf
+  (_websocket._tcp.local., silently skipped without the dep).
 - **M7 (12-month) Beta community loop** — 10 external users pairing their own
   robots unassisted; funnel telemetry (anonymous) on where the 5 minutes goes.
 
