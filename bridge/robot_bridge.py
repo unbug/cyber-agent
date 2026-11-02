@@ -250,6 +250,31 @@ class RoboMasterRobot:
 HELLO_INFO = {}  # filled in main(): {"ws_port", "remote_url"}
 
 
+def start_mdns(platform, port):
+    """Best-effort mDNS registration (_cyberagent-<platform>._ws.local).
+    Silently skipped when zeroconf isn't installed — the bridge must work
+    with the two documented deps only."""
+    try:
+        from zeroconf import Zeroconf, ServiceInfo
+    except ImportError:
+        return None
+    try:
+        info = ServiceInfo(
+            "_websocket._tcp.local.",
+            f"cyberagent-{platform}._websocket._tcp.local.",
+            addresses=[socket.inet_aton(lan_ip())],
+            port=port,
+            properties={"platform": platform, "app": "cyberagent"},
+        )
+        zc = Zeroconf()
+        zc.register_service(info)
+        print(f"[bridge] mDNS: cyberagent-{platform}._websocket._tcp.local.")
+        return zc
+    except Exception as e:
+        print(f"[bridge] mDNS registration skipped: {e}")
+        return None
+
+
 def lan_ip():
     """Best-effort LAN IP of this machine (no traffic actually sent)."""
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -302,9 +327,31 @@ def start_remote_http(html_path, host, http_port, ws_port, robot_name):
 # ─── Bridge server ────────────────────────────────────────────────
 
 
+def detect_serial_port():
+    """Plug-and-play: find the robot's USB-serial device without typing."""
+    import glob
+    for pat in ("/dev/serial/by-id/*ch34*", "/dev/serial/by-id/*USB*UART*",
+                "/dev/serial/by-id/*", "/dev/ttyUSB0", "/dev/ttyUSB*", "/dev/ttyACM*"):
+        hits = sorted(glob.glob(pat))
+        if hits:
+            return hits[0]
+    return None
+
+
 def make_robot(platform, args):
     if platform == "cyberbrick":
-        return CyberBrickRobot(port=args.serial_port)
+        port = args.serial_port
+        if port in (None, "auto"):
+            port = detect_serial_port()
+            if port:
+                print(f"[bridge] auto-detected serial port: {port}")
+            else:
+                hint = ("no USB-serial device found. Check: (1) data cable, not "
+                        "charge-only; (2) plugged into THIS machine; "
+                        "(3) permissions — run: sudo usermod -aG dialout $USER "
+                        "then log out & in")
+                sys.exit(f"[bridge] {hint}")
+        return CyberBrickRobot(port=port)
     if platform == "robomaster":
         return RoboMasterRobot()
     return DummyRobot()
@@ -490,6 +537,8 @@ async def main():
             state["last_rx"] = 0.0
             tel_task.cancel()
 
+    mdns = start_mdns(args.platform, port)
+
     try:
         async with websockets.serve(handler, args.host, port):
             print(f"[bridge] {robot.name} listening on ws://{args.host}:{port}")
@@ -502,6 +551,11 @@ async def main():
             finally:
                 fs_task.cancel()
     finally:
+        if mdns:
+            try:
+                mdns.unregister()
+            except Exception:
+                pass
         if remote_srv:
             remote_srv.shutdown()
         robot.close()

@@ -58,3 +58,15 @@
 .memberErr { margin-top: 8px; font-size: 11px; color: #ff4d5e; }
 .errorText { text-align: center; color: #ff4d5e; font-size: 13px; margin-bottom: 10px; }
 .hint { text-align: center; color: var(--text-secondary, #8b93a7); font-size: 12px; margin-top: 28px; }
+
+.scanBtn {
+  display: inline-flex; align-items: center; gap: 6px; padding: 9px 14px; border-radius: 10px;
+  border: 1px solid var(--border); background: transparent; color: inherit; font-size: 13px; cursor: pointer;
+}
+.scanBtn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.foundRow { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 12px; }
+.foundBtn {
+  display: inline-flex; align-items: center; gap: 8px; padding: 7px 12px; border-radius: 10px;
+  border: 1px solid var(--accent); background: rgba(91,140,255,.08); color: inherit; font-size: 13px; cursor: pointer;
+}
+.foundBtn code { font-size: 11px; opacity: .7; }

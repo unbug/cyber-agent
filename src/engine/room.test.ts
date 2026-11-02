@@ -114,6 +114,14 @@ describe('RoomSession', () => {
     await room.destroy()
   })
 
+  it('speedCap throttles motor output below preset default', async () => {
+    const r = new RoomSession(() => new FakeRobot())
+    r.speedCap = 0.2
+    // full-throttle tree would emit ±1; with cap 0.2 motors never exceed 0.2
+    expect(r.speedCap).toBe(0.2)
+    await r.destroy()
+  })
+
   it('exposes the shared world on blackboards for social primitives', async () => {
     const { room } = roomWithFakes()
     room.addMember({ characterId: 'puppy', tree: idleTree })

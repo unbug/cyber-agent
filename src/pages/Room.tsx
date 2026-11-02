@@ -12,9 +12,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Ban, Play, Square, Plus, X, Users } from 'lucide-react'
+import { Ban, Play, Square, Plus, X, Users, Radar } from 'lucide-react'
 import { characters, getCharacter, getBehavior } from '@/agents'
 import { RoomSession, type RoomSnapshot } from '@/engine'
+import { scanBridges, type BridgeInfo } from '@/engine/bridge-discovery'
+import { SPEED_PRESETS, SPEED_KEY, speedPresetCap } from '@/engine/drive-tuning'
 import type { Emotion } from '@/engine/types'
 import { useI18n } from '@/i18n'
 import styles from './Room.module.css'
@@ -38,13 +40,26 @@ export function RoomPage() {
   const [transport, setTransport] = useState<'demo' | 'bridge'>('demo')
   const [url, setUrl] = useState('ws://127.0.0.1:8765')
   const [addError, setAddError] = useState<string | null>(null)
+  const [preset, setPreset] = useState<string>(
+    () => localStorage.getItem(SPEED_KEY) || 'normal',
+  )
+  const [scanning, setScanning] = useState(false)
+  const [found, setFound] = useState<BridgeInfo[]>([])
 
   const getSession = useCallback((): RoomSession => {
     if (!sessionRef.current) {
       sessionRef.current = new RoomSession()
     }
+    sessionRef.current.speedCap = speedPresetCap(preset)
     return sessionRef.current
+  }, [preset])
+
+  const scan = useCallback(async () => {
+    setScanning(true)
+    setFound(await scanBridges([], 1200))
+    setScanning(false)
   }, [])
+
 
   const addMember = useCallback(
     (characterId: string, bridgeUrl?: string): void => {
@@ -154,6 +169,24 @@ export function RoomPage() {
           </button>
         </div>
         {addError && <div className={styles.errorText}>{addError}</div>}
+        {found.length > 0 && (
+          <div className={styles.foundRow}>
+            {found.map((f) => (
+              <button
+                key={f.url}
+                type="button"
+                className={styles.foundBtn}
+                onClick={() => {
+                  setTransport('bridge')
+                  setUrl(f.url)
+                  setFound([])
+                }}
+              >
+                🤖 {f.name} <code>{f.url}</code>
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Room controls */}
         <div className={styles.roomBar}>
@@ -177,6 +210,27 @@ export function RoomPage() {
             onClick={() => sessionRef.current?.estopAll()}
           >
             <Ban size={18} /> {t('room.estop')}
+          </button>
+          <div className={styles.seg} role="radiogroup" aria-label={t('connect.speed_label')}>
+            {SPEED_PRESETS.map((p) => (
+              <button
+                key={p.id}
+                type="button"
+                role="radio"
+                aria-checked={preset === p.id}
+                className={`${styles.segBtn} ${preset === p.id ? styles.segActive : ''}`}
+                onClick={() => {
+                  setPreset(p.id)
+                  try { localStorage.setItem(SPEED_KEY, p.id) } catch { /* ignore */ }
+                  if (sessionRef.current) sessionRef.current.speedCap = speedPresetCap(p.id)
+                }}
+              >
+                {p.emoji}
+              </button>
+            ))}
+          </div>
+          <button type="button" className={styles.scanBtn} onClick={() => void scan()} disabled={scanning}>
+            <Radar size={14} /> {scanning ? t('connect.scanning') : t('connect.scan')}
           </button>
           {snap && (
             <span className={styles.tps}>

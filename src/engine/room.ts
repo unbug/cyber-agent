@@ -81,6 +81,9 @@ export class RoomSession {
   private lastTps = 0
   private destroyed = false
 
+  /** Forward-speed cap applied to every member (from a SPEED_PRESET). */
+  speedCap = 0.5
+
   constructor(private transport: RoomTransport = (url) =>
     new WebSocketAdapter({ url, autoConnect: false }),
   ) {
@@ -120,7 +123,7 @@ export class RoomSession {
     const platformKey = opts.url ? 'ws' : 'demo'
     const emb = new EmbodimentAdapter(
       tee,
-      resolveEmbodimentConfig(0.5, getTuningFor(opts.characterId, platformKey)),
+      resolveEmbodimentConfig(this.speedCap, getTuningFor(opts.characterId, platformKey)),
     )
 
     const member: Member = {

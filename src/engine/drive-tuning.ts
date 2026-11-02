@@ -23,7 +23,21 @@ export interface DriveTuning {
 
 export type TuningMap = Record<string, DriveTuning>
 
-const STORE_KEY = '***' + 'ent.driveTuning'
+const STORE_KEY = 'cyber' + 'agent.driveTuning'
+
+/** Safety speed presets shared by /connect and /room (M3). */
+export const SPEED_KEY = 'cyber' + 'agent.speedPreset'
+export const SPEED_PRESETS = [
+  { id: 'slow', cap: 0.25, emoji: '🐢' },
+  { id: 'normal', cap: 0.5, emoji: '🚶' },
+  { id: 'turbo', cap: 0.9, emoji: '🐇' },
+] as const
+
+export type SpeedPresetId = (typeof SPEED_PRESETS)[number]['id']
+
+export function speedPresetCap(id: string | null | undefined): number {
+  return SPEED_PRESETS.find((p) => p.id === id)?.cap ?? 0.5
+}
 
 const RANGES: Record<keyof DriveTuning, [number, number]> = {
   maxSpeed: [0.05, 1],
