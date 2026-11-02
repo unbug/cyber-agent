@@ -49,7 +49,9 @@
     "open_editor": "打开编辑器",
     "read_docs": "阅读文档",
     "how_result": "无需硬件编程，只需定义角色个性。",
-    "hero_cta_connect": "连接你的机器人"
+    "hero_cta_connect": "连接你的机器人",
+    "hero_cta_try": "立即体验 — 不需要机器人",
+    "hero_cta_room": "多机器人房间"
   },
   "gallery": {
     "title": "角色图鉴",

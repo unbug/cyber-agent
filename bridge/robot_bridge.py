@@ -357,7 +357,7 @@ def make_robot(platform, args):
     return DummyRobot()
 
 
-def handle_command(robot, raw, max_speed=1.0):
+def handle_command(robot, raw, max_speed=1.0, allow_fire=False):
     try:
         msg = json.loads(raw)
     except (json.JSONDecodeError, TypeError):
@@ -374,7 +374,7 @@ def handle_command(robot, raw, max_speed=1.0):
     elif ctype == "sound":
         robot.sound(float(p.get("frequency", 440)), float(p.get("duration", 200)))
     elif ctype == "fire":
-        if hasattr(robot, "fire"):
+        if allow_fire and hasattr(robot, "fire"):
             robot.fire()
     elif ctype == "turret":
         if hasattr(robot, "turret"):
@@ -398,7 +398,7 @@ def is_browser_role(ws):
             return False
 
 
-async def session(websockets_like, robot, path=None, remote_pin=None, max_speed=1.0):
+async def session(websockets_like, robot, path=None, remote_pin=None, max_speed=1.0, allow_fire=False):
     ws = websockets_like
     peer = getattr(getattr(ws, "remote_address", None), "__str__", lambda: "?")()
     print(f"[bridge] browser connected: {peer}")
@@ -419,6 +419,7 @@ async def session(websockets_like, robot, path=None, remote_pin=None, max_speed=
                 "remote_url": HELLO_INFO.get("remote_url"),
                 "max_speed": HELLO_INFO.get("max_speed", 1.0),
                 "remote_lock": HELLO_INFO.get("remote_lock", False),
+                "allow_fire": bool(allow_fire),
             },
         }))
         if locked:
@@ -438,7 +439,8 @@ async def session(websockets_like, robot, path=None, remote_pin=None, max_speed=
                 elif m.get("type") == "stop":
                     await asyncio.to_thread(robot.stop)
                 continue
-            handled = await asyncio.to_thread(handle_command, robot, raw, max_speed)
+            handled = await asyncio.to_thread(
+                handle_command, robot, raw, max_speed, args.allow_fire)
             if not handled:
                 pass
         # normal close
@@ -484,6 +486,8 @@ async def main():
     ap.add_argument("--host", default="127.0.0.1",
                     help="use LAN IP or 0.0.0.0 to reach the site from another device")
     ap.add_argument("--serial-port", default=None, help="cyberbrick serial device")
+    ap.add_argument("--allow-fire", action="store_true",
+                    help="allow IR/gunfire commands (default OFF for safety)")
     ap.add_argument("--max-speed", type=float, default=1.0,
                     help="hard cap 0..1 applied to every motors command")
     ap.add_argument("--remote-pin", default=None,
@@ -532,7 +536,8 @@ async def main():
         state["last_rx"] = time.time()
         tel_task = asyncio.create_task(telemetry_loop(ws, robot))
         try:
-            await session(ws, robot, remote_pin=args.remote_pin, max_speed=max_speed)
+            await session(ws, robot, remote_pin=args.remote_pin, max_speed=max_speed,
+                          allow_fire=args.allow_fire)
         finally:
             state["last_rx"] = 0.0
             tel_task.cancel()

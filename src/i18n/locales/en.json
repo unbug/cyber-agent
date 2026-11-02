@@ -49,7 +49,9 @@
     "open_editor": "Open Editor",
     "read_docs": "Read Docs",
     "how_result": "No hardware coding. Just define the personality.",
-    "hero_cta_connect": "Connect your robot"
+    "hero_cta_connect": "Connect your robot",
+    "hero_cta_try": "Try it now — no robot needed",
+    "hero_cta_room": "Multi-Robot Room"
   },
   "gallery": {
     "title": "Agent Gallery",

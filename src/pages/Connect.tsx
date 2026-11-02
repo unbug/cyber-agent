@@ -257,6 +257,16 @@ export function ConnectPage() {
     setRecent(getRecentBridges())
   }, [])
 
+  // Magic moment: /connect?character=puppy&start=demo deploys instantly.
+  const autoStarted = useRef(false)
+  useEffect(() => {
+    if (autoStarted.current) return
+    if (params.get('start') === 'demo' && character && phase === 'idle') {
+      autoStarted.current = true
+      void deploy()
+    }
+  }, [character, deploy, params, phase])
+
   const estop = useCallback(() => {
     hardStop()
     runnerRef.current?.stop()

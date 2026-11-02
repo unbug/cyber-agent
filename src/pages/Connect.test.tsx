@@ -68,6 +68,13 @@ describe('ConnectPage', () => {
     )
   })
 
+  it('auto-deploys the demo robot with ?start=demo (the magic moment)', async () => {
+    renderAt('/connect?character=puppy&start=demo')
+    // no clicks — the page must deploy by itself and show the live view
+    await screen.findByText('EMERGENCY STOP', {}, { timeout: 4000 })
+    expect(screen.queryByText(/motors/)).toBeTruthy()
+  })
+
   it('shows scan + recent controls for hardware platforms', () => {
     localStorage.setItem(
       'cyberagent.recentBridges',
