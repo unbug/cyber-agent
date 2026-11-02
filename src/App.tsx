@@ -1,22 +1,34 @@
 import { Routes, Route } from 'react-router-dom'
+import { lazy, Suspense } from 'react'
 import { Layout } from './components/Layout'
 import { HomePage } from './pages/Home'
-import { GalleryPage } from './pages/Gallery'
-import { AgentPage } from './pages/Agent'
-import { DocsPage } from './pages/Docs'
-import { ChallengePage } from './pages/ChallengePage'
-import { MarketplacePage } from './pages/MarketplacePage'
-import { DebugPage } from './pages/DebugPage'
-import { PlaygroundPage } from './pages/PlaygroundPage'
-import { ConnectPage } from './pages/Connect'
-import { RoomPage } from './pages/Room'
-import CharacterEditor from './pages/CharacterEditor'
-import BTGraphEditor from './pages/BTGraphEditor'
 import { useState } from 'react'
 import type { BTEditionNode } from './engine/types'
 
+// Route-level code splitting — first paint loads only Home + shared shell.
+const GalleryPage = lazy(() => import('./pages/Gallery').then((m) => ({ default: m.GalleryPage })))
+const AgentPage = lazy(() => import('./pages/Agent').then((m) => ({ default: m.AgentPage })))
+const DocsPage = lazy(() => import('./pages/Docs').then((m) => ({ default: m.DocsPage })))
+const ChallengePage = lazy(() => import('./pages/ChallengePage').then((m) => ({ default: m.ChallengePage })))
+const MarketplacePage = lazy(() => import('./pages/MarketplacePage').then((m) => ({ default: m.MarketplacePage })))
+const DebugPage = lazy(() => import('./pages/DebugPage').then((m) => ({ default: m.DebugPage })))
+const PlaygroundPage = lazy(() => import('./pages/PlaygroundPage').then((m) => ({ default: m.PlaygroundPage })))
+const ConnectPage = lazy(() => import('./pages/Connect').then((m) => ({ default: m.ConnectPage })))
+const RoomPage = lazy(() => import('./pages/Room').then((m) => ({ default: m.RoomPage })))
+const CharacterEditor = lazy(() => import('./pages/CharacterEditor'))
+const BTGraphEditor = lazy(() => import('./pages/BTGraphEditor'))
+
+function PageFallback() {
+  return (
+    <div style={{ minHeight: '50vh', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.6 }}>
+      …
+    </div>
+  )
+}
+
 export function App() {
   return (
+    <Suspense fallback={<PageFallback />}>
     <Routes>
       <Route element={<Layout />} >
         <Route path="/" element={<HomePage />} />
@@ -35,6 +47,7 @@ export function App() {
         <Route path="/room" element={<RoomPage />} />
       </Route>
     </Routes>
+    </Suspense>
   )
 }
 

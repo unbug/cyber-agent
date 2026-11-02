@@ -250,6 +250,18 @@ class RoboMasterRobot:
 HELLO_INFO = {}  # filled in main(): {"ws_port", "remote_url"}
 
 
+def print_qr(url):
+    """Terminal QR so a phone can scan the remote URL — optional dep."""
+    try:
+        import qrcode
+        qr = qrcode.QRCode(border=1)
+        qr.add_data(url)
+        qr.make(fit=True)
+        qr.print_ascii(invert=True)
+    except Exception:
+        pass  # URL already printed above; QR is a nicety
+
+
 def start_mdns(platform, port):
     """Best-effort mDNS registration (_cyberagent-<platform>._ws.local).
     Silently skipped when zeroconf isn't installed — the bridge must work
@@ -550,6 +562,7 @@ async def main():
             print("[bridge] open https://unbug.github.io/cyber-agent/connect in the browser")
             if remote_srv:
                 print(f"[bridge] 📱 phone remote: {HELLO_INFO.get('remote_url')}")
+                print_qr(HELLO_INFO.get("remote_url", ""))
             fs_task = asyncio.create_task(failsafe_loop(robot, state))
             try:
                 await asyncio.Future()  # serve until Ctrl-C
