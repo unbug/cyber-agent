@@ -211,7 +211,8 @@
     "speed_label": "Speed limit",
     "speed_slow": "Slow",
     "speed_normal": "Normal",
-    "speed_turbo": "Turbo"
+    "speed_turbo": "Turbo",
+    "scan_to_remote": "Scan to control from your phone"
   },
   "room": {
     "title": "Multi-Robot Room",
@@ -225,6 +226,8 @@
     "estop": "E-STOP ALL",
     "idle": "paused",
     "empty": "Add at least one member — mix demo and real robots.",
-    "hint": "Members share a world: they can see each other and exchange signals. Each robot keeps its own E-STOP via the bridge failsafe."
+    "hint": "Members share a world: they can see each other and exchange signals. Each robot keeps its own E-STOP via the bridge failsafe.",
+    "quick_friends": "Cat & Dog friends demo (2 members)",
+    "quick_puppy": "Add Puppy"
   }
 }

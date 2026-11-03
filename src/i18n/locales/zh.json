@@ -211,7 +211,8 @@
     "speed_label": "限速",
     "speed_slow": "慢速",
     "speed_normal": "标准",
-    "speed_turbo": "疾速"
+    "speed_turbo": "疾速",
+    "scan_to_remote": "手机扫码，秒变遥控器"
   },
   "room": {
     "title": "多机器人房间",
@@ -225,6 +226,8 @@
     "estop": "全员急停",
     "idle": "已暂停",
     "empty": "先添加至少一个成员——演示和真机可以混搭。",
-    "hint": "成员共享同一个世界：能互相看见、互发信号。每台机器人都有桥端超时急停兜底。"
+    "hint": "成员共享同一个世界：能互相看见、互发信号。每台机器人都有桥端超时急停兜底。",
+    "quick_friends": "猫狗朋友演示（两个成员）",
+    "quick_puppy": "添加 Puppy"
   }
 }

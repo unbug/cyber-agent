@@ -23,6 +23,7 @@ import {
   type BridgeInfo,
 } from '@/engine/bridge-discovery'
 import { getTuningFor, resolveEmbodimentConfig, SPEED_PRESETS, SPEED_KEY } from '@/engine/drive-tuning'
+import { qrSvg } from '@/engine/qr'
 import { CommandTee } from '@/engine/command-tee'
 import type { RunnerSnapshot } from '@/engine'
 import type { AdapterCommand, Emotion } from '@/engine/types'
@@ -88,6 +89,33 @@ const EMOTION_EMOJI: Record<Emotion, string> = {
 
 // ─── Command tee (visibility without touching adapters) ──────────
 
+/** Post-deploy desktop→phone handoff: scan the bridge's phone-remote URL. */
+export function RemoteQrPanel({ remoteUrl }: { remoteUrl?: string }) {
+  const { t } = useI18n()
+  if (!remoteUrl) return null
+  let svg = ''
+  try {
+    svg = qrSvg(remoteUrl, 4, 8)
+  } catch {
+    return null
+  }
+  return (
+    <div className={styles.qrPanel}>
+      <div
+        className={styles.qrBox}
+        // our own generated SVG string (engine/qr.ts) — no external content
+        dangerouslySetInnerHTML={{ __html: svg }}
+      />
+      <div className={styles.qrText}>
+        <div className={styles.qrTitle}>{t('connect.scan_to_remote')}</div>
+        <a href={remoteUrl} target="_blank" rel="noopener noreferrer" className={styles.qrLink}>
+          {remoteUrl}
+        </a>
+      </div>
+    </div>
+  )
+}
+
 // ─── Page ─────────────────────────────────────────────────────────
 
 /** Mark our session so bridge child-lock (phone remotes) exempts the web app. */
@@ -117,6 +145,7 @@ export function ConnectPage() {
   const [snapshot, setSnapshot] = useState<RunnerSnapshot | null>(null)
   const [commands, setCommands] = useState<AdapterCommand[]>([])
   const [telemetry, setTelemetry] = useState<TelemetryEvent | null>(null)
+  const [hello, setHello] = useState<Record<string, unknown> | null>(null)
   const [scanning, setScanning] = useState(false)
   const [found, setFound] = useState<BridgeInfo[]>([])
   const [noResults, setNoResults] = useState(false)
@@ -164,6 +193,7 @@ export function ConnectPage() {
     void tee?.disconnect().catch(() => undefined)
     setSnapshot(null)
     setCommands([])
+    setHello(null)
     setPhase('idle')
   }, [])
 
@@ -215,7 +245,10 @@ export function ConnectPage() {
       const emb = new EmbodimentAdapter(tee, resolveEmbodimentConfig(preset.cap, tuning))
 
       await emb.connect()
-      tee.onTelemetry(setTelemetry)
+      tee.onTelemetry((ev) => {
+        if (ev.type === 'hello') setHello((ev.payload ?? null) as Record<string, unknown> | null)
+        setTelemetry(ev)
+      })
       if (!platform.loopback) {
         rememberBridge({
           url: urlByPlatform[platform.id] || platform.url,
@@ -542,6 +575,8 @@ export function ConnectPage() {
                 ⚡ {telemetry.type} {JSON.stringify(telemetry.payload)}
               </div>
             )}
+
+            <RemoteQrPanel remoteUrl={typeof hello?.remote_url === 'string' ? hello.remote_url : undefined} />
 
             <button type="button" className={styles.estopBtn} onClick={estop}>
               <Ban size={20} />

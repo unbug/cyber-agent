@@ -241,7 +241,24 @@ export function RoomPage() {
 
         {/* Members */}
         {members.length === 0 ? (
-          <p className={styles.empty}>{t('room.empty')}</p>
+          <div className={styles.empty}>
+            <p>{t('room.empty')}</p>
+            <div className={styles.quickRow}>
+              <button
+                type="button"
+                className={styles.quickBtn}
+                onClick={() => {
+                  addMember('demo-cat')
+                  addMember('demo-dog')
+                }}
+              >
+                🐱🐶 {t('room.quick_friends')}
+              </button>
+              <button type="button" className={styles.quickBtn} onClick={() => addMember('puppy')}>
+                🐶 {t('room.quick_puppy')}
+              </button>
+            </div>
+          </div>
         ) : (
           <div className={styles.grid}>
             {members.map((m) => (

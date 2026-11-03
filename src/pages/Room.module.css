@@ -70,3 +70,9 @@
   border: 1px solid var(--accent); background: rgba(91,140,255,.08); color: inherit; font-size: 13px; cursor: pointer;
 }
 .foundBtn code { font-size: 11px; opacity: .7; }
+
+.quickRow { display: flex; gap: 10px; justify-content: center; margin-top: 16px; }
+.quickBtn {
+  padding: 10px 18px; border-radius: 12px; border: 1px solid var(--accent);
+  background: rgba(91,140,255,.1); color: var(--accent); font-size: 14px; font-weight: 600; cursor: pointer;
+}
