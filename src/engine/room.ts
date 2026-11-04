@@ -47,6 +47,8 @@ export interface RoomMemberSnapshot {
   emotion: Emotion
   link: RoomLinkState
   lastError?: string
+  /** Phone-remote URL advertised by the bridge hello (scan-to-remote). */
+  remoteUrl?: string
   recentCommands: AdapterCommand[]
 }
 
@@ -65,6 +67,7 @@ interface Member extends Omit<RoomMemberOptions, 'tree'> {
   emb: EmbodimentAdapter
   link: RoomLinkState
   lastError?: string
+  remoteUrl?: string
 }
 
 const TICK_MS = 40
@@ -136,6 +139,15 @@ export class RoomSession {
       link: opts.url ? 'connecting' : 'ok',
     }
     this.members.set(id, member)
+
+    // Capture bridge hello → per-member phone-handoff URL.
+    tee.onTelemetry((ev) => {
+      if (ev.type === 'hello') {
+        const p = ev.payload as Record<string, unknown> | undefined
+        const url = p?.remote_url
+        if (typeof url === 'string' && url) member.remoteUrl = url
+      }
+    })
 
     // Fire-and-forget: connect errors are surfaced in the snapshot; the
     // bridge-side failsafe protects the robot if a link drops mid-run.
@@ -230,6 +242,7 @@ export class RoomSession {
         emotion: m.worldAgent.blackboard.emotion,
         link: m.link,
         lastError: m.lastError,
+        remoteUrl: m.remoteUrl,
         recentCommands: m.tee.log.slice(-3).reverse(),
       })),
     }

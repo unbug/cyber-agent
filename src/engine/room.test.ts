@@ -24,8 +24,13 @@ class FakeRobot implements RobotAdapterV2 {
   disconnect() {
     return Promise.resolve()
   }
-  onTelemetry() {
-    return () => undefined
+  private tel: ((e: { type: string; payload: Record<string, unknown>; t: number }) => void) | null = null
+  onTelemetry(cb: (e: { type: string; payload: Record<string, unknown>; t: number }) => void) {
+    this.tel = cb
+    return () => { this.tel = null }
+  }
+  emitHello(remoteUrl: string) {
+    this.tel?.({ type: 'hello', payload: { remote_url: remoteUrl }, t: Date.now() })
   }
   selfTest() {
     return { status: 'healthy', checks: [] } as never
@@ -120,6 +125,16 @@ describe('RoomSession', () => {
     // full-throttle tree would emit ±1; with cap 0.2 motors never exceed 0.2
     expect(r.speedCap).toBe(0.2)
     await r.destroy()
+  })
+
+  it('captures hello.remote_url per member for scan-to-remote', async () => {
+    const { room, made } = roomWithFakes()
+    room.addMember({ characterId: 'puppy', tree: idleTree, url: 'ws://q:8765' })
+    await new Promise((r) => setTimeout(r, 5))
+    expect(room.snapshot().members[0]!.remoteUrl).toBeUndefined()
+    made[0]!.emitHello('http://192.168.1.9:9765/remote')
+    expect(room.snapshot().members[0]!.remoteUrl).toBe('http://192.168.1.9:9765/remote')
+    await room.destroy()
   })
 
   it('exposes the shared world on blackboards for social primitives', async () => {

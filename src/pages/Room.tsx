@@ -15,6 +15,7 @@ import { motion } from 'framer-motion'
 import { Ban, Play, Square, Plus, X, Users, Radar } from 'lucide-react'
 import { characters, getCharacter, getBehavior } from '@/agents'
 import { RoomSession, type RoomSnapshot } from '@/engine'
+import { RemoteQrPanel } from './Connect'
 import { scanBridges, type BridgeInfo } from '@/engine/bridge-discovery'
 import { SPEED_PRESETS, SPEED_KEY, speedPresetCap } from '@/engine/drive-tuning'
 import type { Emotion } from '@/engine/types'
@@ -301,6 +302,12 @@ export function RoomPage() {
                   )}
                 </div>
                 {m.lastError && <div className={styles.memberErr}>{m.lastError}</div>}
+                {m.remoteUrl && (
+                  <details className={styles.qrDetails}>
+                    <summary className={styles.qrSummary}>📱 {t('connect.scan_to_remote')}</summary>
+                    <RemoteQrPanel remoteUrl={m.remoteUrl} />
+                  </details>
+                )}
               </div>
             ))}
           </div>
