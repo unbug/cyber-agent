@@ -34,6 +34,6 @@ describe('RoomPage', () => {
     await waitFor(() => expect(screen.queryByText(/Copy room link/)).toBeTruthy())
     fireEvent.click(screen.getByText(/Copy room link/))
     await waitFor(() => expect(writeText).toHaveBeenCalled())
-    expect(writeText.mock.calls[0][0]).toContain('?a=puppy')
+    expect(writeText.mock.calls[0]?.[0]).toContain('?a=puppy')
   })
 })
