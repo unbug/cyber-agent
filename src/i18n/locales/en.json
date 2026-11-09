@@ -212,7 +212,11 @@
     "speed_slow": "Slow",
     "speed_normal": "Normal",
     "speed_turbo": "Turbo",
-    "scan_to_remote": "Scan to control from your phone"
+    "scan_to_remote": "Scan to control from your phone",
+    "coach_1": "Pick a character you like",
+    "coach_2": "Demo robot — or scan for your real one",
+    "coach_3": "Deploy. The big red button always wins.",
+    "coach_ok": "Got it"
   },
   "room": {
     "title": "Multi-Robot Room",
@@ -228,6 +232,8 @@
     "empty": "Add at least one member — mix demo and real robots.",
     "hint": "Members share a world: they can see each other and exchange signals. Each robot keeps its own E-STOP via the bridge failsafe.",
     "quick_friends": "Cat & Dog friends demo (2 members)",
-    "quick_puppy": "Add Puppy"
+    "quick_puppy": "Add Puppy",
+    "copied": "Copied!",
+    "copy_link": "Copy room link"
   }
 }

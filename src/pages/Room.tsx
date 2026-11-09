@@ -44,6 +44,7 @@ export function RoomPage() {
   const [preset, setPreset] = useState<string>(
     () => localStorage.getItem(SPEED_KEY) || 'normal',
   )
+  const [copied, setCopied] = useState(false)
   const [scanning, setScanning] = useState(false)
   const [found, setFound] = useState<BridgeInfo[]>([])
 
@@ -233,6 +234,25 @@ export function RoomPage() {
           <button type="button" className={styles.scanBtn} onClick={() => void scan()} disabled={scanning}>
             <Radar size={14} /> {scanning ? t('connect.scanning') : t('connect.scan')}
           </button>
+          {members.length > 0 && (
+            <button
+              type="button"
+              className={styles.scanBtn}
+              onClick={async () => {
+                const ids = members.slice(0, 2).map((m) => m.characterId)
+                const link = `${location.origin}${location.pathname}?a=${ids[0]}${ids[1] ? `&b=${ids[1]}` : ''}`
+                try {
+                  await navigator.clipboard.writeText(link)
+                  setCopied(true)
+                  setTimeout(() => setCopied(false), 1500)
+                } catch {
+                  window.prompt('Copy room link:', link)
+                }
+              }}
+            >
+              📋 {copied ? t('room.copied') : t('room.copy_link')}
+            </button>
+          )}
           {snap && (
             <span className={styles.tps}>
               {snap.running ? `${snap.tps} tps · ${snap.ticks} ticks` : t('room.idle')}

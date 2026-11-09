@@ -118,6 +118,9 @@ export function RemoteQrPanel({ remoteUrl }: { remoteUrl?: string }) {
 
 // ─── Page ─────────────────────────────────────────────────────────
 
+/** First-run coach strip: dismissed once, remembered forever. */
+export const COACH_KEY = '***' + 'agent.coachDismissed'
+
 /** Mark our session so bridge child-lock (phone remotes) exempts the web app. */
 export function browserRoleUrl(url: string): string {
   return url.includes('role=') ? url : url + (url.includes('?') ? '&' : '?') + 'role=browser'
@@ -291,6 +294,22 @@ export function ConnectPage() {
   }, [])
 
   // Magic moment: /connect?character=puppy&start=demo deploys instantly.
+  const [coachVisible, setCoachVisible] = useState(() => {
+    try {
+      return !localStorage.getItem(COACH_KEY)
+    } catch {
+      return false
+    }
+  })
+  const dismissCoach = useCallback(() => {
+    setCoachVisible(false)
+    try {
+      localStorage.setItem(COACH_KEY, '1')
+    } catch {
+      /* ignore */
+    }
+  }, [])
+
   const autoStarted = useRef(false)
   useEffect(() => {
     if (autoStarted.current) return
@@ -330,6 +349,17 @@ export function ConnectPage() {
           <h1 className={styles.title}>{t('connect.title')}</h1>
           <p className={styles.subtitle}>{t('connect.subtitle')}</p>
         </motion.div>
+
+        {coachVisible && phase === 'idle' && (
+          <div className={styles.coach}>
+            <span className={styles.coachItem}>🎭 {t('connect.coach_1')}</span>
+            <span className={styles.coachItem}>🤖 {t('connect.coach_2')}</span>
+            <span className={styles.coachItem}>🚀 {t('connect.coach_3')}</span>
+            <button type="button" className={styles.coachOk} onClick={dismissCoach}>
+              {t('connect.coach_ok')}
+            </button>
+          </div>
+        )}
 
         <div className={styles.steps}>
           <span className={chipClass(stepState(1))}>

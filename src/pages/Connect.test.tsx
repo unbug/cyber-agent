@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen, waitFor, fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { ConnectPage, browserRoleUrl } from './Connect'
+import { ConnectPage, browserRoleUrl, COACH_KEY } from './Connect'
 import { I18nProvider } from '@/i18n'
 
 function renderAt(path = '/connect') {
@@ -66,6 +66,19 @@ describe('ConnectPage', () => {
     await waitFor(() =>
       expect(screen.queryByText('EMERGENCY STOP')).toBeNull(),
     )
+  })
+
+  it('first-run coach strip shows once and dismissal sticks', () => {
+    localStorage.removeItem(COACH_KEY)
+    const { unmount } = renderAt()
+    const ok = screen.getByText('Got it')
+    fireEvent.click(ok)
+    expect(screen.queryByText('Got it')).toBeNull()
+    expect(localStorage.getItem(COACH_KEY)).toBe('1')
+    unmount()
+    renderAt()
+    expect(screen.queryByText('Got it')).toBeNull()
+    localStorage.removeItem(COACH_KEY)
   })
 
   it('auto-deploys the demo robot with ?start=demo (the magic moment)', async () => {
